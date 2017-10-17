@@ -95,6 +95,8 @@ global theWindow W H; % window property
 global white red orange yellow bgcolor; % color
 global window_rect lb rb tb bb scale_H anchor_y joy_speed; % rating scale
 global anchor_xl anchor_xr anchor_yu anchor_yd fontsize;
+global program
+
 
 %% Parse varargin
 post_stimulus_t = 5; % post-stimulus continuous rating seconds
@@ -141,8 +143,8 @@ for i = 1:length(varargin)
             case {'mouse', 'trackball'}
                 % do nothing
             case {'CHEPS'}
-                ip = 'xxx.xxx.xxx.xxx';
-                port = xxxx; %port number
+                ip = '203.252.46.54';
+                port = 20121; 
         end
     end
 end
@@ -184,8 +186,8 @@ yellow = [255 220 0];
 % rb = (3*W)/4;
 
 % rating scale left and right bounds 1/5 and 4/5
-lb = 1*W/5; % in 1280, it's 384
-rb = 3*W/5; % in 1280, it's 896 rb-lb = 512
+lb = 1.5*W/5; % in 1280, it's 384
+rb = 3.5*W/5; % in 1280, it's 896 rb-lb = 512
 
 % rating scale upper and bottom bounds 
 tb = H/5+100;           % in 800, it's 310
@@ -215,9 +217,10 @@ data.starttime_getsecs = GetSecs; % in the same format of timestamps for each tr
 % initial save of trial sequence
 save(data.datafile, 'trial_sequence', 'data');
 
-%% SETUP: Experiment
+%% SETUP: Experiment 
+
 [run_num, trial_num, runstart, trial_starts, rating_types] = parse_trial_sequence(trial_sequence, start_line);
-lvs = {'LV1', 'LV2', 'LV3', 'LV4'}; % you can add more..
+%lvs = {'LV1', 'LV2', 'LV3', 'LV4'}; % you can add more..
 
 %% SETUP: STIMULI -- modify this for each study
 % see subfunctions
@@ -584,6 +587,7 @@ DrawFormattedText(theWindow, Run_end_text, 'center', 'center', white, [], [], []
 Screen('Flip', theWindow);
 
 end
+
 
 
 function [type, int, dur, data] = parse_trial(data, trial_sequence, run_i, tr_i)

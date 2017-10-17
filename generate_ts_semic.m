@@ -5,6 +5,7 @@ function ts = generate_ts_semic(session_n, varargin)
 % Session 1 (3 runs, 5 cue means x 3 cue sd x 3 thermode ramp-up = 45 trials x 3 runs = 135 trials): cue + pain + continuous rating 
 % Three ramp-up settings of thermode (2, 4, and 6 seconds) is manipulated by CHEPS Program 
 %
+% ts = generate_ts_semic(1, 'semicircular)
 
 semicircular = false;
 rng('shuffle');
@@ -15,33 +16,30 @@ for i = 1:length(varargin)
             % functional commands
             case {'semicircular'}
                 semicircular = true;
-            case {'linear'}
-                semicircular = false;
+            %case {'linear'}
+            %    semicircular = false;
             case {'data'}
                 data = varargin{i+1};
         end
     end
 end
 
+% 3(2,4,6sec) x 15 other combination
+% Strafied randomization [1 2 3] [2 3 1] ....
+for i = 1:15 
+         program(i*3-2:i*3) = randperm(3) + 99;
+end
+      
 switch session_n
    
     case 1
-        
         S3{1} = repmat({'TP'}, 45, 1);
-        S3{2} = reshape(repmat({'LV1'; 'LV2'; 'LV3'}, 1, 6)', [], 1);
-        S3{3} = repmat({'0010'}, 45, 1);
-        S3{5} = repmat({'3'}, 45, 1);
-        S3{6} = repmat({'5', '11'; '7', '9'; '9', '7'; '11', '5'}, 5, 1);
-        
-        if semicircular
-            S3{4} = repmat({'overall_avoidance_semicircular'}, 18, 1);
-        else
-            S3{4} = repmat({'overall_avoidance'}, 18, 1);
-        end
-        
-        % make S3{7}
-        for j = 1:3, rating_lv{j} = []; end
-        
+        % S3{2} = transpose(program);%program
+        S3{3} = repmat({'0010'}, 45, 1);%duration? 
+        S3{4} = repmat({'cont_int'}, 45, 1);
+        S3{5} = repmat({'3'}, 45, 1);%pre-rating jitter
+        S3{6} = repmat({'5', '11'; '7', '9'; '9', '7'; '11', '5'}, 5, 1); %inter-trial jitter
+
         if exist('data', 'var')
             for trial_i = 1:numel(data.dat{1})
                 if semicircular
@@ -73,10 +71,12 @@ switch session_n
             S3{7}{ii,1} = [S3{2}(ii) {'draw_social_cue', [ref(ii,1), ref(ii,2)+(rand/30-(1/30)/2), 20]}]; % add a little randomness
         end
         
-        trial_n = 18;
         
-        for k = 1:numel(S3)
-            for run_i = 1:3 
+        
+        trial_n = 45;
+        
+        for k = 1:numel(S3) %Number of session? 
+            for run_i = 1:3 %Number of run? 
                 temp = S3{k}(randperm(trial_n),:);
                 switch k
                     case {1, 3, 5}
@@ -100,5 +100,5 @@ switch session_n
                 end
             end
         end
-
+        S3{2} = transpose(program);%program
 end
