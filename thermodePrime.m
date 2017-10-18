@@ -27,7 +27,7 @@ function thermodePrime(ip, port, program)
 
 commandId = program;
 
-for i = 1:length(program)
+for i = 1:1
     fprintf('Press spacebar to begin stimulation\n');
     KbStrokeWait;
     main(ip,port,1,commandId(i)); % pre-test

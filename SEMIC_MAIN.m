@@ -95,7 +95,6 @@ global theWindow W H; % window property
 global white red orange yellow bgcolor; % color
 global window_rect lb rb tb bb scale_H anchor_y joy_speed; % rating scale
 global anchor_xl anchor_xr anchor_yu anchor_yd fontsize;
-global program
 
 
 %% Parse varargin
@@ -374,8 +373,9 @@ try
             data.dat{run_i}{tr_i}.stim_timestamp = GetSecs;
             
             % HERE: STIMULATION ------------------------------------------
-            if strcmp(type, 'TP') % pressure pain
-                eval(['fwrite(t, ''1,' PP_int{strcmp(lvs, int)} ',t'');']);
+            if strcmp(type, 'TP') % Thermal pain
+                thermodePrime(ip, port, program)
+                %eval(['fwrite(t, ''1,' PP_int{strcmp(lvs, int)} ',t'');']);
             elseif strcmp(type, 'AU') % aversive auditory
                 play(players{strcmp(lvs, int)});
             % elseif strcmp(type, 'TP') % see mpa2 code
