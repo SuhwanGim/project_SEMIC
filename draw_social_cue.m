@@ -1,7 +1,7 @@
 function [xx, th] = draw_social_cue(m, std, n, rating_type)
 
 global theWindow W H; % window property
-global white red orange bgcolor; % color
+global white red red_Alpha orange bgcolor; % color
 global window_rect prompt_ex tb bb lb rb scale_H anchor_y anchor_y2 anchor promptW promptH joy_speed; % rating scale
 
 cir_center = [(rb+lb)/2, bb];
@@ -28,7 +28,13 @@ if semicircular
     x = radius*cos(th)+cir_center(1);
     y = cir_center(2)-radius*sin(th);
     
-    Screen('DrawDots', theWindow, [x y]', 8, red, [0 0], 1);  %dif color
+    % Screen('DrawDots', windowPtr, xy [,size] [,color] [,center] [,dot_type][, lenient]);
+    % [,dot_type]
+    % [,color] surpprt RGBA (RGB + Alpha: level of transprency) 0 - 255
+    % 
+    Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); % For using level of alpha
+    Screen('DrawDots', theWindow, [x y]', 14, red_Alpha, [0 0], 1);  %dif color
+    
     
 else
     

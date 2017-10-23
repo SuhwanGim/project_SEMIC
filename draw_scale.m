@@ -430,13 +430,13 @@ switch scale
         xy = [x; bb - sqrt(radius.^2 - (x-xcenter).^2)];
         
         Screen('TextSize', theWindow, 28); % fonsize for anchors
-        
+        Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         anchor_W = Screen(theWindow,'DrawText', double('전혀'), 0, 0, bgcolor);
         anchor_W2 = Screen(theWindow,'DrawText', double('최대'), 0, 0, bgcolor);
         
         % Screen(theWindow, 'FillRect', bgcolor, window_rect); % reset
-        Screen(theWindow,'DrawLines', xy, 3, 255);
         
+        Screen(theWindow,'DrawLines', xy, 3, 255);
         Screen(theWindow,'DrawText', double('전혀'), lb-anchor_W/2, ycenter+20, 255);
         Screen(theWindow,'DrawText', double('최대'), rb-anchor_W2/2, ycenter+20, 255);
         
