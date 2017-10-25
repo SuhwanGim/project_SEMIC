@@ -1,9 +1,8 @@
-function data = thermode_test(runNbr, ip, port)
+function data = thermode_test(runNbr, ip, port, varargin)
 %% INFORMATION
 %
 % 1. This code is for behavioral study (SEMIC Project), using PATHWAY with External contorl
 % (Thermal pain stimulator)
-%
 % 2. Many codes included here are from Cocoanlab github.
 % 3. Now, Be editing codes
 % 4. Ip and port is from external control information of PATHWAY
@@ -14,7 +13,7 @@ function data = thermode_test(runNbr, ip, port)
 %% EXAMPEL of PROGRAM code
 % dec2bin(100) -> ans = 1100100
 %
-% MATLAB VALUE, PATHWAY VALUE = (100,1100100)
+% (MATLAB VALUE, PATHWAY VALUE) = (100,1100100)
 % For example
 % ---------------------------------------------------------
 % '100: Ramp-up 2sec' 1100100
@@ -27,6 +26,46 @@ global theWindow W H; % window property
 global white red red_Alpha orange bgcolor yellow; % color
 global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
 global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
+
+%% Parse varargin
+doexplain_scale = false;
+testmode = false;
+USE_BIOPAC = false;
+use_mouse = true;
+
+% need to be specified differently for different computers
+% psytool = 'C:\toolbox\Psychtoolbox';
+scriptdir = '/Users/cocoan/Dropbox/github/';
+savedir = 'SEMIC_data';
+
+for i = 1:length(varargin)
+    if ischar(varargin{i})
+        switch varargin{i}
+            case {'explain_scale'}
+                doexplain_scale = true;
+                exp_scale.inst = varargin{i+1};
+            case {'test'}
+                testmode = true;
+            case {'scriptdir'}
+                scriptdir = varargin{i+1};
+            case {'psychtoolbox'}
+                psytool = varargin{i+1};
+            case {'biopac1'}
+                USE_BIOPAC = true;
+                channel_n = 3;
+                biopac_channel = 0;
+                ljHandle = BIOPAC_setup(channel_n); % BIOPAC SETUP
+            case {'gazePoint'}
+                % What I should type?
+            case {'mouse', 'trackball'}
+                % do nothing
+        end
+    end
+end
+
+addpath(scriptdir); cd(scriptdir);
+% addpath(genpath(psytool));
+
 
 %% SETUP: Trial sequence handle
 %   1. Run number - Trial number - Pain type - ITI - Delay - Cue mean - Cue variance - Ramp-up
@@ -93,9 +132,18 @@ save(data.datafile, 'ts', 'data');
 Screen('Clear');
 Screen('CloseAll');
 window_num = 0;
-window_rect = [1 1 1280 720]; % in the test mode, use a little smaller screen
-%window_rect = [0 0 1900 1200];
-fontsize = 20;
+if testmode
+    window_rect = [1 1 1280 720]; % in the test mode, use a little smaller screen
+    %window_rect = [0 0 1900 1200];
+    fontsize = 20;
+else
+    screens = Screen('Screens');
+    window_num = screens(end); % the last window
+    window_info = Screen('Resolution', window_num);
+    window_rect = [0 0 window_info.width window_info.height]; % full screen
+    fontsize = 32;
+end
+
 W = window_rect(3); %width of screen
 H = window_rect(4); %height of screen
 
@@ -149,7 +197,25 @@ try
                 display_expmessage('실험자는 모든 것이 잘 준비되었는지 체크해주세요 (PATHWAY, BIOPAC, GAZEPOINT, 등등). \n모두 준비되었으면 SPACE BAR를 눌러주세요.'); % until space; see subfunctions
             end
         end
+        % 1 seconds: BIOPAC
+        
+        if trial_Number(j) == 1
+            if USE_BIOPAC
+                bio_t = GetSecs;
+                data.dat{runNbr}{trial_Number(j)}.biopac_triggertime = bio_t;
+                BIOPAC_trigger(ljHandle, biopac_channel, 'on');
+            end
+            
+            Screen(theWindow,'FillRect',bgcolor, window_rect);
+            Screen('Flip', theWindow);
+            waitsec_fromstarttime(bio_t, 2); % ADJUST THIS
+            
+            if USE_BIOPAC
+                BIOPAC_trigger(ljHandle, biopac_channel, 'off');
+            end
+        end
         data.dat{runNbr}{trial_Number(j)}.starttime = GetSecs; %Trial start
+        
         % ITI (jitter)
         fixPoint(ITI(j), white, '-') %
         % Cue
@@ -198,19 +264,11 @@ try
                     y = cir_center(2)-radius*sin(theta);
                     SetMouse(x,y);
                 end
-                
                 draw_scale('overall_avoidance_semicircular')
                 Screen('DrawDots', theWindow, [x y], 10, orange, [0 0], 1);
                 Screen('Flip', theWindow);
                 
-                %wait till pain finishes
-                % if button(1)
-                %    while button(1)
-                %        [~,~,button] = GetMouse(theWindow);
-                %    end
-                %    break;
-                % end
-                % Save the data
+                % Saving data
                 data.dat{runNbr}{trial_Number(j)}.time_fromstart(rec_i,1) = GetSecs-sTime;
                 data.dat{runNbr}{trial_Number(j)}.xy(rec_i,:) = [x-cir_center(1) cir_center(2)-y]./radius;
                 data.dat{runNbr}{trial_Number(j)}.clicks(rec_i,:) = button;
@@ -231,7 +289,7 @@ try
         data.dat{runNbr}{trial_Number(j)}.heat_exit_timestamp = end_trial - GetSecs; % Duration of trial
         if mod(trial_Number(j),2) == 0, save(data.datafile, '-append', 'data'); end % save data every two trials
         if mod(trial_Number(j),5) == 0 % Because of IRB, When end of every fifth trial, have a rest within 15 seconds
-            display_expmessage('5trial의 한 번은 대기 해야함\n 뿌잉뿌잉뿌뿌이잉');
+            display_expmessage('5trial의 한 번은 대기 해야함\n뿌잉뿌잉뿌뿌이잉');
             waitsec_fromstarttime(end_trial, 15);
             end_trial = end_trial + 15;
         end
