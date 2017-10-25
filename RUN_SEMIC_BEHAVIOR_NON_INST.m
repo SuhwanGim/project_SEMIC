@@ -8,5 +8,5 @@ port = 20121;
 
 
 %% STUDY
-thermode_test(1, ip, port)
+data = thermode_test(1, ip, port)
 %thermodecccctest( 1,'LocalHost',port);
