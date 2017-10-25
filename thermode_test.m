@@ -23,24 +23,10 @@ function data = thermode_test(runNbr, ip, port)
 
 
 %% GLOBAL vaiable
- global theWindow W H; % window property
- global white red red_Alpha orange bgcolor yellow; % color
- global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
- global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
-
-%% SETUP: DATA and Subject INFO
-% savedir = 'SEMIC_data';
-
-%[fname, start_line, SID] = subjectinfo_check(savedir); % subfunction
-% if exist(fname, 'file'), load(fname, 'data'); end
-
-% save data using the canlab_dataset object
-%data.version = 'SEMIC_v1_10-22-2017_Cocoanlab';
-% data.subject = SID;
-%data.datafile = fname;
-%data.starttime = datestr(clock, 0); % date-time
-%data.starttime_getsecs = GetSecs; % in the same format of timestamps for each trial
-
+global theWindow W H; % window property
+global white red red_Alpha orange bgcolor yellow; % color
+global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
+global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
 
 %% SETUP: Trial sequence handle 
 %   1. Run number - Trial number - Pain type - ITI - Delay - Cue mean - Cue variance - Ramp-up 
@@ -85,10 +71,23 @@ rng('shuffle');
     ITI_Delay = ITI_Delay(rn,:);
     ITI = cell2mat(ITI_Delay(:,1));
     Delay = cell2mat(ITI_Delay(:,2));
-% ITI_Delay_1=cell2mat(
-% initial save of trial sequence
-%%%%%%%%%%%% ts = [trial_Number, run_Number, ITI, Delay, c_mean, c_var, program];
-% save(data.datafile, 'ts', 'data');   
+    ts = [trial_Number, run_Number, ITI, Delay, c_mean, c_var, program,ramp_up_con];  
+%% SETUP: Experiment settings
+    rating_type = 'semicircular';
+    NumberOfCue = 25;
+%% SETUP: DATA and Subject INFO
+    savedir = 'SEMIC_data';
+    [fname, ~, SID] = subjectinfo_check(savedir); % subfunction
+    %[fname, start_line, SID] = subjectinfo_check(savedir); % subfunction
+    if exist(fname, 'file'), load(fname, 'data'); end
+% save data using the canlab_dataset object
+    data.version = 'SEMIC_v1_10-22-2017_Cocoanlab';
+    data.subject = SID;
+    data.datafile = fname;
+    data.starttime = datestr(clock, 0); % date-time
+    data.starttime_getsecs = GetSecs; % in the same format of timestamps for each trial
+% save the trial_sequences
+    save(data.datafile, ts, 'data'); 
 %% SETUP: Screen 
     Screen('Clear');
     Screen('CloseAll');
@@ -134,10 +133,8 @@ try
     Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
     Screen('TextFont', theWindow, font); % setting font
     Screen('TextSize', theWindow, fontsize);   
-    % START: RUN
-    start_t = GetSecs;
-    data.dat.run_starttime = start_t;
-    
+% START: RUN
+% Loop of Trials
 for j = 1:length(trial_Number)
     % DISPLAY EXPERIMENT MESSAGE:
             if trial_Number(j) == 1 && run_Number(j) == 1
@@ -151,16 +148,16 @@ for j = 1:length(trial_Number)
                     display_expmessage('실험자는 모든 것이 잘 준비되었는지 체크해주세요 (Biopac, PPD, 등등). \n모두 준비되었으면 SPACE BAR를 눌러주세요.'); % until space; see subfunctions
                 end
             end      
+        data.dat{runNb}{trial_Number(j)}.starttime = GetSecs; %Trial start
     % ITI (jitter)
-        fixPoint(ITI(j), white, '+') % 
+        fixPoint(ITI(j), white, '') %
     % Cue
-        start_cue=GetSecs;
-        rating_type = 'semicircular';
+        data.dat{runNb}{trial_Number(j)}.cue_timestamp = GetSecs;; %Cue time stamp
         draw_scale('overall_avoidance_semicircular');
-        % draw_socia_cue(m, std, n, rating_type)
-        draw_social_cue(c_mean(j), c_var(j), 20, rating_type); 
+        [data.dat{runNb}{trial_Number(j)}.cue_x, data.dat{runNb}{trial_Number(j)}.cue_theta] = draw_social_cue(c_mean(j), c_var(j), NumberOfCue, rating_type); % draw & save details: draw_socia_cue(m, std, n, rating_type)
         Screen('Flip', theWindow);
-        waitsec_fromstarttime(start_cue, 2);
+        waitsec_fromstarttime(cue_t, 2);
+        data.dat{runNb}{trial_Number(j)}.cue_end_timestamp = GetSecs;
     % Delay
         fixPoint(Delay(j), white, '+')
     % HEAT and Ratings
@@ -168,17 +165,39 @@ for j = 1:length(trial_Number)
         cir_center = [(rb+lb)/2, bb];
         SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
         lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
-        responseStr = main(ip,port,1,program(j));
-        start_heat = GetSecs;
+        data.dat{runNb}{trial_Nubmer(j)}.heat_start_txt = main(ip,port,1,program(j)); %heat and save response data
+        data.dat{runNb}{trial_Number(j)}.heat_start_timestamp = GetSecs; %heat-stimulus time stamp
         % show the current location
         % Continuouse Ratings        
         if checkStatus(ip,port)
             sTime = GetSecs;
             while GetSecs - sTime <= ramp_up_con(j) + 7 % 7 = plateau + ramp-down
-                [x,y,button] = GetMouse(theWindow);
+                [x,y,button]=GetMouse(theWindow);
+                % if the point goes further than the semi-circle, move the point to
+                % the closest point
+                radius = (rb-lb)/2; % radius
+                theta = atan2(cir_center(2)-y,x-cir_center(1));
+                % current euclidean distance
+                curr_r = sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2);        
+                % current angle (0 - 180 deg)
+                curr_theta = rad2deg(-theta+pi);
+                % Control a mouse cursor: 
+                % send to diameter of semi-circle
+                if y > bb
+                    y = bb;
+                    SetMouse(x,y);
+                end                
+                % send to arc of semi-circle
+                if sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2) > radius
+                    x = radius*cos(theta)+cir_center(1);
+                    y = cir_center(2)-radius*sin(theta);
+                    SetMouse(x,y);
+                end
+                
                 draw_scale('overall_avoidance_semicircular')
                 Screen('DrawDots', theWindow, [x y], 10, orange, [0 0], 1);
                 Screen('Flip', theWindow);
+                
                 %wait till pain finishes               
                 % if button(1)
                 %    while button(1)
@@ -186,8 +205,14 @@ for j = 1:length(trial_Number)
                 %    end
                 %    break;
                 % end
+                % Save the data 
+                data.dat{runNb}{trial_Number(j)}.time_fromstart(1,1) = GetSecs-sTime;
+                data.dat{runNb}{trial_Number(j)}.xy(1,:) = [x-cir_center(1) cir_center(2)-y]./radius;
+                data.dat{runNb}{trial_Number(j)}.clicks(1,:) = button;
+                data.dat{runNb}{trial_Number(j)}.r_theta(1,:) = [curr_r/radius curr_theta/180]; 
             end
-            main(ip,port,5); % Stop
+            data.dat{runNb}{trial_Number(j)}.heat_exit_txt = main(ip,port,5); % Stop
+            data.dat{runNb}{trial_Number(j)}.heat_exit_timestamp = GetSecs;
         end
         
         % while true %button 
@@ -196,10 +221,22 @@ for j = 1:length(trial_Number)
     SetMouse(0,0);
     Screen(theWindow,'FillRect',bgcolor, window_rect);
     Screen('Flip', theWindow);
+    
+    end_trial = GetSecs;
+    data.dat{runNb}{trial_Number(j)}.heat_exit_timestamp = end_trial - GetSecs; % Duration of trial    
+    if mod(trial_Number(j),2) == 0, save(data.datafile, '-append', 'data'); end % save data every two trials
+    if mod(tiral_Number(j),5) == 0 % Because of IRB, When end of every fifth trial, have a rest within 15 seconds
+        display_expmessage(msg);
+        waitsec_fromstarttime(end_trial, 15);
+        end_trial = end_trial + 15;
+    end
+    waitsec_fromstarttime(end_trial, 1); % For your rest,
 end
 
 Screen('Clear');
 Screen('CloseAll');
+disp('Done');
+save(data.datafile, '-append', 'data');
 
 catch err
     % ERROR 
@@ -223,7 +260,7 @@ function fixPoint(seconds, color, stimText)
         global theWindow white red;
         % stimText = '+';
         % Screen(theWindow,'FillRect', bgcolor, window_rect); 
-        start_fix = GetSecs;
+        start_fix = GetSecs; % Start_time_of_Fixation_Stimulus
         DrawFormattedText(theWindow, double(stimText), 'center', 'center', color, [], [], [], 1.2);
         Screen('Flip', theWindow);
         waitsec_fromstarttime(start_fix, seconds);
@@ -243,7 +280,8 @@ end
 end
 
 function display_expmessage(msg)
-% type your MESSAGE
+% diplay_expmessage("ad;slkja;l불라불라 \nㅂㅣㅏ넝리ㅏㅓ");
+% type each MESSAGE
 
 global theWindow white bgcolor window_rect; % rating scale
 

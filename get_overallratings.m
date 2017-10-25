@@ -234,7 +234,7 @@ if ~explain_scale
     if semicircular
         eval(['data.dat{run_i}{tr_i}.' overall_types '_rating_xy = [x-cir_center(1) cir_center(2)-y]./radius;']);
         eval(['data.dat{run_i}{tr_i}.' overall_types '_rating_r_theta = [curr_r/radius curr_theta/180];']);
-        eval(['data.dat{run_i}{tr_i}.' overall_types '_rating_descript = {''x:range from -1 to 1''; ''y:range from 0 to 1''; ''r:range from 0 to 1(radius)''; ''theta:range from 0 to 1(180degree)''};']);
+        eval(['data.dat{run_i}{tr_i}.' overall_types '_rating_descript = {'   'x:range from -1 to 1''; ''y:range from 0 to 1''; ''r:range from 0 to 1(radius)''; ''theta:range from 0 to 1(180degree)''};']);
     else
         eval(['data.dat{run_i}{tr_i}.' overall_types '_rating = (x-lb)./(rb-lb);']);
     end

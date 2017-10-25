@@ -3,5 +3,10 @@
 % runNbr = Run Number (1-3)
 ip = '203.252.46.72'; % or LocalHost?
 port = 20121;
-     thermode_test(1, ip, port)
+
+%% Learning
+
+
+%% STUDY
+thermode_test(1, ip, port)
 %thermodecccctest( 1,'LocalHost',port);
