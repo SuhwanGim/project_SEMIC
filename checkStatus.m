@@ -14,3 +14,4 @@ function ready = checkStatus(ip,port)
         end
     end    
 end
+

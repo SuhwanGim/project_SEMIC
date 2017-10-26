@@ -58,8 +58,9 @@ for i = 1:length(varargin)
     end
 end
 
-addpath(scriptdir); cd(scriptdir);
+% addpath(scriptdir); cd(scriptdir);
 % addpath(genpath(psytool));
+addpath('pathwaySupportCode');
 
 
 %% SETUP: Trial sequence handle
@@ -201,11 +202,12 @@ try
                 bio_t = GetSecs;
                 data.dat{runNbr}{trial_Number(j)}.biopac_triggertime = bio_t; %BIOPAC timestamp
                 BIOPAC_trigger(ljHandle, biopac_channel, 'on');
+                Screen(theWindow,'FillRect',bgcolor, window_rect);
+                Screen('Flip', theWindow);
+                waitsec_fromstarttime(bio_t, 2); % ADJUST THIS
             end
             
-            Screen(theWindow,'FillRect',bgcolor, window_rect);
-            Screen('Flip', theWindow);
-            waitsec_fromstarttime(bio_t, 2); % ADJUST THIS
+            
             
             if USE_BIOPAC
                 BIOPAC_trigger(ljHandle, biopac_channel, 'off');
@@ -232,58 +234,78 @@ try
         lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
         rec_i = 0;
         
-        data.dat{runNbr}{trial_Number(j)}.heat_start_txt = main(ip,port,1,program(j)); %heat and save response data
-        data.dat{runNbr}{trial_Number(j)}.heat_start_timestamp = GetSecs; %heat-stimulus time stamp
-        % show the current location
-        % Continuouse Ratings
-        if checkStatus(ip,port)
-            sTime = GetSecs;
-            while GetSecs - sTime <= ramp_up_con(j) + 7 % 7 = plateau + ramp-down
-                [x,y,button]=GetMouse(theWindow);
-                rec_i= rec_i+1;
-                % if the point goes further than the semi-circle, move the point to
-                % the closest point
-                radius = (rb-lb)/2; % radius
-                theta = atan2(cir_center(2)-y,x-cir_center(1));
-                % current euclidean distance
-                curr_r = sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2);
-                % current angle (0 - 180 deg)
-                curr_theta = rad2deg(-theta+pi);
-                % Control a mouse cursor:
-                % send to diameter of semi-circle
-                if y > bb
-                    y = bb;
-                    SetMouse(x,y);
-                end
-                % send to arc of semi-circle
-                if sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2) > radius
-                    x = radius*cos(theta)+cir_center(1);
-                    y = cir_center(2)-radius*sin(theta);
-                    SetMouse(x,y);
-                end
-                draw_scale('overall_avoidance_semicircular')
-                Screen('DrawDots', theWindow, [x y], 10, orange, [0 0], 1);
-                Screen('Flip', theWindow);
-                
-                % Saving data
-                data.dat{runNbr}{trial_Number(j)}.time_fromstart(rec_i,1) = GetSecs-sTime;
-                data.dat{runNbr}{trial_Number(j)}.xy(rec_i,:) = [x-cir_center(1) cir_center(2)-y]./radius;
-                data.dat{runNbr}{trial_Number(j)}.clicks(rec_i,:) = button;
-                data.dat{runNbr}{trial_Number(j)}.r_theta(rec_i,:) = [curr_r/radius curr_theta/180];
+        data.dat{runNbr}{trial_Number(j)}.heat_start_txt = main(ip,port,1,program(j)); % Triggering heat signal
+        data.dat{runNbr}{trial_Number(j)}.heat_start_timestamp = GetSecs; % heat-stimulus time stamp
+        % if checkStatus(ip,port)
+        ready = 0;
+        ready2 =0;
+        while ~ready2
+            start_while=GetSecs;
+            while ~ready
+                waitsec_fromstarttime(start_while, 1)
+                resp = main(ip,port,0); %get system status
+                systemState = resp{4}; testState = resp{5};
+                if strcmp(systemState, 'Pathway State: TEST') && strcmp(testState,'Test State: RUNNING')
+                    ready = 1;
+                    sTime = GetSecs;
+                    break;
+                else
+                    ready = 0;
+                end               
             end
-            data.dat{runNbr}{trial_Number(j)}.heat_exit_txt = main(ip,port,5); % Stop
-            data.dat{runNbr}{trial_Number(j)}.heat_exit_timestamp = GetSecs;
+            [x,y,button]=GetMouse(theWindow);
+            rec_i= rec_i+1;
+            % if the point goes further than the semi-circle, move the point to
+            % the closest point
+            radius = (rb-lb)/2; % radius
+            theta = atan2(cir_center(2)-y,x-cir_center(1));
+            % current euclidean distance
+            curr_r = sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2);
+            % current angle (0 - 180 deg)
+            curr_theta = rad2deg(-theta+pi);
+            % Control a mouse cursor:
+            % send to diameter of semi-circle
+            if y > bb
+                y = bb;
+                SetMouse(x,y);
+            end
+            % send to arc of semi-circle
+            if sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2) > radius
+                x = radius*cos(theta)+cir_center(1);
+                y = cir_center(2)-radius*sin(theta);
+                SetMouse(x,y);
+            end
+            draw_scale('overall_avoidance_semicircular')
+            Screen('DrawDots', theWindow, [x y], 10, orange, [0 0], 1);
+            Screen('Flip', theWindow);
+            
+            % Saving data
+            data.dat{runNbr}{trial_Number(j)}.time_fromstart(rec_i,1) = GetSecs-sTime;
+            data.dat{runNbr}{trial_Number(j)}.xy(rec_i,:) = [x-cir_center(1) cir_center(2)-y]./radius;
+            data.dat{runNbr}{trial_Number(j)}.clicks(rec_i,:) = button;
+            data.dat{runNbr}{trial_Number(j)}.r_theta(rec_i,:) = [curr_r/radius curr_theta/180];
+            
+            if GetSecs - sTime > ramp_up_con(j) + 7 % 7 = plateau + ramp-down
+                data.dat{runNbr}{trial_Number(j)}.heat_exit_txt = main(ip,port,5); % Triggering stop signal
+                start_stopsignal=GetSecs;
+                waitsec_fromstarttime(start_stopsignal, 1)
+                resp = main(ip,port,0); %get system status
+                systemState = resp{4}; testState = resp{5};
+                if strcmp(systemState, 'Pathway State: READY') && strcmp(testState,'Test State: IDLE')
+                    ready2 = 1;
+                    data.dat{runNbr}{trial_Number(j)}.heat_exit_timestamp = GetSecs;
+                    break;
+                end
+            end
+            
         end
-        
-        % while true %button
-        % end
-        
+        %end
         SetMouse(0,0);
         Screen(theWindow,'FillRect',bgcolor, window_rect);
         Screen('Flip', theWindow);
-        
         end_trial = GetSecs;
-        data.dat{runNbr}{trial_Number(j)}.heat_exit_timestamp = end_trial - GetSecs; % Duration of trial
+        data.dat{runNbr}{trial_Number(j)}.end_trail = end_trial;
+        data.dat{runNbr}{trial_Number(j)}.ramp_up_cnd = ramp_up_con(j);
         if mod(trial_Number(j),2) == 0, save(data.datafile, '-append', 'data'); end % save data every two trials
         if mod(trial_Number(j),5) == 0 % Because of IRB, When end of every fifth trial, have a rest within 15 seconds
             display_expmessage('5trialÀÇ ÇÑ ¹øÀº ´ë±â ÇØ¾ßÇÔ\n»ÑÀ×»ÑÀ×»Ñ»ÑÀÌÀ×');
@@ -306,8 +328,10 @@ catch err
     end
     abort_experiment;
 end
-
 end
+
+
+
 
 % data, timestamp, save data (once per two trials) and trial information Áß°£Áß°£¿¡
 % redundancy is good thing for data, physio, gazepoint, prompt
