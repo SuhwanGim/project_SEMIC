@@ -1,26 +1,20 @@
 function data = thermode_test(runNbr, ip, port, varargin)
 %% INFORMATION
 %
-% 1. This code is for behavioral study (SEMIC Project), using PATHWAY with External contorl
-% (Thermal pain stimulator)
-% 2. Many codes included here are from Cocoanlab github.
-% 3. Now, Be editing codes
-% 4. Ip and port is from external control information of PATHWAY
-% by Suwhan Gim (roseno.9@daum.net)
-
 % 2017-10-19
 
 %% EXAMPEL of PROGRAM code
 % dec2bin(100) -> ans = 1100100
+% (MATLAB Value, PATHWAY Value) = (100,1100100)
 %
-% (MATLAB VALUE, PATHWAY VALUE) = (100,1100100)
-% For example
+% In thie experiment,
 % ---------------------------------------------------------
-% '100: Ramp-up 2sec' 1100100
-% '101: Ramp-up 4sec' 1100101
-% '102: Ramp-up 6sec' 1100110
-
-
+% Matlab: Program name : Program code (parameter)
+% ------------------------------------------------
+%  100  : Ramp-up 2sec':    1100100
+%  101  : Ramp-up 4sec':    1100101
+%  102  : Ramp-up 6sec':    1100110
+% ...
 %% GLOBAL vaiable
 global theWindow W H; % window property
 global white red red_Alpha orange bgcolor yellow; % color
@@ -31,7 +25,7 @@ global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_y
 doexplain_scale = false;
 testmode = false;
 USE_BIOPAC = false;
-use_mouse = true;
+
 
 % need to be specified differently for different computers
 % psytool = 'C:\toolbox\Psychtoolbox';
@@ -68,15 +62,17 @@ addpath(scriptdir); cd(scriptdir);
 
 
 %% SETUP: Trial sequence handle
+% =========================================================================
 %   1. Run number - Trial number - Pain type - ITI - Delay - Cue mean - Cue variance - Ramp-up
 %   2. ITI and Delay ) 3 to 7 seconds (5 combination: 3-7, 4-6, 5-5, 6-4, 7-3)
 %   3. Cue mean (5 levels: 0-1). e.g., 0.1, 0.3, 0.5, 0.7 0.9
-%       : included jitter score (such as + and - 0.01~0.05)
+%       : included jitter number (such as + and - 0.01~0.05)
 %   4. Cue variance (3 levels: 0-1) e.g., 0.1, 0.25, 0.4
 %       : How to determine this score?
 %   5. Program: Ramp-up (3 levels: 100, 101, 102; Strafied randomization)
-%-----------------------------------------------------------------------
-% runNbr=1; %For test
+%-------------------------------------------------------------------------
+% For TEST,
+% runNbr=1;
 rng('shuffle');
 % Number of trial
 trial_Number=(1:45)'; % and transpose
@@ -152,7 +148,7 @@ font = 'NanumBarunGothic';
 bgcolor = 80;
 white = 255;
 red = [255 0 0];
-red_Alpha = [255 0 0 130]; % RGB + A(Level of tranceprency: for social Cue)
+red_Alpha = [255 164 0 130]; % RGB + A(Level of tranceprency: for social Cue)
 orange = [255 164 0];
 yellow = [255 220 0];
 
@@ -202,7 +198,7 @@ try
         if trial_Number(j) == 1
             if USE_BIOPAC
                 bio_t = GetSecs;
-                data.dat{runNbr}{trial_Number(j)}.biopac_triggertime = bio_t;
+                data.dat{runNbr}{trial_Number(j)}.biopac_triggertime = bio_t; %BIOPAC timestamp
                 BIOPAC_trigger(ljHandle, biopac_channel, 'on');
             end
             

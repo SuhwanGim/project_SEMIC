@@ -1,3 +1,14 @@
+%%
+% IT IS JUST FOR SCREEN TEST, 
+% -----------------------------------------------
+% For example 
+% 1) testing color of social cue, 
+% 2) font size 
+% 3) collecting mouse information (x, y, button[0,0,0]
+% and so on.
+
+
+%% Global variable 
 global theWindow W H; % window property
 global white red orange bgcolor; % color
 global t r; % pressure device udp channel
@@ -5,7 +16,7 @@ global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
 global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
 
 
-%%
+%% 
 GetSecs;
 Screen('Clear');
 Screen('CloseAll');
