@@ -11,6 +11,6 @@ port = 20121;
 
 
 %% STUDY
-data = thermode_test(1, ip, port, 'test'); %gazePoint, bIOPAC, explain_scale, test and so on
+data = thermode_test(1, ip, port, 'test'); %gazePoint, biopac1, explain_scale, test and so on
 
 %thermodecccctest( 1,'LocalHost',port);

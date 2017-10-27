@@ -115,11 +115,11 @@ rating_type = 'semicircular';
 NumberOfCue = 25;
 %% SETUP: DATA and Subject INFO
 savedir = 'SEMIC_data';
-[fname, ~, SID] = subjectinfo_check(savedir); % subfunction
+[fname, ~, SID] = subjectinfo_check(savedir); % subfunction %Start_line
 %[fname, start_line, SID] = subjectinfo_check(savedir); % subfunction
 if exist(fname, 'file'), load(fname, 'data'); end
 % save data using the canlab_dataset object
-data.version = 'SEMIC_v1_10-22-2017_Cocoanlab';
+data.version = 'SEMIC_v1_10-27-2017_Cocoanlab';
 data.subject = SID;
 data.datafile = fname;
 data.starttime = datestr(clock, 0); % date-time
@@ -213,7 +213,7 @@ try
                 BIOPAC_trigger(ljHandle, biopac_channel, 'off');
             end
         end
-        data.dat{runNbr}{trial_Number(j)}.starttime = GetSecs; %Trial start
+        data.dat{runNbr}{trial_Number(j)}.trial_start_t = GetSecs; %Trial start
         
         % ITI (jitter)
         fixPoint(ITI(j), white, '-') %
@@ -251,7 +251,7 @@ try
                     break;
                 else
                     ready = 0;
-                end               
+                end
             end
             [x,y,button]=GetMouse(theWindow);
             rec_i= rec_i+1;
@@ -275,6 +275,7 @@ try
                 y = cir_center(2)-radius*sin(theta);
                 SetMouse(x,y);
             end
+            DrawFormattedText(theWindow, '현재 고통의 정도를 최대한 가깝게 표현해주세요', 'center', 200, color, [], [], [], 1.2);
             draw_scale('overall_avoidance_semicircular')
             Screen('DrawDots', theWindow, [x y], 10, orange, [0 0], 1);
             Screen('Flip', theWindow);
@@ -304,7 +305,7 @@ try
         Screen(theWindow,'FillRect',bgcolor, window_rect);
         Screen('Flip', theWindow);
         end_trial = GetSecs;
-        data.dat{runNbr}{trial_Number(j)}.end_trail = end_trial;
+        data.dat{runNbr}{trial_Number(j)}.end_trial_t = end_trial;
         data.dat{runNbr}{trial_Number(j)}.ramp_up_cnd = ramp_up_con(j);
         if mod(trial_Number(j),2) == 0, save(data.datafile, '-append', 'data'); end % save data every two trials
         if mod(trial_Number(j),5) == 0 % Because of IRB, When end of every fifth trial, have a rest within 15 seconds
