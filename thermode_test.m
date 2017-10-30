@@ -7,7 +7,7 @@ function data = thermode_test(runNbr, ip, port, varargin)
 % dec2bin(100) -> ans = 1100100
 % (MATLAB Value, PATHWAY Value) = (100,1100100)
 %
-% In thie experiment,
+% In this experiment,
 % ---------------------------------------------------------
 % Matlab: Program name : Program code (parameter, 8bit)
 % ------------------------------------------------
@@ -61,7 +61,18 @@ end
 % addpath(scriptdir); cd(scriptdir);
 % addpath(genpath(psytool));
 addpath('pathwaySupportCode');
-
+addpath('pathwaySupportCode/Classess');
+%% SETUP: DATA and Subject INFO
+savedir = 'SEMIC_data';
+[fname,start_trial,start_run, SID] = subjectinfo_check_SEMIC(savedir,runNbr); % subfunction %Start_line
+%[fname, start_line, SID] = subjectinfo_check(savedir); % subfunction
+if exist(fname, 'file'), load(fname, 'data'); load(fname,'ts'); end 
+% save data using the canlab_dataset object
+data.version = 'SEMIC_v1_10-27-2017_Cocoanlab';
+data.subject = SID;
+data.datafile = fname;
+data.starttime = datestr(clock, 0); % date-time
+data.starttime_getsecs = GetSecs; % in the same format of timestamps for each trial
 
 %% SETUP: Trial sequence handle
 % =========================================================================
@@ -75,57 +86,50 @@ addpath('pathwaySupportCode');
 %-------------------------------------------------------------------------
 % For TEST,
 % runNbr=1;
-rng('shuffle');
-% Number of trial
-trial_Number=(1:45)'; % and transpose
-% Run number
-run_Number = repmat(runNbr,length(trial_Number),1);
-% Cue_mean Randoimzation (Five levels: 0.1, 0.3, 0.5, 0.7 0.9)
-c_mean_bs = repmat({0.1; 0.3; 0.5; 0.7; 0.9},9,1); % 5 levels x 9 repetition = 45 trials
-rn=randperm(45);
-c_mean = cell2mat(c_mean_bs(rn));
-% Cue_variance Randoimzation (Three levels: 0.01, 0.05, 0.1)
-c_var_bs = repmat({0.01; 0.05; 0.1},15,1);
-rn=randperm(45);
-c_var=cell2mat(c_var_bs(rn));
-% RAMP-UP program Randoimzation
-for i = 1:15 % 3(2,4,6sec) x 15 other combination
-    program(i*3-2:i*3,1) = randperm(3) + 99; % [1 2 3] [2 3 1] ......
-end
-% Create ramp-up seconds
-for ii = 1:length(program)
-    if program(ii) == 100
-        ramp_up_con(ii) = 2;
-    elseif program(ii) == 101
-        ramp_up_con(ii) = 4;
-    else
-        ramp_up_con(ii) = 6;
+if start_line==1  
+    rng('shuffle');
+    % Number of trial
+    trial_Number=(1:45)'; % and transpose
+    % Run number
+    run_Number = repmat(runNbr,length(trial_Number),1);
+    % Cue_mean Randoimzation (Five levels: 0.1, 0.3, 0.5, 0.7 0.9)
+    c_mean_bs = repmat({0.1; 0.3; 0.5; 0.7; 0.9},9,1); % 5 levels x 9 repetition = 45 trials
+    rn=randperm(45);
+    c_mean = cell2mat(c_mean_bs(rn));
+    % Cue_variance Randoimzation (Three levels: 0.01, 0.05, 0.1)
+    c_var_bs = repmat({0.01; 0.05; 0.1},15,1);
+    rn=randperm(45);
+    c_var=cell2mat(c_var_bs(rn));
+    % RAMP-UP program Randoimzation
+    for i = 1:15 % 3(2,4,6sec) x 15 other combination
+        program(i*3-2:i*3,1) = randperm(3) + 99; % [1 2 3] [2 3 1] ......
     end
+    % Create ramp-up seconds
+    for ii = 1:length(program)
+        if program(ii) == 100
+            ramp_up_con(ii) = 2;
+        elseif program(ii) == 101
+            ramp_up_con(ii) = 4;
+        else
+            ramp_up_con(ii) = 6;
+        end
+    end
+    % ITI-Delay acombination
+    ITI_Delay = repmat({3, 7; 4, 6; 5, 5; 6, 4; 7,3}, 9, 1); % Five combitnations
+    rn=randperm(45);
+    ITI_Delay = ITI_Delay(rn,:);
+    ITI = cell2mat(ITI_Delay(:,1));
+    Delay = cell2mat(ITI_Delay(:,2));
+    %ts = [trial_Number, run_Number, ITI, Delay, c_mean, c_var, program, ramp_up_con];
+    ts{runNbr} = [trial_Number, run_Number, ITI, Delay, c_mean, c_var, program];
+    % save the trial_sequences
+    save(data.datafile, 'ts', 'data');
+else
+    [trial_Number, run_Number, ITI, Delay, c_mean, c_var, program] = ts{start_run};
 end
-% ITI-Delay acombination
-ITI_Delay = repmat({3, 7; 4, 6; 5, 5; 6, 4; 7,3}, 9, 1); % Five combitnations
-rn=randperm(45);
-ITI_Delay = ITI_Delay(rn,:);
-ITI = cell2mat(ITI_Delay(:,1));
-Delay = cell2mat(ITI_Delay(:,2));
-%ts = [trial_Number, run_Number, ITI, Delay, c_mean, c_var, program, ramp_up_con];
-ts = [trial_Number, run_Number, ITI, Delay, c_mean, c_var, program];
 %% SETUP: Experiment settings
 rating_type = 'semicircular';
 NumberOfCue = 25;
-%% SETUP: DATA and Subject INFO
-savedir = 'SEMIC_data';
-[fname, ~, SID] = subjectinfo_check(savedir); % subfunction %Start_line
-%[fname, start_line, SID] = subjectinfo_check(savedir); % subfunction
-if exist(fname, 'file'), load(fname, 'data'); end
-% save data using the canlab_dataset object
-data.version = 'SEMIC_v1_10-27-2017_Cocoanlab';
-data.subject = SID;
-data.datafile = fname;
-data.starttime = datestr(clock, 0); % date-time
-data.starttime_getsecs = GetSecs; % in the same format of timestamps for each trial
-% save the trial_sequences
-save(data.datafile, 'ts', 'data');
 %% SETUP: Screen
 Screen('Clear');
 Screen('CloseAll');
@@ -180,9 +184,15 @@ try
     Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
     Screen('TextFont', theWindow, font); % setting font
     Screen('TextSize', theWindow, fontsize);
+    % settings of ts
+    if start_line ~= 1
+        k=start_trial; 
+    else 
+        k=1;
+    end
     % START: RUN
     % Loop of Trials
-    for j = 1:length(trial_Number)
+    for j = k:length(trial_Number)       
         % DISPLAY EXPERIMENT MESSAGE:
         if trial_Number(j) == 1 && run_Number(j) == 1
             while (1)
@@ -206,9 +216,8 @@ try
                 Screen('Flip', theWindow);
                 waitsec_fromstarttime(bio_t, 2); % ADJUST THIS
             end
-            
-            
-            
+
+            %?
             if USE_BIOPAC
                 BIOPAC_trigger(ljHandle, biopac_channel, 'off');
             end
@@ -275,7 +284,9 @@ try
                 y = cir_center(2)-radius*sin(theta);
                 SetMouse(x,y);
             end
-            DrawFormattedText(theWindow, '현재 고통의 정도를 최대한 가깝게 표현해주세요', 'center', 200, color, [], [], [], 1.2);
+            msg = '현재 고통의 정도를 최대한 가깝게 표현해주세요';
+            msg = double(msg);
+            DrawFormattedText(theWindow, msg, 'center', 250, white, [], [], [], 1.2);
             draw_scale('overall_avoidance_semicircular')
             Screen('DrawDots', theWindow, [x y], 10, orange, [0 0], 1);
             Screen('Flip', theWindow);
