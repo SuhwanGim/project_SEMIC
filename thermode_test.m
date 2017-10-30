@@ -64,8 +64,8 @@ addpath('pathwaySupportCode');
 addpath('pathwaySupportCode/Classess');
 %% SETUP: DATA and Subject INFO
 savedir = 'SEMIC_data';
-[fname,start_trial,start_run, SID] = subjectinfo_check_SEMIC(savedir,runNbr); % subfunction %Start_line
-%[fname, start_line, SID] = subjectinfo_check(savedir); % subfunction
+[fname,start_trial, SID] = subjectinfo_check_SEMIC(savedir,runNbr); % subfunction %start_trial
+%[fname, start_trial, SID] = subjectinfo_check(savedir); % subfunction
 if exist(fname, 'file'), load(fname, 'data'); load(fname,'ts'); end 
 % save data using the canlab_dataset object
 data.version = 'SEMIC_v1_10-27-2017_Cocoanlab';
@@ -86,7 +86,7 @@ data.starttime_getsecs = GetSecs; % in the same format of timestamps for each tr
 %-------------------------------------------------------------------------
 % For TEST,
 % runNbr=1;
-if start_line==1  
+if start_trial==1  
     rng('shuffle');
     % Number of trial
     trial_Number=(1:45)'; % and transpose
@@ -125,7 +125,7 @@ if start_line==1
     % save the trial_sequences
     save(data.datafile, 'ts', 'data');
 else
-    [trial_Number, run_Number, ITI, Delay, c_mean, c_var, program] = ts{start_run};
+    [trial_Number, run_Number, ITI, Delay, c_mean, c_var, program] = ts{runNbr};
 end
 %% SETUP: Experiment settings
 rating_type = 'semicircular';
@@ -185,7 +185,7 @@ try
     Screen('TextFont', theWindow, font); % setting font
     Screen('TextSize', theWindow, fontsize);
     % settings of ts
-    if start_line ~= 1
+    if start_trial ~= 1
         k=start_trial; 
     else 
         k=1;
@@ -240,7 +240,7 @@ try
         % thermodePrime(ip, port, program(j))
         cir_center = [(rb+lb)/2, bb];
         SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
-        lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
+        % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
         rec_i = 0;
         
         data.dat{runNbr}{trial_Number(j)}.heat_start_txt = main(ip,port,1,program(j)); % Triggering heat signal
@@ -272,7 +272,7 @@ try
             curr_r = sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2);
             % current angle (0 - 180 deg)
             curr_theta = rad2deg(-theta+pi);
-            % Control a mouse cursor:
+            % For control a mouse cursor:
             % send to diameter of semi-circle
             if y > bb
                 y = bb;
@@ -320,7 +320,7 @@ try
         data.dat{runNbr}{trial_Number(j)}.ramp_up_cnd = ramp_up_con(j);
         if mod(trial_Number(j),2) == 0, save(data.datafile, '-append', 'data'); end % save data every two trials
         if mod(trial_Number(j),5) == 0 % Because of IRB, When end of every fifth trial, have a rest within 15 seconds
-            display_expmessage('5trialÀÇ ÇÑ ¹øÀº ´ë±â ÇØ¾ßÇÔ\n»ÑÀ×»ÑÀ×»Ñ»ÑÀÌÀ×');
+            display_expmessage('Every 5th trial ´ë±â ÇØ¾ßÇÔ\n»ÑÀ×»ÑÀ×»Ñ»ÑÀÌÀ×');
             waitsec_fromstarttime(end_trial, 15);
             end_trial = end_trial + 15;
         end
