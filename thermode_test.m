@@ -66,7 +66,7 @@ addpath('pathwaySupportCode/Classess');
 savedir = 'SEMIC_data';
 [fname,start_trial, SID] = subjectinfo_check_SEMIC(savedir,runNbr); % subfunction %start_trial
 %[fname, start_trial, SID] = subjectinfo_check(savedir); % subfunction
-if exist(fname, 'file'), load(fname, 'data'); load(fname,'ts'); end 
+if exist(fname, 'file'), load(fname, 'data'); load(fname,'ts'); end
 % save data using the canlab_dataset object
 data.version = 'SEMIC_v1_10-27-2017_Cocoanlab';
 data.subject = SID;
@@ -86,7 +86,7 @@ data.starttime_getsecs = GetSecs; % in the same format of timestamps for each tr
 %-------------------------------------------------------------------------
 % For TEST,
 % runNbr=1;
-if start_trial==1  
+if start_trial==1
     rng('shuffle');
     % Number of trial
     trial_Number=(1:45)'; % and transpose
@@ -186,13 +186,13 @@ try
     Screen('TextSize', theWindow, fontsize);
     % settings of ts
     if start_trial ~= 1
-        k=start_trial; 
-    else 
+        k=start_trial;
+    else
         k=1;
     end
     % START: RUN
     % Loop of Trials
-    for j = k:length(trial_Number)       
+    for j = k:length(trial_Number)
         % DISPLAY EXPERIMENT MESSAGE:
         if trial_Number(j) == 1 && run_Number(j) == 1
             while (1)
@@ -216,7 +216,7 @@ try
                 Screen('Flip', theWindow);
                 waitsec_fromstarttime(bio_t, 2); % ADJUST THIS
             end
-
+            
             %?
             if USE_BIOPAC
                 BIOPAC_trigger(ljHandle, biopac_channel, 'off');

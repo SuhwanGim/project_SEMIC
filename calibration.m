@@ -1,12 +1,10 @@
-%%
-% IT IS JUST FOR SCREEN TEST, 
+%%INFORMATION
+% Start date: 17/11/27
+% Name: Suhwan Gim
+% Purpose: A calibraition for heat-pain machine 
+% 
 % -----------------------------------------------
-% For example 
-% 1) testing color of social cue, 
-% 2) font size 
-% 3) collecting mouse information (x, y, button[0,0,0]
-% and so on.
-
+% 
 
 %% Global variable 
 global theWindow W H; % window property
@@ -93,10 +91,19 @@ while GetSecs - sTime < 5
     
     draw_scale('overall_avoidance_semicircular');
     theta = rad2deg(theta);
+    theta = 180-theta;
     theta = num2str(theta);
     DrawFormattedText(theWindow, theta, 'center', 'center', white, [], [], [], 1.2);
     % disp(theta);
     Screen('Flip',theWindow);
+    
+        if button(1)
+            draw_scale('overall_avoidance_semicircular');
+            Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
+            Screen('Flip',theWindow);
+            WaitSecs(1);
+            break;  
+        end
 end
 
 sca;
