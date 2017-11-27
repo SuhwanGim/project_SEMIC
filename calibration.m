@@ -1,20 +1,19 @@
 %%INFORMATION
 % Start date: 17/11/27
 % Name: Suhwan Gim
-% Purpose: A calibraition for heat-pain machine 
-% 
+% Purpose: A calibraition for heat-pain machine
+%
 % -----------------------------------------------
-% 
+%
 
-%% Global variable 
+%% Global variable
 global theWindow W H; % window property
 global white red orange bgcolor; % color
-global t r; % pressure device udp channel
 global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
 global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
 
 
-%% 
+%%
 GetSecs;
 Screen('Clear');
 Screen('CloseAll');
@@ -61,50 +60,90 @@ th = deg2rad(deg);
 x = radius*cos(th)+cir_center(1);
 y = cir_center(2)-radius*sin(th);
 
+%% skin site
+rng('shuffle');
+% skin_site = repmat({1,2,3,4,5,6}, 1, 3); % Five combitnations
+for i = 1:3 % 6(Skin sites:1 to 6) x 3 (number of stimulation) combination
+    skin_site(i*6-5:i*6,1) = randperm(6); % [1 2 3 4 5 6] [2 3 1 4 6 5] ......
+end
+
 %%
 theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
 Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
 Screen('TextFont', theWindow, font); % setting font
 Screen('TextSize', theWindow, fontsize);
-%%
-sTime = GetSecs;
-while GetSecs - sTime < 5
-    [x,y,button] = GetMouse(theWindow);
-    rating_type = 'semicircular';
-    draw_scale('overall_avoidance_semicircular');
-    Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  %dif color
-    % if the point goes further than the semi-circle, move the point to
-    % the closest point
-    radius = (rb-lb)/2; % radius
-    theta = atan2(cir_center(2)-y,x-cir_center(1));
-    if y > bb
-        y = bb;
-        SetMouse(x,y);
-    end
-    % send to arc of semi-circle
-    if sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2) > radius
-        x = radius*cos(theta)+cir_center(1);
-        y = cir_center(2)-radius*sin(theta);
-        SetMouse(x,y);
-    end
-    
-    draw_scale('overall_avoidance_semicircular');
-    theta = rad2deg(theta);
-    theta = 180-theta;
-    theta = num2str(theta);
-    DrawFormattedText(theWindow, theta, 'center', 'center', white, [], [], [], 1.2);
-    % disp(theta);
-    Screen('Flip',theWindow);
-    
+%% START: Calibration
+try
+    %0. Instructions
+    display_expmessage('지금부터 Calibration을 시작하겠습니다.\n참가자는 편안하게 계시고 진행자의 지시를 따라주시기 바랍니다.');
+    WaitSecs(1);
+    for i=1:20 %total trial
+        %1. Display where the skin site stimulates (1-6)
+        msg = strcat('다음 위치의 thermode를 이동하신 후 SPACE 키를 누르십시오: ', num2str(skin_site(i)));
+        while (1)
+            [~,~,keyCode] = KbCheck;
+            if keyCode(KbName('space'))==1
+                break
+            elseif keyCode(KbName('q'))==1
+                abort_man;
+            end
+            display_expmessage(msg);
+        end
+        sTime = GetSecs;
+        %2. Fixation
+        start_fix = GetSecs; % Start_time_of_Fixation_Stimulus
+        DrawFormattedText(theWindow, double(stimText), 'center', 'center', color, [], [], [], 1.2);
+        Screen('Flip', theWindow);
+        waitsec_fromstarttime(start_fix, 3);
+        %3. Stimulation
+        
+        %4. Ratings
+        [x,y,button] = GetMouse(theWindow);
+        rating_type = 'semicircular';
+        draw_scale('overall_avoidance_semicircular');
+        Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  %dif color
+        % if the point goes further than the semi-circle, move the point to
+        % the closest point
+        radius = (rb-lb)/2; % radius
+        theta = atan2(cir_center(2)-y,x-cir_center(1));
+        if y > bb
+            y = bb;
+            SetMouse(x,y);
+        end
+        % send to arc of semi-circle
+        if sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2) > radius
+            x = radius*cos(theta)+cir_center(1);
+            y = cir_center(2)-radius*sin(theta);
+            SetMouse(x,y);
+        end
+        
+        draw_scale('overall_avoidance_semicircular');
+        theta = rad2deg(theta);
+        theta = 180-theta;
+        theta = num2str(theta);
+        DrawFormattedText(theWindow, theta, 'center', 'center', white, [], [], [], 1.2);
+        % disp(theta);
+        Screen('Flip',theWindow);
+        
         if button(1)
             draw_scale('overall_avoidance_semicircular');
             Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
             Screen('Flip',theWindow);
             WaitSecs(1);
-            break;  
+            break;
         end
+        %5. Calculation
+        %6. Fixation
+    end
+catch err
+    % ERROR
+    disp(err);
+    for i = 1:numel(err.stack)
+        disp(err.stack(i));
+    end
+    abort_experiment;
 end
-
 sca;
 Screen('CloseAll');
+

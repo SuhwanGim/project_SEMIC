@@ -1,22 +1,21 @@
 %%
-% IT IS JUST FOR SCREEN TEST, 
+% IT IS JUST FOR SCREEN TEST,
 % -----------------------------------------------
-% For example 
-% 1) testing color of social cue, 
-% 2) font size 
+% For example
+% 1) testing color of social cue,
+% 2) font size
 % 3) collecting mouse information (x, y, button[0,0,0]
 % and so on.
 
 
-%% Global variable 
+%% Global variable
 global theWindow W H; % window property
 global white red orange bgcolor; % color
-global t r; % pressure device udp channel
 global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
 global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
 
 
-%% 
+%%
 GetSecs;
 Screen('Clear');
 Screen('CloseAll');
@@ -71,7 +70,8 @@ Screen('TextFont', theWindow, font); % setting font
 Screen('TextSize', theWindow, fontsize);
 %%
 sTime = GetSecs;
-while GetSecs - sTime < 5
+while GetSecs - sTime < 110
+
     [x,y,button] = GetMouse(theWindow);
     rating_type = 'semicircular';
     draw_scale('overall_avoidance_semicircular');
@@ -93,10 +93,15 @@ while GetSecs - sTime < 5
     
     draw_scale('overall_avoidance_semicircular');
     theta = rad2deg(theta);
+    theta= 180 - theta; 
     theta = num2str(theta);
-    DrawFormattedText(theWindow, theta, 'center', 'center', white, [], [], [], 1.2);
+    DrawFormattedText(theWindow, theta, 'center', 'center', white, [], [], [], 1.2); %Display the degree of the cursur based on cir_center
     % disp(theta);
     Screen('Flip',theWindow);
+    if button(1)
+        WaitSecs(1);
+        break;
+    end
 end
 
 sca;
