@@ -2,9 +2,9 @@
 % IT IS JUST FOR SCREEN TEST,
 % -----------------------------------------------
 % For example
-% 1) testing color of social cue,
-% 2) font size
-% 3) collecting mouse information (x, y, button[0,0,0]
+% 1) test a color of social cue,
+% 2) identify a font size
+% 3) to verify function that collect a mouse information (x, y, button[0,0,0]
 % and so on.
 
 
@@ -64,7 +64,7 @@ y = cir_center(2)-radius*sin(th);
 
 %%
 theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
-Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); % For alpha value of color: [R G B alpha]
 Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
 Screen('TextFont', theWindow, font); % setting font
 Screen('TextSize', theWindow, fontsize);

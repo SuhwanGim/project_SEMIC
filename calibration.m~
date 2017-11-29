@@ -215,7 +215,7 @@ try
         %           --> End
         % END
         if current_stim?
-            degree? fghfg
+            degree? 
         end
         
         degree? 
