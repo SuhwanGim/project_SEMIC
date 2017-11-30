@@ -5,12 +5,9 @@ function cali_regression (degree, rating, th, varargin)
 % deg = level of heat (thermode)
 % rating = subject score for heat-stimulation
 %
-% 1) input data to regression line
-% 2) calculating
 % 3) where the skin site?
 % 4) 너무 낮은 온도나 높은 온도면 제한을 걸어줘야함
 % 5) residual 계산을해줘야함
-% 계속 축적되게 계산하고, 현재의 rating 평가는 잘 모르겠지만
 
 %For example
 % input: deg=41; rating=30;
@@ -33,16 +30,20 @@ std_rating=[30 50 70]; % low, mid, and high %from L. Atlas et al. (2010)
 
 %% SETUP: Input data
 reg.stim_degree(th)=degree;
-reg.stim_rating(th)=rating;
+reg.stim_rating(th)=rating; %0 to 100
 
-%% START: it will be wokrs
+%% START:
 
 if th>2
     P=polyfit(reg.stim_degree,reg.stim_rating,1); % (x,y, dimension) regression
-    for i=1:3
-        %v_rating=P(1).*new_deg+P(2);
-        non_corrected_degree=(std_rating(i)-P(2))./P(1);
-        reg.cur_heat_LMH(i)=unit_integer(non_corrected_degree);
+    if th>4
+        for i=1:3
+            %v_rating=P(1).*new_deg+P(2);
+            non_corrected_degree=(std_rating(i)-P(2))./P(1);
+            reg.cur_heat_LMH(th,i)=unit_integer(non_corrected_degree);
+        end
+    else
+        reg.cur_heat_LMH(th,:)=0;
     end
 else
     %do nothing
@@ -72,5 +73,9 @@ function c_number=unit_integer(uc_number)
 
 uc_number=uc_number.*2;
 c_number=round(uc_number)./2;
+
+% limitation
+c_number(c_number > 48) = 48;
+c_number(c_number < 41) = 41;
 end
 

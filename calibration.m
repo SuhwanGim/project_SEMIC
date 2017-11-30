@@ -55,7 +55,7 @@ anchor_y = H/2+10+scale_H;
 
 %% Parameter
 stimText = '+';
-
+init_stim={'00110010' '00111000' '00111110'}; %  Initial degree of heat pain [41 44 47]
 
 
 %%
@@ -75,22 +75,23 @@ for i = 1:3 % 6(Skin sites:1 to 6) x 3 (number of stimulation) combination
     reg.skin_site(i*6-5:i*6,1) = randperm(6); % [1 2 3 4 5 6] [2 3 1 4 6 5] ......
 end
 
-%% Pathway program (50 to 64) / [degree decValue ProgramName]
+%% Pathway program (50 to 64) /
+% [degree decValue ProgramNameInPathway]
 PathPrg = {41 '00110010' 'SEMIC_41'; ...
-           41.5 '00110011' 'SEMIC_41.5'; ... 
-           42 '00110100' 'SEMIC_42'; ...
-           42.5 '00110101' 'SEMIC_42.5'; ...
-           43 '00110110' 'SEMIC_43'; ...         
-           43.5 '00110111' 'SEMIC_43.5'; ...
-           44 '00111000' 'SEMIC_44'; ...
-           44.5 '00111001' 'SEMIC_44.5'; ...
-           45 '00111010' 'SEMIC_45'; ...
-           45.5 '00111011' 'SEMIC_45.5'; ...
-           46 '00111100' 'SEMIC_46'; ...
-           46.5 '00111101' 'SEMIC_46.5'; ...
-           47 '00111110' 'SEMIC_47'; ...
-           47.5 '00111111' 'SEMIC_47.5'; ...
-           48 '01000000' 'SEMIC_48';};
+    41.5 '00110011' 'SEMIC_41.5'; ...
+    42 '00110100' 'SEMIC_42'; ...
+    42.5 '00110101' 'SEMIC_42.5'; ...
+    43 '00110110' 'SEMIC_43'; ...
+    43.5 '00110111' 'SEMIC_43.5'; ...
+    44 '00111000' 'SEMIC_44'; ...
+    44.5 '00111001' 'SEMIC_44.5'; ...
+    45 '00111010' 'SEMIC_45'; ...
+    45.5 '00111011' 'SEMIC_45.5'; ...
+    46 '00111100' 'SEMIC_46'; ...
+    46.5 '00111101' 'SEMIC_46.5'; ...
+    47 '00111110' 'SEMIC_47'; ...
+    47.5 '00111111' 'SEMIC_47.5'; ...
+    48 '01000000' 'SEMIC_48';};
 %        for ii=1:15
 %            disp(bin2dec(PathPrg{ii,2}));
 %        end
@@ -107,14 +108,14 @@ Screen('TextSize', theWindow, fontsize);
 try
     display_expmessage('지금부터 Calibration을 시작하겠습니다.\n참가자는 편안하게 계시고 진행자의 지시를 따라주시기 바랍니다.');
     WaitSecs(1);
+    random_value = randperm(3);
     for i=1:18 %Total trial
-        random_value = randperm(3);
         % manipulate the current stim
         if i<4
-            init_stim={'00110010' '00111000' '00111110'}; %프로그램코드는 [41 44 47]
-            current_stim=bin2dec(init_stim{random_value(i)}); 
+            current_stim=bin2dec(init_stim{random_value(i)});
         else
-            current_stim=reg.cur_heat_LMH(i/3); % random
+            rn=randperm(3,1);
+            current_stim=reg.cur_heat_LMH(i,rn); % random
             %프로그램코드: reg.cur_heat_LMH(randperm(3,1))
         end
         
@@ -123,7 +124,7 @@ try
         while (1)
             [~,~,keyCode] = KbCheck;
             if keyCode(KbName('space'))==1
-                break
+                break;
             elseif keyCode(KbName('q'))==1
                 abort_man;
             end
@@ -176,10 +177,6 @@ try
             end
             
             draw_scale('overall_avoidance_semicircular');
-            theta = rad2deg(theta);
-            theta = 180-theta;
-            
-            vas_rating = theta/180*100; % [0 180] to [0 100]
             
             %For draw theta text on 'theWindow' screen
             % theta = num2str(theta);
@@ -187,8 +184,7 @@ try
             % disp(theta);
             Screen('Flip',theWindow);
             
-            %
-            
+            % Feedback
             if button(1)
                 draw_scale('overall_avoidance_semicircular');
                 Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
@@ -214,17 +210,21 @@ try
         %           --> Selete the closest degree of heat pain program
         %           --> End
         % END
-        if current_stim?
-            degree? fghfg
+        
+        % 지금은 스팀 프로그램에서 온도로 변환해야하는데, 현재 변수에서 같은 row의 것을 가져오는?
+        
+        theta = rad2deg(theta);
+        theta = 180-theta;
+        vas_rating = theta/180*100; % [0 180] to [0 100]
+        
+        for iii=1:length(PathPrg) %find degree
+            if str2double(dec2bin(current_stim)) == str2double(PathPrg{iii,2})
+                degree = PathPrg{iii,1};
+            end
         end
         
-        degree? 
-        rating? 
-        if i<4
-            cali_regression (degree, rating, i); % cali_regression (stim_degree, rating, order of trial)
-        else
-            cali_regression (degree, rating, i);
-        end
+        %calibration
+        cali_regression (degree, vas_rating, i); % cali_regression (stim_degree, rating, order of trial)       
         
     end %trial end
     
