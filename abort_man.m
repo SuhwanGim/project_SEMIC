@@ -5,10 +5,10 @@ function abort_man
 
 global t r; % pressure device udp channel
 
-try
-    fclose(t); fclose(r);
-catch
-end
+% try
+%     fclose(t); fclose(r);
+% catch
+% end
 
 ShowCursor; %unhide mouse
 Screen('CloseAll'); %relinquish screen control

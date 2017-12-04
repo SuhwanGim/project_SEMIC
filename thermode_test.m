@@ -60,7 +60,7 @@ end
 
 % addpath(scriptdir); cd(scriptdir);
 % addpath(genpath(psytool));
-addpath('mat_joy');
+% addpath('mat_joy');
 addpath('pathwaySupportCode');
 addpath('pathwaySupportCode/Classess');
 %% SETUP: DATA and Subject INFO

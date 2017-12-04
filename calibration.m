@@ -7,6 +7,9 @@
 % 1. Degree of first three heat-stimulations is randomly given at any skin sites:[41 44 47]
 % 2. After calculate the linear regression,
 
+%%
+clear all;
+close all;
 %% Global variable
 global theWindow W H; % window property
 global white red orange bgcolor; % color
@@ -14,8 +17,18 @@ global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
 global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
 global reg; % regression data
 
-
-
+%% SETUP: DATA and Subject INFO
+scriptdir = '/Users/cocoan/Dropbox/github/';
+savedir = 'Cali_Semic_data';
+[fname,~, SID] = subjectinfo_check_SEMIC(savedir,1); % subfunction %start_trial
+% save data using the canlab_dataset object
+reg.version = 'SEMIC_Calibration_v1_04-12-2017_Cocoanlab';
+reg.subject = SID;
+reg.datafile = fname;
+reg.starttime = datestr(clock, 0); % date-time
+reg.starttime_getsecs = GetSecs; % in the same format of timestamps for each trial
+%% 
+addpath(genpath(pwd));
 %%
 
 Screen('Clear');
@@ -57,7 +70,10 @@ anchor_y = H/2+10+scale_H;
 stimText = '+';
 init_stim={'00110010' '00111000' '00111110'}; %  Initial degree of heat pain [41 44 47]
 
+ip = '203.252.46.249'; % should activate both 'external control' and 'automatic start' options
+port = 20121;
 
+save(reg.datafile, 'init_stim');
 %%
 cir_center = [(rb+lb)/2, bb];
 radius = (rb-lb)/2; % radius
@@ -76,7 +92,8 @@ for i = 1:3 % 6(Skin sites:1 to 6) x 3 (number of stimulation) combination
 end
 
 %% Pathway program (50 to 64) /
-% [degree decValue ProgramNameInPathway]
+% :: It will be adjusted each settings of study
+% Example:[degree decValue ProgramNameInPathway]
 PathPrg = {41 '00110010' 'SEMIC_41'; ...
     41.5 '00110011' 'SEMIC_41.5'; ...
     42 '00110100' 'SEMIC_42'; ...
@@ -99,7 +116,7 @@ PathPrg = {41 '00110010' 'SEMIC_41'; ...
 
 %%
 theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
-Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); % For alpha value of color: [R G B alpha]
+Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); % For alpha value of  : [R G B alpha]
 Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
 Screen('TextFont', theWindow, font); % setting font
 Screen('TextSize', theWindow, fontsize);
@@ -115,7 +132,14 @@ try
             current_stim=bin2dec(init_stim{random_value(i)});
         else
             rn=randperm(3,1);
-            current_stim=reg.cur_heat_LMH(i,rn); % random
+            % current_stim=reg.cur_heat_LMH(i,rn); % random
+            for iiii=1:length(PathPrg) %find degree
+                if reg.cur_heat_LMH(i,rn) == PathPrg{iiii,1}
+                    current_stim = bin2dec(PathPrg{iiii,2});
+                else
+                    % do nothing
+                end
+            end
             %프로그램코드: reg.cur_heat_LMH(randperm(3,1))
         end
         
@@ -133,25 +157,25 @@ try
         
         %2. Fixation
         start_fix = GetSecs; % Start_time_of_Fixation_Stimulus
-        DrawFormattedText(theWindow, double(stimText), 'center', 'center', color, [], [], [], 1.2);
+        DrawFormattedText(theWindow, double(stimText), 'center', 'center', white , [], [], [], 1.2);
         Screen('Flip', theWindow);
         waitsec_fromstarttime(start_fix, 2);
         
         %3. Stimulation
-        main(ip,port,1,current_stim); %trigerring heat-pain %
-        
-        start_while=GetSecs;
-        while GetSecs - start_while < 10 % same as the test,
-            resp = main(ip,port,0); % get system status
-            systemState = resp{4}; testState = resp{5};
-            if strcmp(systemState, 'Pathway State: TEST') && strcmp(testState,'Test State: RUNNING')
-                start_stim=GetSecs;
-                waitsec_fromstarttime(start_stim,10);
-                break;
-            else
-                %do nothing
-            end
-        end
+%         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% main(ip,port,1,current_stim); %trigerring heat-pain %
+%         
+%         start_while=GetSecs;
+%         while GetSecs - start_while < 10 % same as the test,
+%             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% resp = main(ip,port,0); % get system status
+%             systemState = resp{4}; testState = resp{5};
+%             if strcmp(systemState, 'Pathway State: TEST') && strcmp(testState,'Test State: RUNNING')
+%                 start_stim=GetSecs;
+%                 waitsec_fromstarttime(start_stim,10);
+%                 break;
+%             else
+%                 %do nothing
+%             end
+%         end
         
         %4. Ratings
         start_ratings=GetSecs;
@@ -196,7 +220,7 @@ try
         
         %5. Inter-stimulus inteval, 3 seconds
         start_fix = GetSecs; % Start_time_of_Fixation_Stimulus
-        DrawFormattedText(theWindow, double(stimText), 'center', 'center', color, [], [], [], 1.2);
+        DrawFormattedText(theWindow, double(stimText), 'center', 'center', white, [], [], [], 1.2);
         Screen('Flip', theWindow);
         waitsec_fromstarttime(start_fix, 3);
         
@@ -211,8 +235,6 @@ try
         %           --> End
         % END
         
-        % 지금은 스팀 프로그램에서 온도로 변환해야하는데, 현재 변수에서 같은 row의 것을 가져오는?
-        
         theta = rad2deg(theta);
         theta = 180-theta;
         vas_rating = theta/180*100; % [0 180] to [0 100]
@@ -220,15 +242,20 @@ try
         for iii=1:length(PathPrg) %find degree
             if str2double(dec2bin(current_stim)) == str2double(PathPrg{iii,2})
                 degree = PathPrg{iii,1};
+            else
+                % do nothing
             end
-        end
+        end    
         
         %calibration
         cali_regression (degree, vas_rating, i); % cali_regression (stim_degree, rating, order of trial)       
-        
-    end %trial end
+        save(reg.datafile, '-append', 'reg');
+    end %trial 
+    
+
     
     % End of calibration
+    save(reg.datafile, '-append', 'reg');
     start_endMsg = GetSecs;
     msg='캘리브레이션이 종료되었습니다\n이제 실험자의 지시를 따라주시기 바랍니다';
     display_expmessage(msg);
@@ -236,13 +263,15 @@ try
     sca;
     Screen('CloseAll');
     
+    % disp(best skin site)
+    disp(reg.studySkinSite);
 catch err
     % ERROR
     disp(err);
     for i = 1:numel(err.stack)
         disp(err.stack(i));
     end
-    abort_experiment;
+    abort_man;
 end
 
 
