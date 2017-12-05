@@ -12,9 +12,6 @@ function data = thermode_test(runNbr, ip, port, varargin)
 % Matlab: Program name : Program code (parameter, 8bit)
 % ------------------------------------------------
 %   50  : Pulse 49     :   00110010
-%  100  : Ramp-up 2sec':   01100100
-%  101  : Ramp-up 4sec':   01100101
-%  102  : Ramp-up 6sec':   01100110
 % ...
 %% GLOBAL vaiable
 global theWindow W H; % window property

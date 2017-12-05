@@ -8,7 +8,7 @@
 % 2. After calculate the linear regression,
 
 %%
-clear all;
+clear;
 close all;
 %% Global variable
 global theWindow W H; % window property
@@ -30,11 +30,10 @@ reg.starttime_getsecs = GetSecs; % in the same format of timestamps for each tri
 %% 
 addpath(genpath(pwd));
 %%
-
 Screen('Clear');
 Screen('CloseAll');
 window_num = 0;
-window_rect = [1 1 1200 720]; % in the test mode, use a little smaller screen
+window_rect = [2 2 1200 720]; % in the test mode, use a little smaller screen
 %window_rect = [0 0 1900 1200];
 fontsize = 20;
 W = window_rect(3); %width of screen
@@ -67,14 +66,15 @@ anchor_y = H/2+10+scale_H;
 % anchor_lms = [0.014 0.061 0.172 0.354 0.533].*(rb-lb)+lb;
 
 %% Parameter
+NumOfTr = 18;
 stimText = '+';
-init_stim={'00110010' '00111000' '00111110'}; %  Initial degree of heat pain [41 44 47]
-
+init_stim={'00110010' '00111000' '00111110'}; % Initial degree of heat pain [41 44 47]
+% CHEPS setting
 ip = '203.252.46.249'; % should activate both 'external control' and 'automatic start' options
 port = 20121;
-
+% save?
 save(reg.datafile, 'init_stim');
-%%
+%% 
 cir_center = [(rb+lb)/2, bb];
 radius = (rb-lb)/2; % radius
 deg = 180-normrnd(0.5, 0.1, 20, 1)*180; % convert 0-1 values to 0-180 degree
@@ -109,24 +109,19 @@ PathPrg = {41 '00110010' 'SEMIC_41'; ...
     47 '00111110' 'SEMIC_47'; ...
     47.5 '00111111' 'SEMIC_47.5'; ...
     48 '01000000' 'SEMIC_48';};
-%        for ii=1:15
-%            disp(bin2dec(PathPrg{ii,2}));
-%        end
-%        bin2dec(PathPrg{i,2});
-
 %%
 theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
-Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); % For alpha value of  : [R G B alpha]
+Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); % For alpha value of e.g.,[R G B alpha]
 Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
 Screen('TextFont', theWindow, font); % setting font
 Screen('TextSize', theWindow, fontsize);
 %% START: Calibration
-%0. Instructions
 try
+    %0. Instructions
     display_expmessage('지금부터 Calibration을 시작하겠습니다.\n참가자는 편안하게 계시고 진행자의 지시를 따라주시기 바랍니다.');
     WaitSecs(1);
     random_value = randperm(3);
-    for i=1:18 %Total trial
+    for i=1:NumOfTr %Total trial
         % manipulate the current stim
         if i<4
             current_stim=bin2dec(init_stim{random_value(i)});
@@ -140,11 +135,10 @@ try
                     % do nothing
                 end
             end
-            %프로그램코드: reg.cur_heat_LMH(randperm(3,1))
         end
         
         %1. Display where the skin site stimulates (1-6)
-        msg = strcat('다음 위치의 thermode를 이동하신 후 SPACE 키를 누르십시오: ', num2str(reg.skin_site(i)));
+        msg = strcat('다음 위치의 thermode를 이동하신 후 SPACE 키를 누르십시오 :  ', num2str(reg.skin_site(i)));
         while (1)
             [~,~,keyCode] = KbCheck;
             if keyCode(KbName('space'))==1
@@ -162,23 +156,25 @@ try
         waitsec_fromstarttime(start_fix, 2);
         
         %3. Stimulation
-%         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% main(ip,port,1,current_stim); %trigerring heat-pain %
-%         
-%         start_while=GetSecs;
-%         while GetSecs - start_while < 10 % same as the test,
-%             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% resp = main(ip,port,0); % get system status
-%             systemState = resp{4}; testState = resp{5};
-%             if strcmp(systemState, 'Pathway State: TEST') && strcmp(testState,'Test State: RUNNING')
-%                 start_stim=GetSecs;
-%                 waitsec_fromstarttime(start_stim,10);
-%                 break;
-%             else
-%                 %do nothing
-%             end
-%         end
+        main(ip,port,1,current_stim); %trigerring heat-pain %
+        
+        start_while=GetSecs;
+        while GetSecs - start_while < 10 % same as the test,
+            resp = main(ip,port,0); % get system status
+            systemState = resp{4}; testState = resp{5};
+            if strcmp(systemState, 'Pathway State: TEST') && strcmp(testState,'Test State: RUNNING')
+                start_stim=GetSecs;
+                waitsec_fromstarttime(start_stim,10);
+                break;
+            else
+                %do nothing
+            end
+        end
         
         %4. Ratings
         start_ratings=GetSecs;
+        cir_center = [(rb+lb)/2, bb];
+        SetMouse(cir_center(1), cir_center(2));
         while GetSecs - start_ratings < 10 % Under 10 seconds,
             [x,y,button] = GetMouse(theWindow);
             rating_type = 'semicircular';
@@ -205,7 +201,8 @@ try
             %For draw theta text on 'theWindow' screen
             % theta = num2str(theta);
             % DrawFormattedText(theWindow, theta, 'center', 'center', white, [], [], [], 1.2);
-            % disp(theta);
+            disp(theta);
+            disp(i);
             Screen('Flip',theWindow);
             
             % Feedback
@@ -248,7 +245,7 @@ try
         end    
         
         %calibration
-        cali_regression (degree, vas_rating, i); % cali_regression (stim_degree, rating, order of trial)       
+        cali_regression (degree, vas_rating, i, NumOfTr); % cali_regression (stim_degree in this trial, rating, order of trial, Number of Trial)       
         save(reg.datafile, '-append', 'reg');
     end %trial 
     
@@ -256,10 +253,10 @@ try
     
     % End of calibration
     save(reg.datafile, '-append', 'reg');
-    start_endMsg = GetSecs;
+    reg.endtime_getsecs = GetSecs;
     msg='캘리브레이션이 종료되었습니다\n이제 실험자의 지시를 따라주시기 바랍니다';
     display_expmessage(msg);
-    waitsec_fromstarttime(start_endMsg, 10);
+    waitsec_fromstarttime(reg.endtime_getsecs, 10);
     sca;
     Screen('CloseAll');
     
