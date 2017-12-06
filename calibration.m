@@ -1,11 +1,10 @@
-% INFORMATION
-% Start date: 17/11/27
-% Name: Suhwan Gim
+% INFORMATION 
+% Start date: 17/11/27 
+% Name: Suhwan Gim 
 % : A calibraition for heat-pain machine
-%
-% -----------------------------------------------
-% 1. Degree of first three heat-stimulations is randomly given at any skin sites:[41 44 47]
-% 2. After calculate the linear regression,
+% --------------------------------------------------------------------------
+% 1.Degree of first three heat-stimulations is randomly given at any skin
+% sites:[41 44 47] 2. After calculate the linear regression,
 
 %%
 clear;
@@ -73,7 +72,7 @@ init_stim={'00110010' '00111000' '00111110'}; % Initial degree of heat pain [41 
 ip = '203.252.46.249'; % should activate both 'external control' and 'automatic start' options
 port = 20121;
 % save?
-save(reg.datafile, 'init_stim');
+save(reg.init_stim, 'init_stim','reg');
 %% 
 cir_center = [(rb+lb)/2, bb];
 radius = (rb-lb)/2; % radius
@@ -84,16 +83,24 @@ th = deg2rad(deg);
 x = radius*cos(th)+cir_center(1);
 y = cir_center(2)-radius*sin(th);
 
-%% skin site
+%% skin site / LMH sequence
 rng('shuffle');
 % reg.skin_site = repmat({1,2,3,4,5,6}, 1, 3); % Five combitnations
 for i = 1:3 % 6(Skin sites:1 to 6) x 3 (number of stimulation) combination
     reg.skin_site(i*6-5:i*6,1) = randperm(6); % [1 2 3 4 5 6] [2 3 1 4 6 5] ......
 end
 
+for z = 1:6
+    [I, V] = find(reg.skin_site==z); % [Index, Value]
+    rn=randperm(3);
+    for zz=1:size(I,1)
+        reg.skin_LMH(I(zz)) = rn(zz); 
+    end
+end
+
 %% Pathway program (50 to 64) /
-% :: It will be adjusted each settings of study
-% Example:[degree decValue ProgramNameInPathway]
+% :: It will be adjusted each settings of study Example:[degree decValue
+% ProgramNameInPathway]
 PathPrg = {41 '00110010' 'SEMIC_41'; ...
     41.5 '00110011' 'SEMIC_41.5'; ...
     42 '00110100' 'SEMIC_42'; ...
@@ -126,10 +133,9 @@ try
         if i<4
             current_stim=bin2dec(init_stim{random_value(i)});
         else
-            rn=randperm(3,1);
             % current_stim=reg.cur_heat_LMH(i,rn); % random
             for iiii=1:length(PathPrg) %find degree
-                if reg.cur_heat_LMH(i,rn) == PathPrg{iiii,1}
+                if reg.cur_heat_LMH(i,reg.skin_LMH(i)) == PathPrg{iiii,1}
                     current_stim = bin2dec(PathPrg{iiii,2});
                 else
                     % do nothing
@@ -181,8 +187,8 @@ try
             draw_scale('overall_avoidance_semicircular');
             Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  %dif color
             
-            % if the point goes further than the semi-circle, move the point to
-            % the closest point
+            % if the point goes further than the semi-circle, move the
+            % point to the closest point
             radius = (rb-lb)/2; % radius
             theta = atan2(cir_center(2)-y,x-cir_center(1));
             if y > bb
@@ -199,8 +205,8 @@ try
             draw_scale('overall_avoidance_semicircular');
             
             %For draw theta text on 'theWindow' screen
-            % theta = num2str(theta);
-            % DrawFormattedText(theWindow, theta, 'center', 'center', white, [], [], [], 1.2);
+            % theta = num2str(theta); DrawFormattedText(theWindow, theta,
+            % 'center', 'center', white, [], [], [], 1.2);
             disp(theta);
             disp(i);
             Screen('Flip',theWindow);
@@ -224,12 +230,12 @@ try
         %6. Linear regression (excuted from 4th trial)
         % IF: 1-3rd trial
         %                : [41 44 47] randomized matrix --> End
-        % or
-        % ELSEIF 4th~18th trial
-        %                : create converted rating 30 50 70 matrix from below flow
+        % or ELSEIF 4th~18th trial
+        %                : create converted rating 30 50 70 matrix from
+        %                below flow
         %           --> Calculating converted rating from linear regrssion
-        %           --> Selete the closest degree of heat pain program
-        %           --> End
+        %           --> Selete the closest degree of heat pain program -->
+        %           End
         % END
         
         theta = rad2deg(theta);

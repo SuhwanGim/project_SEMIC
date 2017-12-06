@@ -1,18 +1,21 @@
 function data = thermode_test(runNbr, ip, port, varargin)
 %% INFORMATION
 %
-% 2017-10-19
-
-%% EXAMPEL of PROGRAM code
+% by Suhwan Gim (roseno.9@daum.net)
+% 2017-12-06
+% ========================================================================
+% EXAMPEL of PROGRAM code
 % dec2bin(100) -> ans = 1100100
 % (MATLAB Value, PATHWAY Value) = (100,1100100)
-%
 % In this experiment,
 % ---------------------------------------------------------
 % Matlab: Program name : Program code (parameter, 8bit)
 % ------------------------------------------------
-%   50  : Pulse 49     :   00110010
-% ...
+%   25  : Pulse 49     :   00011001
+%   50  : SEMIC_41     :   00110010
+%   51  : SEMIC_41.5   :   00110011
+%    ~        ~                ~
+%   64  : SEMIC_48     :   01000000
 %% GLOBAL vaiable
 global theWindow W H; % window property
 global white red red_Alpha orange bgcolor yellow; % color
@@ -20,22 +23,18 @@ global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
 global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
 
 %% Parse varargin
-doexplain_scale = false;
 testmode = false;
 USE_BIOPAC = false;
-
 
 % need to be specified differently for different computers
 % psytool = 'C:\toolbox\Psychtoolbox';
 scriptdir = '/Users/cocoan/Dropbox/github/';
 savedir = 'SEMIC_data';
 
+
 for i = 1:length(varargin)
     if ischar(varargin{i})
         switch varargin{i}
-            case {'explain_scale'}
-                doexplain_scale = true;
-                exp_scale.inst = varargin{i+1};
             case {'test'}
                 testmode = true;
             case {'scriptdir'}
@@ -47,8 +46,6 @@ for i = 1:length(varargin)
                 channel_n = 3;
                 biopac_channel = 0;
                 ljHandle = BIOPAC_setup(channel_n); % BIOPAC SETUP
-            case {'gazePoint'}
-                % What I should type?
             case {'mouse', 'trackball'}
                 % do nothing
         end
@@ -58,76 +55,104 @@ end
 % addpath(scriptdir); cd(scriptdir);
 % addpath(genpath(psytool));
 % addpath('mat_joy');
-addpath('pathwaySupportCode');
-addpath('pathwaySupportCode/Classess');
+% addpath('pathwaySupportCode');
+% addpath('pathwaySupportCode/Classess');
+addpath(genpath(pwd));
 %% SETUP: DATA and Subject INFO
+reg=load_cali_results(); %informaion of calibration
+
 savedir = 'SEMIC_data';
 [fname,start_trial, SID] = subjectinfo_check_SEMIC(savedir,runNbr); % subfunction %start_trial
 %[fname, start_trial, SID] = subjectinfo_check(savedir); % subfunction
 if exist(fname, 'file'), load(fname, 'data'); load(fname,'ts'); end
 % save data using the canlab_dataset object
-data.version = 'SEMIC_v1_10-27-2017_Cocoanlab';
+data.version = 'SEMIC_v1_12-06-2017_Cocoanlab';
 data.subject = SID;
 data.datafile = fname;
 data.starttime = datestr(clock, 0); % date-time
 data.starttime_getsecs = GetSecs; % in the same format of timestamps for each trial
 
+%% SETUP: CHEPS PROGRAM(50 to 64) /
+% :: It will be adjusted each settings of study Example:[degree decValue
+% ProgramNameInPathway]
+PathPrg = {41 '00110010' 'SEMIC_41'; ...
+    41.5 '00110011' 'SEMIC_41.5'; ...
+    42 '00110100' 'SEMIC_42'; ...
+    42.5 '00110101' 'SEMIC_42.5'; ...
+    43 '00110110' 'SEMIC_43'; ...
+    43.5 '00110111' 'SEMIC_43.5'; ...
+    44 '00111000' 'SEMIC_44'; ...
+    44.5 '00111001' 'SEMIC_44.5'; ...
+    45 '00111010' 'SEMIC_45'; ...
+    45.5 '00111011' 'SEMIC_45.5'; ...
+    46 '00111100' 'SEMIC_46'; ...
+    46.5 '00111101' 'SEMIC_46.5'; ...
+    47 '00111110' 'SEMIC_47'; ...
+    47.5 '00111111' 'SEMIC_47.5'; ...
+    48 '01000000' 'SEMIC_48';};
 %% SETUP: Trial sequence handle
 % =========================================================================
 %   1. Run number - Trial number - Pain type - ITI - Delay - Cue mean - Cue variance - Ramp-up
 %   2. ITI and Delay ) 3 to 7 seconds (5 combination: 3-7, 4-6, 5-5, 6-4, 7-3)
-%   3. Cue mean (5 levels: 0-1). e.g., 0.1, 0.3, 0.5, 0.7 0.9
-%       : included jitter number (such as + and - 0.01~0.05)
-%   4. Cue variance (3 levels: 0-1) e.g., 0.1, 0.25, 0.4
-%       : How to determine this score?
-%   5. Program: Ramp-up (3 levels: 100, 101, 102; Strafied randomization)
+%   3. Cue mean (2 levels: 0-1). e.g., 0.3(LOW), 0.7(HIGH)
+%       : plused random number (such as + and - 0.01~0.05)
+%   4. Cue variance (1 levels: 0-1) e.g., 0.1, 0.11, 0.123....
 %-------------------------------------------------------------------------
 % For TEST,
 % runNbr=1;
 if start_trial==1
     rng('shuffle');
     % Number of trial
-    trial_Number=(1:45)'; % and transpose
+    trial_Number=(1:20)'; % and transpose
     % Run number
     run_Number = repmat(runNbr,length(trial_Number),1);
     % Cue_mean Randoimzation (Five levels: 0.1, 0.3, 0.5, 0.7 0.9)
-    c_mean_bs = repmat({0.1; 0.3; 0.5; 0.7; 0.9},9,1); % 5 levels x 9 repetition = 45 trials
-    rn=randperm(45);
-    c_mean = cell2mat(c_mean_bs(rn));
+    cue_mean_bs = repmat({0.3; 0.7;},10,1); % LOW HIGH x 10 = 20 trials
+    cue_settings = repmat({"LOW";"HIGH"},10,1);
+    rn=randperm(20);
+    cue_settings = cue_settings(rn);
+    cue_mean = cell2mat(cue_mean_bs(rn))+ randn(20,1).*0.07;
     % Cue_variance Randoimzation (Three levels: 0.01, 0.05, 0.1)
-    c_var_bs = repmat({0.01; 0.05; 0.1},15,1);
-    rn=randperm(45);
-    c_var=cell2mat(c_var_bs(rn));
-    % RAMP-UP program Randoimzation
-    for i = 1:15 % 3(2,4,6sec) x 15 other combination
-        program(i*3-2:i*3,1) = randperm(3) + 99; % [1 2 3] [2 3 1] ......
-    end
-    % Create ramp-up seconds
-    for ii = 1:length(program)
-        if program(ii) == 100
-            ramp_up_con(ii) = 2;
-        elseif program(ii) == 101
-            ramp_up_con(ii) = 4;
-        else
-            ramp_up_con(ii) = 6;
+    cue_var_bs = repmat({0.05;},20,1);
+    rn=randperm(20);
+    cue_var=abs(cell2mat(cue_var_bs(rn)) + randn(20,1).*0.003);
+    
+    % Find the dec value
+    for iiii=1:numel(reg.FinalLMH_5Level)        
+        for iii=1:length(PathPrg) %find degree
+            if reg.FinalLMH_5Level(iiii) == PathPrg{iii,1}
+                degree{iiii,1} = bin2dec(PathPrg{iii,2});
+            else
+                % do nothing
+            end
         end
     end
+    stim_degree=cell2mat(degree);   
+    % LV1 to LV5 (calibrated) program Randoimzation
+    for i = 1:4 % 5(LV1 to LV 5) x 4 other combination
+        ts_program(i*5-4:i*5,1) = randperm(5); % [1 2 3 4 5] [2 3 4 1 5] ......
+        stim_level = repmat({"LV1"; "LV2"; "LV3"; "LV4";"LV5"},4,1);
+        program(i*5-4:i*5,1) = stim_degree;
+    end
+    program = program(ts_program);
+    stim_level = stim_level(ts_program);
     % ITI-Delay acombination
     ITI_Delay = repmat({3, 7; 4, 6; 5, 5; 6, 4; 7,3}, 9, 1); % Five combitnations
     rn=randperm(45);
     ITI_Delay = ITI_Delay(rn,:);
     ITI = cell2mat(ITI_Delay(:,1));
     Delay = cell2mat(ITI_Delay(:,2));
-    %ts = [trial_Number, run_Number, ITI, Delay, c_mean, c_var, program, ramp_up_con];
-    ts{runNbr} = [trial_Number, run_Number, ITI, Delay, c_mean, c_var, program];
+    %ts = [trial_Number, run_Number, ITI, Delay, cue_mean, cue_var, ts_program, ramp_up_con];
+    ts{runNbr} = [trial_Number, run_Number, ITI, Delay, cue_mean, cue_settings, cue_var, ts_program, program, stim_level];
     % save the trial_sequences
     save(data.datafile, 'ts', 'data');
 else
-    [trial_Number, run_Number, ITI, Delay, c_mean, c_var, program] = ts{runNbr};
+    [trial_Number, run_Number, ITI, Delay, cue_mean, cue_settings, cue_var, ts_program, program, stim_level] = ts{runNbr};
 end
 %% SETUP: Experiment settings
 rating_type = 'semicircular';
 NumberOfCue = 25;
+
 %% SETUP: Screen
 Screen('Clear');
 Screen('CloseAll');
@@ -222,30 +247,34 @@ try
         end
         data.dat{runNbr}{trial_Number(j)}.trial_start_t = GetSecs; %Trial start
         
-        % ITI (jitter)
+        % 1. ITI (jitter)
         fixPoint(ITI(j), white, '-') %
-        % Cue
+        
+        % 2. Cue
         cue_t = GetSecs;
         data.dat{runNbr}{trial_Number(j)}.cue_timestamp = cue_t; %Cue time stamp
         draw_scale('overall_avoidance_semicircular');
-        [data.dat{runNbr}{trial_Number(j)}.cue_x, data.dat{runNbr}{trial_Number(j)}.cue_theta] = draw_social_cue(c_mean(j), c_var(j), NumberOfCue, rating_type); % draw & save details: draw_socia_cue(m, std, n, rating_type)
+        [data.dat{runNbr}{trial_Number(j)}.cue_x, data.dat{runNbr}{trial_Number(j)}.cue_theta] = draw_social_cue(cue_mean(j), cue_var(j), NumberOfCue, rating_type); % draw & save details: draw_socia_cue(m, std, n, rating_type)
         Screen('Flip', theWindow);
         waitsec_fromstarttime(cue_t, 2);
         data.dat{runNbr}{trial_Number(j)}.cue_end_timestamp = GetSecs;
-        % Delay
+        
+        % 3. Delay
         fixPoint(Delay(j), white, '+')
-        % HEAT and Ratings
-        % thermodePrime(ip, port, program(j))
+        
+        % 4. HEAT and Ratings
         cir_center = [(rb+lb)/2, bb];
         SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
         % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
         rec_i = 0;
-        
+        % thermodePrime(ip, port, ts_program(j))
+        tic;
         data.dat{runNbr}{trial_Number(j)}.heat_start_txt = main(ip,port,1,program(j)); % Triggering heat signal
+        data.dat{runNbr}{trial_Number(j)}.duration_heat_trigger = toc;
         data.dat{runNbr}{trial_Number(j)}.heat_start_timestamp = GetSecs; % heat-stimulus time stamp
         % if checkStatus(ip,port)
         ready = 0;
-        ready2 =0;
+        ready2 = 0;
         while ~ready2
             start_while=GetSecs;
             while ~ready
@@ -295,21 +324,22 @@ try
             data.dat{runNbr}{trial_Number(j)}.clicks(rec_i,:) = button;
             data.dat{runNbr}{trial_Number(j)}.r_theta(rec_i,:) = [curr_r/radius curr_theta/180];
             
-            if GetSecs - sTime > ramp_up_con(j) + 7 % 7 = plateau + ramp-down
-                data.dat{runNbr}{trial_Number(j)}.heat_exit_txt = main(ip,port,5); % Triggering stop signal
-                start_stopsignal=GetSecs;
-                waitsec_fromstarttime(start_stopsignal, 1)
-                resp = main(ip,port,0); %get system status
-                systemState = resp{4}; testState = resp{5};
-                if strcmp(systemState, 'Pathway State: READY') && strcmp(testState,'Test State: IDLE')
-                    ready2 = 1;
-                    data.dat{runNbr}{trial_Number(j)}.heat_exit_timestamp = GetSecs;
-                    break;
-                end
-            end
+%             if GetSecs - sTime > 10 % 7 = plateau + ramp-down
+%                 data.dat{runNbr}{trial_Number(j)}.heat_exit_txt = main(ip,port,5); % Triggering stop signal
+%                 start_stopsignal=GetSecs;
+%                 waitsec_fromstarttime(start_stopsignal, 2)
+%                 resp = main(ip,port,0); %get system status
+%                 systemState = resp{4}; testState = resp{5};
+%                 if strcmp(systemState, 'Pathway State: READY') && strcmp(testState,'Test State: IDLE')
+%                     ready2 = 1;
+%                     data.dat{runNbr}{trial_Number(j)}.heat_exit_timestamp = GetSecs;
+%                     break;
+%                 end
+%             end
             
         end
-        %end
+        
+        % rating end
         SetMouse(0,0);
         Screen(theWindow,'FillRect',bgcolor, window_rect);
         Screen('Flip', theWindow);
