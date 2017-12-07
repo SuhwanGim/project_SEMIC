@@ -46,6 +46,8 @@ for i = 1:length(varargin)
                 channel_n = 3;
                 biopac_channel = 0;
                 ljHandle = BIOPAC_setup(channel_n); % BIOPAC SETUP
+            case {'eyelink'}
+                %
             case {'mouse', 'trackball'}
                 % do nothing
         end
@@ -54,9 +56,6 @@ end
 
 % addpath(scriptdir); cd(scriptdir);
 % addpath(genpath(psytool));
-% addpath('mat_joy');
-% addpath('pathwaySupportCode');
-% addpath('pathwaySupportCode/Classess');
 addpath(genpath(pwd));
 %% SETUP: DATA and Subject INFO
 reg=load_cali_results(); %informaion of calibration
@@ -98,8 +97,6 @@ PathPrg = {41 '00110010' 'SEMIC_41'; ...
 %       : plused random number (such as + and - 0.01~0.05)
 %   4. Cue variance (1 levels: 0-1) e.g., 0.1, 0.11, 0.123....
 %-------------------------------------------------------------------------
-% For TEST,
-% runNbr=1;
 if start_trial==1
     rng('shuffle');
     % Number of trial
@@ -116,7 +113,6 @@ if start_trial==1
     cue_var_bs = repmat({0.05;},20,1);
     rn=randperm(20);
     cue_var=abs(cell2mat(cue_var_bs(rn)) + randn(20,1).*0.003);
-    
     % Find the dec value
     for iiii=1:numel(reg.FinalLMH_5Level)        
         for iii=1:length(PathPrg) %find degree
@@ -137,17 +133,23 @@ if start_trial==1
     program = program(ts_program);
     stim_level = stim_level(ts_program);
     % ITI-Delay acombination
-    ITI_Delay = repmat({3, 7; 4, 6; 5, 5; 6, 4; 7,3}, 9, 1); % Five combitnations
-    rn=randperm(45);
+    ITI_Delay = repmat({3, 7; 4, 6; 5, 5; 6, 4; 7,3}, 4, 1); % Five combitnations
+    rn=randperm(20);
     ITI_Delay = ITI_Delay(rn,:);
     ITI = cell2mat(ITI_Delay(:,1));
     Delay = cell2mat(ITI_Delay(:,2));
+    % Overall_ratings Question randomization
+    overall_unpl_Q_txt= repmat({'다른 사람들은 방금의 자극을 얼마나 불쾌하게 느꼈을 것 같나요?'; '방금 경험한 열자극이 얼마나 불쾌했나요?'},10,1);
+    overall_unpl_Q_cond = ({1;2},10,1);
+    rn=randperm(20);
+    overall_unpl_Q_txt = overall_unpl_Q_txt(rn);
+    overall_unpl_Q_cond = overall_unpl_Q_cond(rn); 
     %ts = [trial_Number, run_Number, ITI, Delay, cue_mean, cue_var, ts_program, ramp_up_con];
-    ts{runNbr} = [trial_Number, run_Number, ITI, Delay, cue_mean, cue_settings, cue_var, ts_program, program, stim_level];
+    ts{runNbr} = [trial_Number, run_Number, ITI, Delay, cue_mean, cue_settings, cue_var, ts_program, program, stim_level, overall_unpl_Q_txt, overall_unpl_Q_cond];
     % save the trial_sequences
     save(data.datafile, 'ts', 'data');
 else
-    [trial_Number, run_Number, ITI, Delay, cue_mean, cue_settings, cue_var, ts_program, program, stim_level] = ts{runNbr};
+    [trial_Number, run_Number, ITI, Delay, cue_mean, cue_settings, cue_var, ts_program, program, stim_level, overall_unpl_Q_txt, overall_unpl_Q_cond] = ts{runNbr};
 end
 %% SETUP: Experiment settings
 rating_type = 'semicircular';
@@ -200,7 +202,7 @@ anchor_y = H/2+10+scale_H;
 % anchor_lms = [0.014 0.061 0.172 0.354 0.533].*(rb-lb)+lb;
 
 %% EXPERIEMENT START
-
+ 
 % START
 try
     theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
@@ -256,7 +258,7 @@ try
         draw_scale('overall_avoidance_semicircular');
         [data.dat{runNbr}{trial_Number(j)}.cue_x, data.dat{runNbr}{trial_Number(j)}.cue_theta] = draw_social_cue(cue_mean(j), cue_var(j), NumberOfCue, rating_type); % draw & save details: draw_socia_cue(m, std, n, rating_type)
         Screen('Flip', theWindow);
-        waitsec_fromstarttime(cue_t, 2);
+        waitsec_fromstarttime(cue_t, 2); % 2 seconds
         data.dat{runNbr}{trial_Number(j)}.cue_end_timestamp = GetSecs;
         
         % 3. Delay
@@ -311,7 +313,7 @@ try
                 y = cir_center(2)-radius*sin(theta);
                 SetMouse(x,y);
             end
-            msg = '현재 고통의 정도를 최대한 가깝게 표현해주세요';
+            msg = '현재 느껴지는 통증의 세기를 최대한 정확하게 실시간으로 보고해주세요';
             msg = double(msg);
             DrawFormattedText(theWindow, msg, 'center', 250, white, [], [], [], 1.2);
             draw_scale('overall_avoidance_semicircular')
@@ -319,18 +321,72 @@ try
             Screen('Flip', theWindow);
             
             % Saving data
-            data.dat{runNbr}{trial_Number(j)}.time_fromstart(rec_i,1) = GetSecs-sTime;
-            data.dat{runNbr}{trial_Number(j)}.xy(rec_i,:) = [x-cir_center(1) cir_center(2)-y]./radius;
-            data.dat{runNbr}{trial_Number(j)}.clicks(rec_i,:) = button;
-            data.dat{runNbr}{trial_Number(j)}.r_theta(rec_i,:) = [curr_r/radius curr_theta/180];
+            data.dat{runNbr}{trial_Number(j)}.con_time_fromstart(rec_i,1) = GetSecs-sTime;
+            data.dat{runNbr}{trial_Number(j)}.con_xy(rec_i,:) = [x-cir_center(1) cir_center(2)-y]./radius;
+            data.dat{runNbr}{trial_Number(j)}.con_clicks(rec_i,:) = button;
+            data.dat{runNbr}{trial_Number(j)}.con_r_theta(rec_i,:) = [curr_r/radius curr_theta/180];
+            
+           
+        end
+        
+        %5. Overall ratings
+        cir_center = [(rb+lb)/2, bb];
+        SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
+        % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
+        rec_i = 0;
+        % if checkStatus(ip,port)
+        data.dat{runNbr}{trial_Number(j)}.overall_rating_timestamp=GetSecs;
+        while GetSecs - data.dat{runNbr}{trial_Number(j)}.overall_rating_timestamp > 5
+            [x,y,button]=GetMouse(theWindow);
+            rec_i= rec_i+1;
+            % if the point goes further than the semi-circle, move the point to
+            % the closest point
+            radius = (rb-lb)/2; % radius
+            theta = atan2(cir_center(2)-y,x-cir_center(1));
+            % current euclidean distance
+            curr_r = sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2);
+            % current angle (0 - 180 deg)
+            curr_theta = rad2deg(-theta+pi);
+            % For control a mouse cursor:
+            % send to diameter of semi-circle
+            if y > bb
+                y = bb;
+                SetMouse(x,y);
+            end
+            % send to arc of semi-circle
+            if sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2) > radius
+                x = radius*cos(theta)+cir_center(1);
+                y = cir_center(2)-radius*sin(theta);
+                SetMouse(x,y);
+            end
+            msg = double(overall_unpl_Q_txt{j});
+            DrawFormattedText(theWindow, msg, 'center', 250, white, [], [], [], 1.2);
+            draw_scale('overall_avoidance_semicircular')
+            Screen('DrawDots', theWindow, [x y], 10, orange, [0 0], 1);
+            Screen('Flip', theWindow);
+            
+            if button(1)
+                draw_scale('overall_avoidance_semicircular');
+                Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
+                Screen('Flip',theWindow);
+                WaitSecs(1);
+                break; % break for "if"
+            end
+            
+            % Saving data
+            data.dat{runNbr}{trial_Number(j)}.ovr_time_fromstart(rec_i,1) = GetSecs-sTime;
+            data.dat{runNbr}{trial_Number(j)}.ovr_xy(rec_i,:) = [x-cir_center(1) cir_center(2)-y]./radius;
+            data.dat{runNbr}{trial_Number(j)}.ovr_clicks(rec_i,:) = button;
+            data.dat{runNbr}{trial_Number(j)}.ovr_r_theta(rec_i,:) = [curr_r/radius curr_theta/180];
+            
             
 %             if GetSecs - sTime > 10 % 7 = plateau + ramp-down
-%                 data.dat{runNbr}{trial_Number(j)}.heat_exit_txt = main(ip,port,5); % Triggering stop signal
 %                 start_stopsignal=GetSecs;
 %                 waitsec_fromstarttime(start_stopsignal, 2)
 %                 resp = main(ip,port,0); %get system status
 %                 systemState = resp{4}; testState = resp{5};
 %                 if strcmp(systemState, 'Pathway State: READY') && strcmp(testState,'Test State: IDLE')
+%                     data.dat{runNbr}{trial_Number(j)}.heat_exit_txt = main(ip,port,5); % Triggering stop signal
 %                     ready2 = 1;
 %                     data.dat{runNbr}{trial_Number(j)}.heat_exit_timestamp = GetSecs;
 %                     break;
@@ -339,7 +395,6 @@ try
             
         end
         
-        % rating end
         SetMouse(0,0);
         Screen(theWindow,'FillRect',bgcolor, window_rect);
         Screen('Flip', theWindow);
@@ -347,11 +402,11 @@ try
         data.dat{runNbr}{trial_Number(j)}.end_trial_t = end_trial;
         data.dat{runNbr}{trial_Number(j)}.ramp_up_cnd = ramp_up_con(j);
         if mod(trial_Number(j),2) == 0, save(data.datafile, '-append', 'data'); end % save data every two trials
-        if mod(trial_Number(j),5) == 0 % Because of IRB, When end of every fifth trial, have a rest within 15 seconds
-            display_expmessage('Every 5th trial 대기 해야함\n뿌잉뿌잉뿌뿌이잉');
-            waitsec_fromstarttime(end_trial, 15);
-            end_trial = end_trial + 15;
-        end
+%         if mod(trial_Number(j),5) == 0 % Because of IRB, When end of every fifth trial, have a rest within 15 seconds
+%             display_expmessage('Every 5th trial 대기 해야함\n뿌잉뿌잉뿌뿌이잉');
+%             waitsec_fromstarttime(end_trial, 15);
+%             end_trial = end_trial + 15;
+%         end
         waitsec_fromstarttime(end_trial, 1); % For your rest,
     end
     
