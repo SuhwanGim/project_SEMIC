@@ -5,10 +5,12 @@
 % --------------------------------------------------------------------------
 % 1.Degree of first three heat-stimulations is randomly given at any skin
 % sites:[41 44 47] 2. After calculate the linear regression,
+%%
 
 %%
 clear;
 close all;
+
 %% Global variable
 global theWindow W H; % window property
 global white red orange bgcolor; % color
@@ -32,7 +34,7 @@ addpath(genpath(pwd));
 Screen('Clear');
 Screen('CloseAll');
 window_num = 0;
-window_rect = [2 2 1200 720]; % in the test mode, use a little smaller screen
+window_rect = [2 2 800 600]; % in the test mode, use a little smaller screen
 %window_rect = [0 0 1900 1200];
 fontsize = 20;
 W = window_rect(3); %width of screen
@@ -62,17 +64,18 @@ anchor_yd = bb+20; % 710
 
 % y location for anchors of rating scales -
 anchor_y = H/2+10+scale_H;
-% anchor_lms = [0.014 0.061 0.172 0.354 0.533].*(rb-lb)+lb;
+% anchor_lms = [0.0200 0.1069 0.3123 0.6490 0.9801].*(rb-lb)+lb  % adapted
+% anchor_lms = [0.014 0.061 0.172 0.354 0.533].*(rb-lb)+lb; for VAS
 
 %% Parameter
-NumOfTr = 18;
+NumOfTr = 12;
 stimText = '+';
 init_stim={'00110010' '00111000' '00111110'}; % Initial degree of heat pain [41 44 47]
-% CHEPS setting
+% Pathway setting
 ip = '203.252.46.249'; % should activate both 'external control' and 'automatic start' options
 port = 20121;
 % save?
-save(reg.init_stim, 'init_stim','reg');
+save(reg.datafile,'reg','init_stim');
 %% 
 cir_center = [(rb+lb)/2, bb];
 radius = (rb-lb)/2; % radius
@@ -86,11 +89,11 @@ y = cir_center(2)-radius*sin(th);
 %% skin site / LMH sequence
 rng('shuffle');
 % reg.skin_site = repmat({1,2,3,4,5,6}, 1, 3); % Five combitnations
-for i = 1:3 % 6(Skin sites:1 to 6) x 3 (number of stimulation) combination
-    reg.skin_site(i*6-5:i*6,1) = randperm(6); % [1 2 3 4 5 6] [2 3 1 4 6 5] ......
+for i = 1:3 % 4(Skin sites:1 to 4) x 3 (number of stimulation) combination
+    reg.skin_site(i*4-3:i*4,1) = randperm(4); % [1 2 3 4] [2 3 1 4] ......
 end
 
-for z = 1:6
+for z = 1:4 % four skin_site %Each skin site stimulated by LMH heat-pain
     [I, V] = find(reg.skin_site==z); % [Index, Value]
     rn=randperm(3);
     for zz=1:size(I,1)
@@ -161,21 +164,21 @@ try
         Screen('Flip', theWindow);
         waitsec_fromstarttime(start_fix, 2);
         
-        %3. Stimulation
-        main(ip,port,1,current_stim); %trigerring heat-pain %
-        
-        start_while=GetSecs;
-        while GetSecs - start_while < 10 % same as the test,
-            resp = main(ip,port,0); % get system status
-            systemState = resp{4}; testState = resp{5};
-            if strcmp(systemState, 'Pathway State: TEST') && strcmp(testState,'Test State: RUNNING')
-                start_stim=GetSecs;
-                waitsec_fromstarttime(start_stim,10);
-                break;
-            else
-                %do nothing
-            end
-        end
+%         %3. Stimulation
+%         main(ip,port,1,current_stim); %trigerring heat-pain %
+%         
+%         start_while=GetSecs;
+%         while GetSecs - start_while < 10 % same as the test,
+%             resp = main(ip,port,0); % get system status
+%             systemState = resp{4}; testState = resp{5};
+%             if strcmp(systemState, 'Pathway State: TEST') && strcmp(testState,'Test State: RUNNING')
+%                 start_stim=GetSecs;
+%                 waitsec_fromstarttime(start_stim,10);
+%                 break;
+%             else
+%                 %do nothing
+%             end
+%         end
         
         %4. Ratings
         start_ratings=GetSecs;
@@ -209,6 +212,7 @@ try
             % 'center', 'center', white, [], [], [], 1.2);
             disp(theta);
             disp(i);
+            disp(current_stim);
             Screen('Flip',theWindow);
             
             % Feedback

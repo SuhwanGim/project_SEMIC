@@ -2,8 +2,8 @@ function cali_regression (degree, rating, th, NumOfTr)
 %%
 % This function calibrate heat perception for each individuals.There are
 % two steps in this function. First fit the regression line usgin least
-% squre manner until last trial. Second find well-fitted skin sites and
-% export on command line
+% squre manner until last trial. Second, find well-fitted skin sites and
+% export on command line.
 % =======================================================================
 % 1. INPUT VARIALBE
 %  1) th = 'N'th of trial 2) deg = level of heat (thermode) 3) rating =
@@ -35,8 +35,12 @@ reg.stim_rating(th)=rating; %0 to 100
 if th>2 % Trial 3~: fit the regression line (least square manner)
     P=polyfit(reg.stim_degree,reg.stim_rating,1); % (x,y, dimension) regression
     for i=1:3 % Trial 4~
-        non_corrected_degree=(std_rating(i)-P(2))./P(1); % v_rating=P(1).*new_deg+P(2);
-        reg.cur_heat_LMH(th+1,i)=unit_integer(non_corrected_degree); %Subfunction
+        non_corrected_degree=(std_rating(i)-P(2))./P(1); 
+        % std_rating(i) = P(1).*non_corrected_degree.^2 + P(2).*non_corrected_degree + P(3)
+        % fzero(@(x)f1(x)-std_rating(i),50);
+        % f1 = @(x) P(1).*x.^2+P(2).*x+P(3);
+        % non_corrected_degree = fzero(@(x)f1(x)-std_rating(i),50);
+        reg.cur_heat_LMH(th+1,i)=unit_integer(non_corrected_degree); % see subfunction
     end
 else
     reg.cur_heat_LMH(th,:)=0; % this is only for avoiding NaN % Don't use until 3rd trial
@@ -44,7 +48,7 @@ end
 % 3) calculate the size of residuals
 if th == NumOfTr
     reg.sum_residuals(reg.skin_site) = 0;
-    reg.total_fit = fitlm(reg.stim_degree,reg.stim_rating);
+    reg.total_fit = fitlm(reg.stim_degree,reg.stim_rating,'quadratic');
     for ii=1:th
         reg.sum_residuals(reg.skin_site(ii)) = reg.sum_residuals(reg.skin_site(ii)) + abs(reg.total_fit.Residuals.Raw(ii));
     end
@@ -78,6 +82,6 @@ c_number=round(uc_number)./2;
 
 % limit the degree
 c_number(c_number > 48) = 48;
-c_number(c_number < 41) = 41;
+c_number(c_number < 32) = 32;
 end
 

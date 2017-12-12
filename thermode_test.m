@@ -1,10 +1,17 @@
 function data = thermode_test(runNbr, ip, port, varargin)
-%% INFORMATION
+%%
+% This function triggers heat-pain, report ratings using TCP/IP
+%communication. runNbr is number of run. ip and port is obtained from
+%"Pathway" device. And there are some optional inputs.
+%
+%If you want to use this function, you should have a connected computers
+%using TCP/IP (for example, connect each other or connect same router).
+%However, if didn't, this function will not working
+% 
 %
 % by Suhwan Gim (roseno.9@daum.net)
 % 2017-12-06
-% ========================================================================
-% EXAMPEL of PROGRAM code
+% =================EXAMPEL of PROGRAM codes================================
 % dec2bin(100) -> ans = 1100100
 % (MATLAB Value, PATHWAY Value) = (100,1100100)
 % In this experiment,
@@ -16,6 +23,7 @@ function data = thermode_test(runNbr, ip, port, varargin)
 %   51  : SEMIC_41.5   :   00110011
 %    ~        ~                ~
 %   64  : SEMIC_48     :   01000000
+
 %% GLOBAL vaiable
 global theWindow W H; % window property
 global white red red_Alpha orange bgcolor yellow; % color
