@@ -53,6 +53,19 @@ global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
 global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
 %%
 addpath(genpath(pwd));
+%% SETUP: DATA and Subject INFO
+scriptdir = '/Users/cocoan/Dropbox/github/';
+savedir = 'Cali_Semic_data';
+[fname,~ , SID] = subjectinfo_check_SEMIC(savedir,1); % subfunction %start_trial
+% save data using the canlab_dataset object
+mot.version = 'SEMIC_Motor_task_v1_21-12-2017_Cocoanlab';
+mot.subject = SID;
+mot.datafile = fname;
+mot.starttime = datestr(clock, 0); % date-time
+mot.starttime_getsecs = GetSecs; % in the same format of timestamps for each trial
+
+%%save?
+save(mot.datafile,'mot');
 %% SETUP
 window_num = 0;
 if testmode
@@ -65,6 +78,7 @@ else
     window_info = Screen('Resolution', window_num);
     window_rect = [0 0 window_info.width window_info.height]; % full screen
     fontsize = 32;
+    HideCursor();
 end
 W = window_rect(3); %width of screen
 H = window_rect(4); %height of screen
@@ -219,6 +233,7 @@ try
     end
     task_end_timestamp=GetSecs;
     sca;
+    ShowCursor();
     Screen('CloseAll');
     
 catch err

@@ -16,6 +16,6 @@ clc;
     if ~isempty(txt)
         disp('잠시만 기다려주세요');
         WaitSecs(0.5);
-        main(ip, port, 0, 25);
+        main(ip, port, 1, 25);
     end
 end

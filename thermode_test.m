@@ -1,4 +1,4 @@
-function data = thermode_test(runNbr, ip, port, varargin)
+function data = thermode_test(runNbr, ip, port, reg, varargin)
 %%
 % This function triggers heat-pain, report ratings using TCP/IP
 %communication. runNbr is number of run. ip and port is obtained from
@@ -59,6 +59,7 @@ for i = 1:length(varargin)
                 %
             case {'mouse', 'trackball'}
                 % do nothing
+            
         end
     end
 end
@@ -67,8 +68,6 @@ end
 % addpath(genpath(psytool));
 addpath(genpath(pwd));
 %% SETUP: DATA and Subject INFO
-reg=load_cali_results(); %informaion of calibration
-
 savedir = 'SEMIC_data';
 [fname,start_trial, SID] = subjectinfo_check_SEMIC(savedir,runNbr); % subfunction %start_trial
 %[fname, start_trial, SID] = subjectinfo_check(savedir); % subfunction
@@ -105,7 +104,8 @@ PathPrg = {39 '00101110' 'SEMIC_39' ; ...
 %% SETUP: Generate a trial sequence
 % =========================================================================
 %   1. Run number - Trial number - Pain type - ITI - Delay - Cue mean - Cue variance - Ramp-up
-%   2. ITI and Delay ) 3 to 7 seconds (5 combination: 3-7, 4-6, 5-5, 6-4, 7-3)
+%   2. ITI - Delay - Delay 2  
+%   : Total 15 seconds per one trial. Each is 3 to 7 seconds (5 combination: [3 5 7] [3 6 6] [4 4 7] [4 5 6] [5 5 5])
 %   3. Cue mean (2 levels: 0-1). e.g., 0.3(LOW), 0.7(HIGH)
 %       : plused random number (such as + and - 0.01~0.05)
 %   4. Cue variance (1 levels: 0-1) e.g., 0.1, 0.11, 0.123....
@@ -113,15 +113,15 @@ PathPrg = {39 '00101110' 'SEMIC_39' ; ...
 if start_trial==1
     rng('shuffle');
     % Number of trial
-    trial_Number=(1:20)'; % and transpose
+    trial_Number=(1:16)'; % and transpose % 4 (stim level) x 2 (two cues) x 2 (two overall questions)
     % Run number
     run_Number = repmat(runNbr,length(trial_Number),1);
     % Cue_mean Randoimzation (Five levels: 0.1, 0.3, 0.5, 0.7 0.9)
-    cue_mean_bs = repmat({0.3; 0.7;},10,1); % LOW HIGH x 10 = 20 trials
-    cue_settings = repmat({"LOW";"HIGH"},10,1);
-    rn=randperm(20);
+    cue_mean = repmat([0.3; 0.7],8,1) + randn(16,1).*0.07; % (LOW HIGH) x 4 = 16 trials
+    cue_settings = repmat({"LOW";"HIGH"},8,1);
+    rn=randperm(length(cue_mean));
+    cue_mean = cue_mean(rn);
     cue_settings = cue_settings(rn);
-    cue_mean = cell2mat(cue_mean_bs(rn))+ randn(20,1).*0.07;
     % Cue_variance Randoimzation (Three levels: 0.01, 0.05, 0.1)
     cue_var_bs = repmat({0.05;},20,1);
     rn=randperm(20);
@@ -145,24 +145,26 @@ if start_trial==1
     end
     program = program(ts_program);
     stim_level = stim_level(ts_program);
-    % ITI-Delay acombination
-    ITI_Delay = repmat({3, 7; 4, 6; 5, 5; 6, 4; 7,3}, 4, 1); % Five combitnations
-    rn=randperm(20);
+    % ITI-Delay1-Delay2 combination
+    %:In this task, the combination from 17th to 20th will not use. 
+    ITI_Delay = repmat({3, 5, 7; 3, 6, 6; 4, 4, 7; 4, 5, 6; 5, 5, 5}, 4, 1); % Five combitnations
+    rn=randperm(size(ITI_Delay,1)); % length of vector
     ITI_Delay = ITI_Delay(rn,:);
     ITI = cell2mat(ITI_Delay(:,1));
     Delay = cell2mat(ITI_Delay(:,2));
+    Delay2 = cell2mat(ITI_Delay(:,3));
     % Overall_ratings Question randomization
-    overall_unpl_Q_txt= repmat({'다른 사람들은 방금의 자극을 얼마나 불쾌하게 느꼈을 것 같나요?'; '방금 경험한 열자극이 얼마나 불쾌했나요?'},10,1);
-    overall_unpl_Q_cond = repmat({1;2},10,1);
-    rn=randperm(20);
+    overall_unpl_Q_txt= repmat({'다른 사람들은 이 자극을 얼마나 아파했을 것 같나요?'; '방금 경험한 자극이 얼마나 아팠나요? '},8,1);
+    overall_unpl_Q_cond = repmat({'other_painful';'self_painful'},10,1);
+    rn=randperm(numel(overall_unpl_Q_txt));
     overall_unpl_Q_txt = overall_unpl_Q_txt(rn);
     overall_unpl_Q_cond = overall_unpl_Q_cond(rn); 
     %ts = [trial_Number, run_Number, ITI, Delay, cue_mean, cue_var, ts_program, ramp_up_con];
-    ts{runNbr} = [trial_Number, run_Number, ITI, Delay, cue_mean, cue_settings, cue_var, ts_program, program, stim_level, overall_unpl_Q_txt, overall_unpl_Q_cond];
+    ts{runNbr} = [trial_Number, run_Number, ITI, Delay, Delay2, cue_mean, cue_settings, cue_var, ts_program, program, stim_level, overall_unpl_Q_txt, overall_unpl_Q_cond];
     % save the trial_sequences
     save(data.datafile, 'ts', 'data');
 else
-    [trial_Number, run_Number, ITI, Delay, cue_mean, cue_settings, cue_var, ts_program, program, stim_level, overall_unpl_Q_txt, overall_unpl_Q_cond] = ts{runNbr};
+    [trial_Number, run_Number, ITI, Delay, Delay2, cue_mean, cue_settings, cue_var, ts_program, program, stim_level, overall_unpl_Q_txt, overall_unpl_Q_cond] = ts{runNbr};
 end
 %% SETUP: Experiment settings
 rating_type = 'semicircular';
@@ -182,6 +184,7 @@ else
     window_info = Screen('Resolution', window_num);
     window_rect = [0 0 window_info.width window_info.height]; % full screen
     fontsize = 32;
+    HideCursor();
 end
 
 W = window_rect(3); %width of screen
@@ -215,8 +218,6 @@ anchor_y = H/2+10+scale_H;
 % anchor_lms = [0.014 0.061 0.172 0.354 0.533].*(rb-lb)+lb;
 
 %% EXPERIEMENT START
- 
-% START
 try
     theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
     Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
@@ -264,22 +265,24 @@ try
                         abort_experiment;
                     end
                 end
-                display_runmessage(run_i, run_num, dofmri); % until 5 or r; see subfunctions
+                display_runmessage(trial_Number(j), run_Number(j), dofmri); % until 5 or r; see subfunctions
             end
             
             if dofmri
+                fmri_t = GetSecs;
                 % gap between 5 key push and the first stimuli (disdaqs: data.disdaq_sec)
                 % 5 seconds: "占쏙옙占쏙옙占쌌니댐옙..."
                 Screen(theWindow, 'FillRect', bgcolor, window_rect);
                 DrawFormattedText(theWindow, double('시작합니다...'), 'center', 'center', white, [], [], [], 1.2);
                 Screen('Flip', theWindow);
                 data.dat{runNbr}{trial_Number(j)}.runscan_starttime = GetSecs;
-                WaitSecs(4);
+                waitsec_fromstarttime(fmri_t, 4);
                 
                 % 5 seconds: Blank
+                fmri_t2 = GetSecs;
                 Screen(theWindow,'FillRect',bgcolor, window_rect);
                 Screen('Flip', theWindow);
-                WaitSecs(4); % ADJUST THIS
+                waitsec_fromstarttime(fmri_t2, 4); % ADJUST THIS
             end
                         
             if USE_BIOPAC
@@ -312,8 +315,7 @@ try
         data.dat{runNbr}{trial_Number(j)}.cue_end_timestamp = GetSecs;
         
         % 3. Delay
-        fixPoint(Delay(j), white, '+')
-        
+        fixPoint(Delay(j), white, '+')    
         % 4. HEAT and Ratings
         cir_center = [(rb+lb)/2, bb];
         SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
@@ -363,7 +365,7 @@ try
                 y = cir_center(2)-radius*sin(theta);
                 SetMouse(x,y);
             end
-            msg = '현재 느껴지는 통증의 세기를 최대한 정확하게 실시간으로 보고해주세요';
+            msg = '현재 아픈 정도를 최대한 정확하게 실시간으로 보고해주세요';
             msg = double(msg);
             DrawFormattedText(theWindow, msg, 'center', 250, white, [], [], [], 1.2);
             draw_scale('overall_avoidance_semicircular')
@@ -378,7 +380,9 @@ try
                       
         end
         
-        %5. Overall ratings
+        %5. Delay2
+        fixPoint(Delay2(j), white, '+')
+        %6. Overall ratings
         cir_center = [(rb+lb)/2, bb];
         SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
         % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
@@ -451,6 +455,7 @@ try
         waitsec_fromstarttime(end_trial, 1); % For your rest,
     end
     
+    ShowCursor();
     Screen('Clear');
     Screen('CloseAll');
     disp('Done');
@@ -477,7 +482,7 @@ end
 
 %% ::::::::::::::::::::::: SUBFUNCTION ::::::::::::::::::::::::::::::::::
 function fixPoint(seconds, color, stimText)
-global theWindow white red;
+global theWindow;
 % stimText = '+';
 % Screen(theWindow,'FillRect', bgcolor, window_rect);
 start_fix = GetSecs; % Start_time_of_Fixation_Stimulus

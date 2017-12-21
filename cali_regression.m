@@ -48,7 +48,7 @@ end
 % 3) calculate the size of residuals
 if th == NumOfTr
     reg.sum_residuals(reg.skin_site) = 0;
-    reg.total_fit = fitlm(reg.stim_degree,reg.stim_rating,'quadratic');
+    reg.total_fit = fitlm(reg.stim_degree,reg.stim_rating,'linear');
     for ii=1:th
         reg.sum_residuals(reg.skin_site(ii)) = reg.sum_residuals(reg.skin_site(ii)) + abs(reg.total_fit.Residuals.Raw(ii));
     end

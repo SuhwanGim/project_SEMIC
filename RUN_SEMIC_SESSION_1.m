@@ -9,7 +9,5 @@ port = 20121;
 addpath(genpath(pwd));
 %% 1. PATHWAY TEST 
 pathway_test(ip, port);
-
 %% 2. Calibration
-
-
+calibration(ip, port,'test');

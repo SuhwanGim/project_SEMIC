@@ -1,4 +1,8 @@
-% INFORMATION 
+function calibration(ip, port, varargin)
+%%
+% This function is for finding each participant's pain space. There are
+% sub-fucntions and cali_regression function. This functino is for
+% calculating a linear line. 
 % Start date: 17/11/27 
 % Name: Suhwan Gim 
 % : A calibraition for heat-pain machine
@@ -7,10 +11,25 @@
 % sites:[41 44 47] 
 % 2. After calculate the linear regression,
 %%
-
 %%
 clear;
 close all;
+%% Parse varargin
+testmode = false;
+for i = 1:length(varargin)
+    if ischar(varargin{i})
+        switch varargin{i}
+            case {'test'}
+                testmode = true;
+            case {'scriptdir'}
+                scriptdir = varargin{i+1};
+            case {'psychtoolbox'}
+                psytool = varargin{i+1};
+            case {'mouse', 'trackball'}
+                % do nothing
+        end
+    end
+end
 %% Global variable
 global theWindow W H; % window property
 global white red orange bgcolor; % color
@@ -21,9 +40,9 @@ global reg; % regression data
 %% SETUP: DATA and Subject INFO
 scriptdir = '/Users/cocoan/Dropbox/github/';
 savedir = 'Cali_Semic_data';
-[fname,~, SID] = subjectinfo_check_SEMIC(savedir,1); % subfunction %start_trial
+[fname,~ , SID] = subjectinfo_check_SEMIC(savedir,1); % subfunction %start_trial
 % save data using the canlab_dataset object
-reg.version = 'SEMIC_Calibration_v1_04-12-2017_Cocoanlab';
+reg.version = 'SEMIC_Calibration_v1_21-12-2017_Cocoanlab';
 reg.subject = SID;
 reg.datafile = fname;
 reg.starttime = datestr(clock, 0); % date-time
@@ -34,9 +53,18 @@ addpath(genpath(pwd));
 Screen('Clear');
 Screen('CloseAll');
 window_num = 0;
-window_rect = [2 2 800 600]; % in the test mode, use a little smaller screen
-%window_rect = [0 0 1900 1200];
-fontsize = 20;
+if testmode
+    window_rect = [1 1 800 640]; % in the test mode, use a little smaller screen
+    %window_rect = [0 0 1900 1200];
+    fontsize = 20;
+else
+    screens = Screen('Screens');
+    window_num = screens(end); % the last window
+    window_info = Screen('Resolution', window_num);
+    window_rect = [0 0 window_info.width window_info.height]; % full screen
+    fontsize = 32;
+    HideCursor();
+end
 W = window_rect(3); %width of screen
 H = window_rect(4); %height of screen
 
@@ -70,10 +98,8 @@ anchor_y = H/2+10+scale_H;
 %% Parameter
 NumOfTr = 12;
 stimText = '+';
-init_stim={'00110010' '00111000' '00111110'}; % Initial degree of heat pain [41 44 47]
-% Pathway setting
-ip = '203.252.46.249'; % should activate both 'external control' and 'automatic start' options
-port = 20121;
+init_stim={'00110010' '00111000' '00111110'}; % Initial degrees of a heat pain [41 44 47]
+rating_type = 'semicircular';
 % save?
 save(reg.datafile,'reg','init_stim');
 %% 
@@ -189,7 +215,6 @@ try
         SetMouse(cir_center(1), cir_center(2));
         while GetSecs - start_ratings < 10 % Under 10 seconds,
             [x,y,button] = GetMouse(theWindow);
-            rating_type = 'semicircular';
             draw_scale('overall_avoidance_semicircular');
             Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  %dif color
             
@@ -271,6 +296,7 @@ try
     display_expmessage(msg);
     waitsec_fromstarttime(reg.endtime_getsecs, 10);
     sca;
+    ShowCursor();
     Screen('CloseAll');
     
     % disp(best skin site)
@@ -282,6 +308,7 @@ catch err
         disp(err.stack(i));
     end
     abort_experiment;
+end
 end
 
 function abort_experiment(varargin)
