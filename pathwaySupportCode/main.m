@@ -29,7 +29,7 @@ function responseStr = main(hostName, portNum, commandId, parameter)
     if STATUS == 0 
         responseStr = 'Error has occured, message not recieved';
     else 
-        responseStr = formatresponse(readBuffer,readBytes);
+        responseStr = formatresponse(readBuffr,readBytes);
     end
     celldisp(responseStr);
 end

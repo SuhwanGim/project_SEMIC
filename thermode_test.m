@@ -9,7 +9,7 @@ function data = thermode_test(runNbr, ip, port, varargin)
 %However, if didn't, this function will not working
 % 
 %
-% by Suhwan Gim (roseno.9@daum.net)
+% written by Suhwan Gim (roseno.9@daum.net)
 % 2017-12-06
 % =================EXAMPEL of PROGRAM codes================================
 % dec2bin(100) -> ans = 1100100
@@ -33,12 +33,11 @@ global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_y
 %% Parse varargin
 testmode = false;
 USE_BIOPAC = false;
+dofmri = false;
 
 % need to be specified differently for different computers
 % psytool = 'C:\toolbox\Psychtoolbox';
 scriptdir = '/Users/cocoan/Dropbox/github/';
-savedir = 'SEMIC_data';
-
 
 for i = 1:length(varargin)
     if ischar(varargin{i})
@@ -49,6 +48,8 @@ for i = 1:length(varargin)
                 scriptdir = varargin{i+1};
             case {'psychtoolbox'}
                 psytool = varargin{i+1};
+            case {'fmri'}
+                dofmri = true;
             case {'biopac1'}
                 USE_BIOPAC = true;
                 channel_n = 3;
@@ -61,7 +62,7 @@ for i = 1:length(varargin)
         end
     end
 end
-
+%%
 % addpath(scriptdir); cd(scriptdir);
 % addpath(genpath(psytool));
 addpath(genpath(pwd));
@@ -79,10 +80,14 @@ data.datafile = fname;
 data.starttime = datestr(clock, 0); % date-time
 data.starttime_getsecs = GetSecs; % in the same format of timestamps for each trial
 
-%% SETUP: CHEPS PROGRAM(50 to 64) /
+%% SETUP: CHEPS PROGRAM(46 to 64) /
 % :: It will be adjusted each settings of study Example:[degree decValue
 % ProgramNameInPathway]
-PathPrg = {41 '00110010' 'SEMIC_41'; ...
+PathPrg = {39 '00101110' 'SEMIC_39' ; ...
+    39.5 '00101111' 'SEMIC_39.5' ; ...
+    40 '00110000' 'SEMIC_40' ; ...
+    40.5 '00110001' 'SEMIC_40.5'; ...
+    41 '00110010' 'SEMIC_41'; ...
     41.5 '00110011' 'SEMIC_41.5'; ...
     42 '00110100' 'SEMIC_42'; ...
     42.5 '00110101' 'SEMIC_42.5'; ...
@@ -97,7 +102,7 @@ PathPrg = {41 '00110010' 'SEMIC_41'; ...
     47 '00111110' 'SEMIC_47'; ...
     47.5 '00111111' 'SEMIC_47.5'; ...
     48 '01000000' 'SEMIC_48';};
-%% SETUP: Trial sequence handle
+%% SETUP: Generate a trial sequence
 % =========================================================================
 %   1. Run number - Trial number - Pain type - ITI - Delay - Cue mean - Cue variance - Ramp-up
 %   2. ITI and Delay ) 3 to 7 seconds (5 combination: 3-7, 4-6, 5-5, 6-4, 7-3)
@@ -148,7 +153,7 @@ if start_trial==1
     Delay = cell2mat(ITI_Delay(:,2));
     % Overall_ratings Question randomization
     overall_unpl_Q_txt= repmat({'다른 사람들은 방금의 자극을 얼마나 불쾌하게 느꼈을 것 같나요?'; '방금 경험한 열자극이 얼마나 불쾌했나요?'},10,1);
-    overall_unpl_Q_cond = ({1;2},10,1);
+    overall_unpl_Q_cond = repmat({1;2},10,1);
     rn=randperm(20);
     overall_unpl_Q_txt = overall_unpl_Q_txt(rn);
     overall_unpl_Q_cond = overall_unpl_Q_cond(rn); 
@@ -168,7 +173,7 @@ Screen('Clear');
 Screen('CloseAll');
 window_num = 0;
 if testmode
-    window_rect = [1 1 1280 720]; % in the test mode, use a little smaller screen
+    window_rect = [1 1 800 640]; % in the test mode, use a little smaller screen
     %window_rect = [0 0 1900 1200];
     fontsize = 20;
 else
@@ -233,14 +238,50 @@ try
                 if keyCode(KbName('space'))==1
                     break
                 elseif keyCode(KbName('q'))==1
-                    abort_man;
+                    abort_experiment;
                 end
-                display_expmessage('실험자는 모든 것이 잘 준비되었는지 체크해주세요 (PATHWAY, BIOPAC, GAZEPOINT, 등등). \n모두 준비되었으면 SPACE BAR를 눌러주세요.'); % until space; see subfunctions
+                display_expmessage('실험자는 모든 것이 잘 준비되었는지 체크해주세요 (PATHWAY, BIOPAC, EYELINK, 등등). \n모두 준비되었으면 SPACE BAR를 눌러주세요.'); % until space; see subfunctions
             end
         end
         % 1 seconds: BIOPAC
         
         if trial_Number(j) == 1
+            
+            while (1)
+                [~,~,keyCode] = KbCheck;              
+                % if this is for fMRI experiment, it will start with "s",
+                % but if behavioral, it will start with "r" key.
+                if dofmri
+                    if keyCode(KbName('s'))==1
+                        break
+                    elseif keyCode(KbName('q'))==1
+                        abort_experiment;
+                    end
+                else
+                    if keyCode(KbName('r'))==1
+                        break
+                    elseif keyCode(KbName('q'))==1
+                        abort_experiment;
+                    end
+                end
+                display_runmessage(run_i, run_num, dofmri); % until 5 or r; see subfunctions
+            end
+            
+            if dofmri
+                % gap between 5 key push and the first stimuli (disdaqs: data.disdaq_sec)
+                % 5 seconds: "占쏙옙占쏙옙占쌌니댐옙..."
+                Screen(theWindow, 'FillRect', bgcolor, window_rect);
+                DrawFormattedText(theWindow, double('시작합니다...'), 'center', 'center', white, [], [], [], 1.2);
+                Screen('Flip', theWindow);
+                data.dat{runNbr}{trial_Number(j)}.runscan_starttime = GetSecs;
+                WaitSecs(4);
+                
+                % 5 seconds: Blank
+                Screen(theWindow,'FillRect',bgcolor, window_rect);
+                Screen('Flip', theWindow);
+                WaitSecs(4); % ADJUST THIS
+            end
+                        
             if USE_BIOPAC
                 bio_t = GetSecs;
                 data.dat{runNbr}{trial_Number(j)}.biopac_triggertime = bio_t; %BIOPAC timestamp
@@ -254,6 +295,7 @@ try
             if USE_BIOPAC
                 BIOPAC_trigger(ljHandle, biopac_channel, 'off');
             end
+            
         end
         data.dat{runNbr}{trial_Number(j)}.trial_start_t = GetSecs; %Trial start
         
@@ -333,8 +375,7 @@ try
             data.dat{runNbr}{trial_Number(j)}.con_xy(rec_i,:) = [x-cir_center(1) cir_center(2)-y]./radius;
             data.dat{runNbr}{trial_Number(j)}.con_clicks(rec_i,:) = button;
             data.dat{runNbr}{trial_Number(j)}.con_r_theta(rec_i,:) = [curr_r/radius curr_theta/180];
-            
-           
+                      
         end
         
         %5. Overall ratings
@@ -385,9 +426,7 @@ try
             data.dat{runNbr}{trial_Number(j)}.ovr_time_fromstart(rec_i,1) = GetSecs-sTime;
             data.dat{runNbr}{trial_Number(j)}.ovr_xy(rec_i,:) = [x-cir_center(1) cir_center(2)-y]./radius;
             data.dat{runNbr}{trial_Number(j)}.ovr_clicks(rec_i,:) = button;
-            data.dat{runNbr}{trial_Number(j)}.ovr_r_theta(rec_i,:) = [curr_r/radius curr_theta/180];
-            
-            
+            data.dat{runNbr}{trial_Number(j)}.ovr_r_theta(rec_i,:) = [curr_r/radius curr_theta/180];                     
 %             if GetSecs - sTime > 10 % 7 = plateau + ramp-down
 %                 start_stopsignal=GetSecs;
 %                 waitsec_fromstarttime(start_stopsignal, 2)
@@ -400,7 +439,6 @@ try
 %                     break;
 %                 end
 %             end
-            
         end
         
         SetMouse(0,0);
@@ -410,11 +448,6 @@ try
         data.dat{runNbr}{trial_Number(j)}.end_trial_t = end_trial;
         data.dat{runNbr}{trial_Number(j)}.ramp_up_cnd = ramp_up_con(j);
         if mod(trial_Number(j),2) == 0, save(data.datafile, '-append', 'data'); end % save data every two trials
-%         if mod(trial_Number(j),5) == 0 % Because of IRB, When end of every fifth trial, have a rest within 15 seconds
-%             display_expmessage('Every 5th trial 대기 해야함\n뿌잉뿌잉뿌뿌이잉');
-%             waitsec_fromstarttime(end_trial, 15);
-%             end_trial = end_trial + 15;
-%         end
         waitsec_fromstarttime(end_trial, 1); % For your rest,
     end
     
@@ -481,6 +514,32 @@ Screen('Flip', theWindow);
 
 end
 
+function display_runmessage(run_i, run_num, dofmri)
+
+% MESSAGE FOR EACH RUN
+
+% HERE: YOU CAN ADD MESSAGES FOR EACH RUN USING RUN_NUM and RUN_I
+
+global theWindow white bgcolor window_rect; % rating scale
+
+if dofmri
+    if run_i <= run_num % you can customize the run start message using run_num and run_i
+        Run_start_text = double('참가자가 준비되었으면 이미징을 시작합니다 (s).');
+    end
+else
+    if run_i <= run_num
+        Run_start_text = double('참가자가 준비되었으면, r을 눌러주세요.');
+    end
+end
+
+% display
+Screen(theWindow,'FillRect',bgcolor, window_rect);
+DrawFormattedText(theWindow, Run_start_text, 'center', 'center', white, [], [], [], 1.5);
+Screen('Flip', theWindow);
+
+end
+
+
 
 function abort_experiment(varargin)
 
@@ -508,3 +567,4 @@ Screen('CloseAll'); %relinquish screen control
 disp(str); %present this text in command window
 
 end
+

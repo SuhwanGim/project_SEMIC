@@ -4,13 +4,13 @@
 % : A calibraition for heat-pain machine
 % --------------------------------------------------------------------------
 % 1.Degree of first three heat-stimulations is randomly given at any skin
-% sites:[41 44 47] 2. After calculate the linear regression,
+% sites:[41 44 47] 
+% 2. After calculate the linear regression,
 %%
 
 %%
 clear;
 close all;
-
 %% Global variable
 global theWindow W H; % window property
 global white red orange bgcolor; % color
@@ -101,10 +101,14 @@ for z = 1:4 % four skin_site %Each skin site stimulated by LMH heat-pain
     end
 end
 
-%% Pathway program (50 to 64) /
-% :: It will be adjusted each settings of study Example:[degree decValue
-% ProgramNameInPathway]
-PathPrg = {41 '00110010' 'SEMIC_41'; ...
+%% Pathway program (46 to 64) /
+% :: It will be adjusted each settings of study 
+% Example:[degree decValue ProgramNameInPathway]
+PathPrg = {39 '00101110' 'SEMIC_39' ; ...
+    39.5 '00101111' 'SEMIC_39.5' ; ...
+    40 '00110000' 'SEMIC_40' ; ...
+    40.5 '00110001' 'SEMIC_40.5'; ...
+    41 '00110010' 'SEMIC_41'; ...
     41.5 '00110011' 'SEMIC_41.5'; ...
     42 '00110100' 'SEMIC_42'; ...
     42.5 '00110101' 'SEMIC_42.5'; ...
@@ -164,21 +168,20 @@ try
         Screen('Flip', theWindow);
         waitsec_fromstarttime(start_fix, 2);
         
-%         %3. Stimulation
-%         main(ip,port,1,current_stim); %trigerring heat-pain %
-%         
-%         start_while=GetSecs;
-%         while GetSecs - start_while < 10 % same as the test,
-%             resp = main(ip,port,0); % get system status
-%             systemState = resp{4}; testState = resp{5};
-%             if strcmp(systemState, 'Pathway State: TEST') && strcmp(testState,'Test State: RUNNING')
-%                 start_stim=GetSecs;
-%                 waitsec_fromstarttime(start_stim,10);
-%                 break;
-%             else
-%                 %do nothing
-%             end
-%         end
+        %3. Stimulation
+        start_while=GetSecs;
+        while GetSecs - start_while < 10 % same as the test,
+            resp = main(ip,port,0); % get system status
+            systemState = resp{4}; testState = resp{5};
+            if strcmp(systemState, 'Pathway State: READY') && strcmp(testState,'Test State: IDLE')
+                main(ip,port,1,current_stim); %trigerring heat-pain % About 0.5~0.6 sec
+                start_stim=GetSecs;
+                waitsec_fromstarttime(start_stim,10);
+                break;
+            else
+                %do nothing
+            end
+        end
         
         %4. Ratings
         start_ratings=GetSecs;

@@ -19,6 +19,11 @@ function response = formatresponse(message,nBytes)
 %
 % Last updated:
 % March, 25th, 2014
+% 
+% update history
+% Dec, 18th, 2017
+% by Suhan Gim
+% 1) add various type of time to response array
 %---------------------------------------------------------------------
 
     % Segmentation points for decoding response

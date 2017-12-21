@@ -468,8 +468,8 @@ switch scale
         % Screen(theWindow, 'FillRect', bgcolor, window_rect); % reset
         Screen(theWindow,'DrawLines', xy, 3, 255);
         
-        Screen(theWindow,'DrawText', double('전혀'), lb-anchor_W/2, ycenter+20, 255);
-        Screen(theWindow,'DrawText', double('최대'), rb-anchor_W2/2, ycenter+20, 255);
+        Screen(theWindow,'DrawText', double('0'), lb-anchor_W/2, ycenter+20, 255);
+        Screen(theWindow,'DrawText', double('180'), rb-anchor_W2/2, ycenter+20, 255);
         
         Screen('TextSize', theWindow, fontsize); % fonsize for instructions
 end
