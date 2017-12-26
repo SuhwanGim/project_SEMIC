@@ -1,6 +1,6 @@
 function calibration(ip, port, varargin)
 %%
-% This function is for finding each participant's pain space. There are
+% This function is for finding each participant's a pain space. There are
 % sub-fucntions and cali_regression function. This functino is for
 % calculating a linear line. 
 % Start date: 17/11/27 
@@ -11,9 +11,6 @@ function calibration(ip, port, varargin)
 % sites:[41 44 47] 
 % 2. After calculate the linear regression,
 %%
-%%
-clear;
-close all;
 %% Parse varargin
 testmode = false;
 for i = 1:length(varargin)
@@ -290,8 +287,8 @@ try
 
     
     % End of calibration
-    save(reg.datafile, '-append', 'reg');
     reg.endtime_getsecs = GetSecs;
+    save(reg.datafile, '-append', 'reg');
     msg='캘리브레이션이 종료되었습니다\n이제 실험자의 지시를 따라주시기 바랍니다';
     display_expmessage(msg);
     waitsec_fromstarttime(reg.endtime_getsecs, 10);

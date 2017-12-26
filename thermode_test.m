@@ -59,7 +59,6 @@ for i = 1:length(varargin)
                 %
             case {'mouse', 'trackball'}
                 % do nothing
-            
         end
     end
 end

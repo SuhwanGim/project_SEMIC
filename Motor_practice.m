@@ -15,22 +15,16 @@ function Motor_practice(varargin)
 % written by Suhwan Gim (19, December 2017)
 
 %%
-clear;
 Screen('Clear');
 Screen('CloseAll');
 %% Parse varargin
 testmode = false;
 dofmri = false;
-
 for i = 1:length(varargin)
     if ischar(varargin{i})
         switch varargin{i}
             case {'test'}
                 testmode = true;
-            case {'scriptdir'}
-                scriptdir = varargin{i+1};
-            case {'psychtoolbox'}
-                psytool = varargin{i+1};
             case {'fmri'}
                 dofmri = true;
             case {'biopac1'}
