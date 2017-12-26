@@ -12,7 +12,7 @@
 global theWindow W H; % window property
 global white red orange bgcolor; % color
 global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
-global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
+global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd anchor_lms anchor_lms_y anchor_lms_x; % anchors
 
 
 %%
@@ -50,6 +50,8 @@ anchor_yd = bb+20; % 710
 
 % y location for anchors of rating scales -
 anchor_y = H/2+10+scale_H;
+anchor_lms = [0.1000 0.2881 0.5966 0.9000];
+% anchor_lms = [0.061 0.172 0.354 0.533].*(rb-lb)+lb;
 % anchor_lms = [0.014 0.061 0.172 0.354 0.533].*(rb-lb)+lb;
 
 %%
@@ -61,6 +63,8 @@ deg(deg < 0) = 0;
 th = deg2rad(deg);
 x = radius*cos(th)+cir_center(1);
 y = cir_center(2)-radius*sin(th);
+
+% anchor_lms_y = bb - sqrt(radius.^2 - (anchor_lms_x-(lb+rb)/2).^2);
 
 %%
 theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
@@ -74,7 +78,7 @@ while GetSecs - sTime < 110
 
     [x,y,button] = GetMouse(theWindow);
     rating_type = 'semicircular';
-    draw_scale('overall_avoidance_semicircular');
+    draw_scale('explain_painful_semicircularr');
     Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  %dif color
     % if the point goes further than the semi-circle, move the point to
     % the closest point
@@ -91,7 +95,7 @@ while GetSecs - sTime < 110
         SetMouse(x,y);
     end
     
-    draw_scale('overall_avoidance_semicircular');
+    draw_scale('explain_painful_semicircular');
     theta = rad2deg(theta);
     theta= 180 - theta; 
     theta = num2str(theta);

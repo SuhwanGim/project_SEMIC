@@ -89,7 +89,7 @@ anchor_yd = bb+20; % 710
 
 % y location for anchors of rating scales -
 anchor_y = H/2+10+scale_H;
-% anchor_lms = [0.0200 0.1069 0.3123 0.6490 0.9801].*(rb-lb)+lb  % adapted
+% anchor_lms = [0.1000 0.2881 0.5966 0.9000] % adjusted for SEMIC
 % anchor_lms = [0.014 0.061 0.172 0.354 0.533].*(rb-lb)+lb; for VAS
 
 %% Parameter

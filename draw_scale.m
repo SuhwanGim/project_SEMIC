@@ -7,7 +7,7 @@ global theWindow W H; % window property
 global white red orange bgcolor; % color
 global t r; % pressure device udp channel
 global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
-global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
+global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd anchor_lms anchor_lms_y anchor_lms_x; % anchors
 
 switch scale
     case 'line'
@@ -77,13 +77,13 @@ switch scale
         Screen(theWindow,'DrawText','at all',lb-35,H/6+10+scale_H+25,255);
         Screen(theWindow,'DrawText','Most',rb,H/6+10+scale_H,255);
         Screen(theWindow,'DrawText',' ',rb,H/6+10+scale_H+25,255);
-%     case 'overall_int'
-%         xy = [lb H/2+scale_H; rb H/2+scale_H; rb H/2];
-%         Screen(theWindow, 'FillPoly', 255, xy);
-%         Screen(theWindow,'DrawText','Not',lb-50,anchor_y,255);
-%         Screen(theWindow,'DrawText','at all',lb-50,anchor_y2,255);
-%         Screen(theWindow,'DrawText','Strongest',rb-50,anchor_y,255);
-%         Screen(theWindow,'DrawText','imaginable',rb-50,anchor_y2,255);
+        %     case 'overall_int'
+        %         xy = [lb H/2+scale_H; rb H/2+scale_H; rb H/2];
+        %         Screen(theWindow, 'FillPoly', 255, xy);
+        %         Screen(theWindow,'DrawText','Not',lb-50,anchor_y,255);
+        %         Screen(theWindow,'DrawText','at all',lb-50,anchor_y2,255);
+        %         Screen(theWindow,'DrawText','Strongest',rb-50,anchor_y,255);
+        %         Screen(theWindow,'DrawText','imaginable',rb-50,anchor_y2,255);
     case 'overall_aversive_ornot'
         lb2 = W/3;
         rb2 = (W*2)/3;
@@ -121,7 +121,7 @@ switch scale
         Screen(theWindow,'DrawText','Extremely',rb-35,anchor_y,255);
         Screen(theWindow,'DrawText','Bored',rb-35,anchor_y2,255);
         % Screen('Flip', theWindow);
-	case 'overall_alertness'
+    case 'overall_alertness'
         %xy = [lb lb lb rb rb rb; H/2 H/2+scale_H H/2+scale_H/2 H/2+scale_H/2 H/2 H/2+scale_H];
         % added middle line
         xy = [lb lb lb (lb+rb)/2 (lb+rb)/2 (lb+rb)/2 (lb+rb)/2 rb rb rb; ...
@@ -150,7 +150,7 @@ switch scale
         Screen(theWindow,'DrawText','Not',lb-40,anchor_y,255);
         Screen(theWindow,'DrawText','at all',lb-40,anchor_y2,255);
         Screen(theWindow,'DrawText','Best',rb-35,anchor_y,255);
-	case 'overall_resting_positive'
+    case 'overall_resting_positive'
         %xy = [lb lb lb rb rb rb; H/2 H/2+scale_H H/2+scale_H/2 H/2+scale_H/2 H/2 H/2+scale_H];
         % added middle line
         xy = [lb lb lb (lb+rb)/2 (lb+rb)/2 (lb+rb)/2 (lb+rb)/2 rb rb rb; ...
@@ -164,7 +164,7 @@ switch scale
         Screen(theWindow,'DrawText','Strongly',rb-35,anchor_y,255);
         Screen(theWindow,'DrawText','disagree',rb-35,anchor_y2,255);
         % Screen('Flip', theWindow);
-	case 'overall_resting_negative'
+    case 'overall_resting_negative'
         %xy = [lb lb lb rb rb rb; H/2 H/2+scale_H H/2+scale_H/2 H/2+scale_H/2 H/2 H/2+scale_H];
         % added middle line
         xy = [lb lb lb (lb+rb)/2 (lb+rb)/2 (lb+rb)/2 (lb+rb)/2 rb rb rb; ...
@@ -178,7 +178,7 @@ switch scale
         Screen(theWindow,'DrawText','Strongly',rb-35,anchor_y,255);
         Screen(theWindow,'DrawText','disagree',rb-35,anchor_y2,255);
         % Screen('Flip', theWindow);
-	case 'overall_resting_myself'
+    case 'overall_resting_myself'
         %xy = [lb lb lb rb rb rb; H/2 H/2+scale_H H/2+scale_H/2 H/2+scale_H/2 H/2 H/2+scale_H];
         % added middle line
         xy = [lb lb lb (lb+rb)/2 (lb+rb)/2 (lb+rb)/2 (lb+rb)/2 rb rb rb; ...
@@ -387,7 +387,7 @@ switch scale
         xcenter = (lb+rb)/2;
         ycenter = bb;
         xy = [lb xcenter xcenter xcenter rb xcenter xcenter xcenter;
-              ycenter ycenter tb ycenter ycenter ycenter bb ycenter];
+            ycenter ycenter tb ycenter ycenter ycenter bb ycenter];
         
         Screen('TextSize', theWindow, 22);
         anchor_W = Screen(theWindow,'DrawText', double('나와 매우 관련'), 0, 0, bgcolor);
@@ -399,7 +399,7 @@ switch scale
         Screen(theWindow,'DrawText', double('긍정적'), anchor_xr, ycenter-10, 255);
         
         Screen(theWindow,'DrawText', double('나와 매우 관련'), xcenter-anchor_W/2, anchor_yu, 255);
-        Screen(theWindow,'DrawText', double('나와 관련 없음'), xcenter-anchor_W/2, anchor_yd, 255);        
+        Screen(theWindow,'DrawText', double('나와 관련 없음'), xcenter-anchor_W/2, anchor_yd, 255);
         Screen('TextSize', theWindow, fontsize);
         
     case 'time'
@@ -421,7 +421,7 @@ switch scale
         Screen(theWindow,'DrawText', double('미래'), rb-anchor_W/2, ycenter-50, 255);
         Screen('TextSize', theWindow, fontsize);
         
-	case 'overall_avoidance_semicircular'
+    case 'overall_avoidance_semicircular'
         xcenter = (lb+rb)/2;
         ycenter = bb;
         
@@ -442,7 +442,7 @@ switch scale
         
         Screen('TextSize', theWindow, fontsize); % fonsize for instructions
         
-   
+        
     case 'overall_motor'
         xy = [lb H/2+scale_H; rb H/2+scale_H; rb H/2];
         Screen(theWindow, 'FillPoly', 255, xy);
@@ -452,7 +452,7 @@ switch scale
         Screen('TextSize', theWindow, fontsize); % fonsize for anchors
         % Screen('Flip', theWindow);
         
-	case 'overall_motor_semicircular'
+    case 'overall_motor_semicircular'
         xcenter = (lb+rb)/2;
         ycenter = bb;
         
@@ -472,6 +472,36 @@ switch scale
         Screen(theWindow,'DrawText', double('180'), rb-anchor_W2/2, ycenter+20, 255);
         
         Screen('TextSize', theWindow, fontsize); % fonsize for instructions
+        
+    case 'explain_painful_semicircular'
+        xcenter = (lb+rb)/2;
+        ycenter = bb;
+        
+        radius = (rb-lb)/2; % radius
+        x = reshape(repmat(linspace(lb,rb,1000),2,1),1,2000); x([1 2000]) = [];
+        xy = [x; bb - sqrt(radius.^2 - (x-xcenter).^2)];
+        
+        Screen('TextSize', theWindow, 28); % fonsize for anchors
+        
+        anchor_W = Screen(theWindow,'DrawText', double('전혀'), 0, 0, bgcolor);
+        anchor_W2 = Screen(theWindow,'DrawText', double('조금'), 0, 0, bgcolor);
+        anchor_W3 = Screen(theWindow,'DrawText', double('보통'), 0, 0, bgcolor);
+        anchor_W4 = Screen(theWindow,'DrawText', double('많이'), 0, 0, bgcolor);
+        anchor_W5 = Screen(theWindow,'DrawText', double('매우많이'), 0, 0, bgcolor);
+        anchor_W6 = Screen(theWindow,'DrawText', double('최대'), 0, 0, bgcolor);
+        
+        % Screen(theWindow, 'FillRect', bgcolor, window_rect); % reset
+        Screen(theWindow,'DrawLines', xy, 3, 255);
+        
+        
+        Screen(theWindow,'DrawText', double('1'), lb-anchor_W/2, ycenter, 255); %전혀
+        Screen(theWindow,'DrawText', double('2'), anchor_lms_x(1), anchor_lms_y(1), 255);
+        Screen(theWindow,'DrawText', double('3'), anchor_lms_x(2), anchor_lms_y(2), 255);
+        Screen(theWindow,'DrawText', double('4'), anchor_lms_x(3), anchor_lms_y(3), 255);
+        Screen(theWindow,'DrawText', double('5'), anchor_lms_x(4), anchor_lms_y(4), 255);
+        Screen(theWindow,'DrawText', double('6'), rb-anchor_W6/2+40, ycenter, 255); %최대
+        
+        Screen('TextSize', theWindow, fontsize); % fonsize for instructions
 end
 
-end     
+end
