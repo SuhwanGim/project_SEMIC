@@ -1,44 +1,27 @@
-function data = thermode_test(runNbr, ip, port, reg, varargin)
+function data = Learning_test(ip, port, reg, varargin)
 %%
-% This function triggers heat-pain, report ratings using TCP/IP
-%communication. runNbr is number of run. ip and port is obtained from
-%"Pathway" device. And there are some optional inputs.
-%
-%If you want to use this function, you should have a connected computers
-%using TCP/IP (for example, connect each other or connect same router).
-%However, if didn't, this function will not working
+%**THERE IS ONLY DIFFERENT THING THAT THIS FUCNTION TRIGGER THERMAL PAIN
+%WITH CONGURENT SOICAL CUE CONCOMPARED WITH THERMODE_TEST
 % 
-%
-% written by Suhwan Gim (roseno.9@daum.net)
-% 2017-12-06
-% =================EXAMPEL of PROGRAM codes================================
-% dec2bin(100) -> ans = 1100100
-% (MATLAB Value, PATHWAY Value) = (100,1100100)
-% In this experiment,
-% ---------------------------------------------------------
-% Matlab: Program name : Program code (parameter, 8bit)
-% ------------------------------------------------
-%   25  : Pulse 49     :   00011001
-%   50  : SEMIC_41     :   00110010
-%   51  : SEMIC_41.5   :   00110011
-%    ~        ~                ~
-%   64  : SEMIC_48     :   01000000
+% written by Suhwan Gim (roseno.9@daum.net) 2017-12-06
+% =========================================================================
+% You can see details of this fucntion (see below)
+% see also thermode_test
 
 %% GLOBAL vaiable
 global theWindow W H; % window property
 global white red red_Alpha orange bgcolor yellow; % color
 global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
 global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
-
+%%
+runNbr = 1;
 %% Parse varargin
 testmode = false;
 USE_BIOPAC = false;
 dofmri = false;
-
 % need to be specified differently for different computers
 % psytool = 'C:\toolbox\Psychtoolbox';
 scriptdir = '/Users/cocoan/Dropbox/github/';
-
 for i = 1:length(varargin)
     if ischar(varargin{i})
         switch varargin{i}
@@ -63,16 +46,14 @@ for i = 1:length(varargin)
     end
 end
 %%
-% addpath(scriptdir); cd(scriptdir);
-% addpath(genpath(psytool));
 addpath(genpath(pwd));
 %% SETUP: DATA and Subject INFO
-savedir = 'SEMIC_test_data';
+savedir = 'SEMIC_Learning_data';
 [fname,start_trial, SID] = subjectinfo_check_SEMIC(savedir,runNbr); % subfunction %start_trial
 %[fname, start_trial, SID] = subjectinfo_check(savedir); % subfunction
 if exist(fname, 'file'), load(fname, 'data'); load(fname,'ts'); end
 % save data using the canlab_dataset object
-data.version = 'SEMIC_v1_12-06-2017_Cocoanlab';
+data.version = 'SEMIC_v1_12-27-2017_Cocoanlab';
 data.subject = SID;
 data.datafile = fname;
 data.starttime = datestr(clock, 0); % date-time
@@ -166,7 +147,6 @@ end
 %% SETUP: Experiment settings
 rating_type = 'semicircular';
 NumberOfCue = 25;
-
 %% SETUP: Screen
 Screen('Clear');
 Screen('CloseAll');
@@ -212,7 +192,7 @@ anchor_yd = bb+20; % 710
 
 % y location for anchors of rating scales -
 anchor_y = H/2+10+scale_H;
-% anchor_lms = [0.014 0.061 0.172 0.354 0.533].*(rb-lb)+lb;
+% anchor_lms = [0.1000 0.2881 0.5966 0.9000].*(rb-lb)+lb;
 
 %% EXPERIEMENT START
 try

@@ -11,10 +11,12 @@
 %% 0. PATHWAY TEST 
     pathway_test(ip, port);
 %% 1. T1 & Learning phase
-
+    Learning_test(ip, port);
 %% 2. Motor TASK
     Motor_practice('test');
 %% 3. STUDY % thermode_test(Number of run, ip, port, options...), 
+    %% PATHWAY TEST
+    pathway_test(ip, port);
     %% RUN1
     data1 = thermode_test(1, ip, port, reg,'test'); 
     %% RUN2
