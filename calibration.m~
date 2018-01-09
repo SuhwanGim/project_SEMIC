@@ -90,7 +90,6 @@ anchor_y = H/2+10+scale_H;
 % anchor_lms = [0.014 0.061 0.172 0.354 0.533].*(rb-lb)+lb; for VAS
 
 %% Parameter
-motorN = 4; % number of motor practice trial
 NumOfTr = 12;
 stimText = '+';
 init_stim={'00111000' '00111100' '01000000'}; % Initial degrees of a heat pain [44 46 48]
@@ -150,11 +149,9 @@ Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); % For 
 Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
 Screen('TextFont', theWindow, font); % setting font
 Screen('TextSize', theWindow, fontsize);
-%% START
-%: Motor_practice --> calibration
+%% START: Calibration
 try
-    %PART0. Motor_practice (3-4 trials)
-    % 1. Instruction
+    %-2. Motor practice (3~4 trials)
     while (1)
         [~,~,keyCode] = KbCheck;
         if keyCode(KbName('space'))==1
@@ -164,12 +161,11 @@ try
         end
         display_expmessage('지금부터 조이스틱 연습을 하겠습니다.\n 준비되었으면 SPACE BAR를 눌러주세요.'); % until space; see subfunctions
     end
-    % 2. Moving dot part
-    for i=1:motorN % Four trials
+    % -1. Moving dot part
+    for i=1:numel(xx)
         trial_start_timestamp=GetSecs; % trial_star_timestamp
-        % -1.1. Fixation point
+        % 1. Fixation point
         fixPoint(ISI(i), white, stimText);
-        % -1.2. Moving dot part
         ready = 0;
         moving_start_timestamp = GetSecs;
         SetMouse(cir_center(1), cir_center(2));
@@ -211,10 +207,8 @@ try
         end
         moving_end_timestamp = GetSecs;
     end
-    
-    %PART1. Calibrtaion 
-    % 0. Instructions
-    display_expmessage('지금부터는 Calibration을 시작하겠습니다.\n참가자는 편안하게 계시고 진행자의 지시를 따라주시기 바랍니다.');
+    %0. Instructions
+    display_expmessage('지금부터 Calibration을 시작하겠습니다.\n참가자는 편안하게 계시고 진행자의 지시를 따라주시기 바랍니다.');
     WaitSecs(1);
     random_value = randperm(3);
     for i=1:NumOfTr %Total trial
@@ -232,7 +226,7 @@ try
             end
         end
         
-        % 1. Display where the skin site stimulates (1-6)
+        %1. Display where the skin site stimulates (1-6)
         msg = strcat('다음 위치의 thermode를 이동하신 후 SPACE 키를 누르십시오 :  ', num2str(reg.skin_site(i)));
         while (1)
             [~,~,keyCode] = KbCheck;
@@ -244,13 +238,13 @@ try
             display_expmessage(msg);
         end
         
-        % 2. Fixation
+        %2. Fixation
         start_fix = GetSecs; % Start_time_of_Fixation_Stimulus
         DrawFormattedText(theWindow, double(stimText), 'center', 'center', white , [], [], [], 1.2);
         Screen('Flip', theWindow);
         waitsec_fromstarttime(start_fix, 2);
         
-        % 3. Stimulation
+        %3. Stimulation
         start_while=GetSecs;
         while GetSecs - start_while < 10 % same as the test,
             resp = main(ip,port,0); % get system status
@@ -266,7 +260,7 @@ try
             end
         end
         
-        % 4. Ratings
+        %4. Ratings
         start_ratings=GetSecs;
         cir_center = [(rb+lb)/2, bb];
         SetMouse(cir_center(1), cir_center(2));
@@ -310,7 +304,7 @@ try
             end
         end
         
-        % 5. Inter-stimulus inteval, 3 seconds
+        %5. Inter-stimulus inteval, 3 seconds
         start_fix = GetSecs; % Start_time_of_Fixation_Stimulus
         DrawFormattedText(theWindow, double(stimText), 'center', 'center', white, [], [], [], 1.2);
         Screen('Flip', theWindow);
@@ -328,7 +322,7 @@ try
             end
         end    
         
-        %Calculating regression line 
+        %calibration
         cali_regression (degree, vas_rating, i, NumOfTr); % cali_regression (stim_degree in this trial, rating, order of trial, Number of Trial)       
         save(reg.datafile, '-append', 'reg');
     end %trial 

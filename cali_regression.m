@@ -12,18 +12,19 @@ function cali_regression (degree, rating, th, NumOfTr)
 % mid, and high
 %========================================================================
 % ONE IMPORTANT NOTIFICATION : This function include some Statistical and
-% Machine learning Toolbox function. IF YOUR MATLAB DON'T INSTALL IT, THIS
+% Machine learning Toolbox functions. IF YOUR MATLAB DON'T INCLUDE IT, THIS
 % FUNCTION WILL DO NOT WORK FUNCTIONALLY.
 %
 % by. Suhwan Gim (roseno.9@daum.net) 
+%
 % see also glmfit % glmval %
 % LinearModel.Residuals.Raw: sum of squared errors polyfit: in a
 % least-squares sense % polyval
 
 %% SETUP: variable
 global reg;
-std_rating=[30 50 70]; % low, mid, and high %from L. Atlas et al. (2010)
-final_rating=[30 40 50 60 70];
+std_rating=[16.6667 50 83.3333]; % low, mid, and high %from L. Atlas et al. (2010)
+final_rating=[16.6667 33.3333 50 66.6667 83.3333];
 
 %% SETUP: Input data
 reg.stim_degree(th)=degree;
@@ -48,14 +49,15 @@ end
 % 3) calculate the size of residuals
 if th == NumOfTr
     reg.sum_residuals(reg.skin_site) = 0;
-    reg.total_fit = fitlm(reg.stim_degree,reg.stim_rating,'quadratic');
+    reg.total_fit = fitlm(reg.stim_degree,reg.stim_rating,'linear');
     for ii=1:th
         reg.sum_residuals(reg.skin_site(ii)) = reg.sum_residuals(reg.skin_site(ii)) + abs(reg.total_fit.Residuals.Raw(ii));
     end
-    ForCAL = reg.sum_residuals;
+    
+    ForCAL = reg.sum_residuals; %for a calculation
     for iii=1:3 % To find three lowest value and index
         [~, min_dim] = min(ForCAL);
-        ForCAL(min_dim) = 999; % mark lowest number
+        ForCAL(min_dim) = 999; % mark a lowest number repeatly
     end
     reg.studySkinSite = find(ForCAL==999); %input marked numbers
     

@@ -313,6 +313,7 @@ try
         
         % 3. Delay
         fixPoint(Delay(j), white, '+')    
+        
         % 4. HEAT and Ratings
         cir_center = [(rb+lb)/2, bb];
         SetMouse(cir_center(1), cir_center(2)); % set mouse at the center

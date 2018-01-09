@@ -42,14 +42,14 @@ end
 
 %% SETUP: Global variable
 global theWindow W H; % window property
-global white red orange bgcolor yellow; % color
+global white red orange bgcolor; % color
 global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
 global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
 %%
 addpath(genpath(pwd));
 %% SETUP: DATA and Subject INFO
 scriptdir = '/Users/cocoan/Dropbox/github/';
-savedir = 'Motor_Semic_data';
+savedir = 'Cali_Semic_data';
 [fname,~ , SID] = subjectinfo_check_SEMIC(savedir,1); % subfunction %start_trial
 % save data using the canlab_dataset object
 mot.version = 'SEMIC_Motor_task_v1_21-12-2017_Cocoanlab';
@@ -170,7 +170,7 @@ try
         Screen(theWindow, 'FillRect', bgcolor, window_rect);
         DrawFormattedText(theWindow, double('시작합니다...'), 'center', 'center', white, [], [], [], 1.2);
         Screen('Flip', theWindow);
-        mot.dat.runscan_starttime = GetSecs;
+        mot.dat{runNbr}{trial_Number(j)}.runscan_starttime = GetSecs;
         WaitSecs(4);
         
         % 5 seconds: Blank
@@ -178,15 +178,14 @@ try
         Screen('Flip', theWindow);
         WaitSecs(4); % ADJUST THIS
     end
-    
     % TRIAL START
     for i=1:numel(xx)
-        mot.dat{i}.trial_start_timestamp=GetSecs; % trial_star_timestamp
+        trial_start_timestamp=GetSecs; % trial_star_timestamp
         % 1. Fixation point
         fixPoint(ISI(i), white, stimText);
         % 2. Moving dot part
         ready = 0;
-        mot.dat{i}.moving_start_timestamp = GetSecs;
+        mot.moving_start_timestamp = GetSecs;
         SetMouse(cir_center(1), cir_center(2));
         while GetSecs - moving_start_timestamp < 5
             while ~ready
@@ -211,7 +210,7 @@ try
                 Screen('Flip',theWindow);
                 
                 if button(1)
-                    mot.dat{i}.button_click_timestamp=GetSecs; %
+                    button_click_timestamp=GetSecs; %
                     draw_scale('overall_motor_semicircular');
                     Screen('DrawDots', theWindow, [xx(i) yy(i)]', 20, white, [0 0], 1);  % draw random dot in SemiC
                     Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
@@ -224,12 +223,9 @@ try
             fixPoint(0, white, '');
             Screen('Flip', theWindow);
         end
-        mot.dat{i}.moving_end_timestamp = GetSecs;
-        if mod(i,2) == 0, save(mot.datafile, '-append', 'mot'); end % save data every two trials
+        moving_end_timestamp = GetSecs;
     end
-    mot.dat{i}.task_end_timestamp=GetSecs;
-    save(mot.datafile, '-append', 'mot');
-    
+    task_end_timestamp=GetSecs;
     sca;
     ShowCursor();
     Screen('CloseAll');
