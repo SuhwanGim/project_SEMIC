@@ -93,7 +93,7 @@ anchor_y = H/2+10+scale_H;
 motorN = 4; % number of motor practice trial
 NumOfTr = 12;
 stimText = '+';
-init_stim={'00111000' '00111100' '01000000'}; % Initial degrees of a heat pain [44 46 48]
+init_stim={'00110010' '00111100' '01000110'}; % Initial degrees of a heat pain [44 46 48]
 rating_type = 'semicircular';
 % save?
 save(reg.datafile,'reg','init_stim');
