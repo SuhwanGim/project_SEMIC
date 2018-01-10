@@ -89,7 +89,7 @@ anchor_y = H/2+10+scale_H;
 % anchor_lms = [0.1000 0.2881 0.5966 0.9000] % adjusted for SEMIC
 % anchor_lms = [0.014 0.061 0.172 0.354 0.533].*(rb-lb)+lb; for VAS
 
-%% Parameter
+%% SETUP: Parameter
 motorN = 4; % number of motor practice trial
 NumOfTr = 12;
 stimText = '+';
@@ -106,8 +106,15 @@ deg(deg < 0) = 0;
 th = deg2rad(deg);
 x = radius*cos(th)+cir_center(1);
 y = cir_center(2)-radius*sin(th);
-
-%% skin site / LMH sequence
+%% SETUP: the pathway program 
+PathPrg = load_PathProgram('SEMIC');
+%% SETUP: PTB=Screen
+theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
+Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); % For alpha value of e.g.,[R G B alpha]
+Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
+Screen('TextFont', theWindow, font); % setting font
+Screen('TextSize', theWindow, fontsize);
+%% Setup: generate sequence of skin site and LMH (Low, middle and high)
 rng('shuffle');
 % reg.skin_site = repmat({1,2,3,4,5,6}, 1, 3); % Five combitnations
 for i = 1:3 % 4(Skin sites:1 to 4) x 3 (number of stimulation) combination
@@ -122,34 +129,7 @@ for z = 1:4 % four skin_site %Each skin site stimulated by LMH heat-pain
     end
 end
 
-%% Pathway program (46 to 64) /
-% :: It will be adjusted each settings of study 
-% Example:[degree decValue ProgramNameInPathway]
-PathPrg = {39 '00101110' 'SEMIC_39' ; ...
-    39.5 '00101111' 'SEMIC_39.5' ; ...
-    40 '00110000' 'SEMIC_40' ; ...
-    40.5 '00110001' 'SEMIC_40.5'; ...
-    41 '00110010' 'SEMIC_41'; ...
-    41.5 '00110011' 'SEMIC_41.5'; ...
-    42 '00110100' 'SEMIC_42'; ...
-    42.5 '00110101' 'SEMIC_42.5'; ...
-    43 '00110110' 'SEMIC_43'; ...
-    43.5 '00110111' 'SEMIC_43.5'; ...
-    44 '00111000' 'SEMIC_44'; ...
-    44.5 '00111001' 'SEMIC_44.5'; ...
-    45 '00111010' 'SEMIC_45'; ...
-    45.5 '00111011' 'SEMIC_45.5'; ...
-    46 '00111100' 'SEMIC_46'; ...
-    46.5 '00111101' 'SEMIC_46.5'; ...
-    47 '00111110' 'SEMIC_47'; ...
-    47.5 '00111111' 'SEMIC_47.5'; ...
-    48 '01000000' 'SEMIC_48';};
-%%
-theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
-Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); % For alpha value of e.g.,[R G B alpha]
-Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
-Screen('TextFont', theWindow, font); % setting font
-Screen('TextSize', theWindow, fontsize);
+
 %% START
 %: Motor_practice --> calibration
 try

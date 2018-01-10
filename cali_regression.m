@@ -77,13 +77,14 @@ function c_number=unit_integer(uc_number)
 %For example
 
 % Input=[44.34 43.11 45.57 43.89 43.75 43.77 44.77 45.13 46.1 ];
-% Output=[44.5 43 45.5 44 43.5 44 45 45 46];
+% Output=[44.4000 43.2000 45.6000 43.8000 43.8000 43.8000 44.8000 45.2000
+% 46.2000];
 
-uc_number=uc_number.*2;
-c_number=round(uc_number)./2;
+uc_number=uc_number.*5;
+c_number=round(uc_number)./5;
 
 % limit the degree
-c_number(c_number > 48) = 48;
-c_number(c_number < 32) = 32;
+c_number(c_number > 49.6) = 49.6;
+c_number(c_number < 39) = 39;
 end
 

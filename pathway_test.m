@@ -1,6 +1,6 @@
 function pathway_test(ip, port)
 %%
-% This fucntion is only for stimulating 49 thermal degree before
+% This fucntion is only for stimulating 50 thermal degree before
 % participants experiece thermal pain. It needs two inputs, 1) IP adress
 % and 2) port.
 %
@@ -16,6 +16,6 @@ clc;
     if ~isempty(txt)
         disp('잠시만 기다려주세요');
         WaitSecs(0.5);
-        main(ip, port, 1, 25);
+        main(ip, port, 1, 24);
     end
 end
