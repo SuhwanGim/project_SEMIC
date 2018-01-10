@@ -148,7 +148,7 @@ try
     for i=1:motorN % Four trials
         trial_start_timestamp=GetSecs; % trial_star_timestamp
         % -1.1. Fixation point
-        fixPoint(ISI(i), white, stimText);
+        fixPoint(2, white, stimText);
         % -1.2. Moving dot part
         ready = 0;
         moving_start_timestamp = GetSecs;
@@ -157,7 +157,6 @@ try
             while ~ready
                 [x,y,button] = GetMouse(theWindow);
                 draw_scale('overall_motor_semicircular');
-                Screen('DrawDots', theWindow, [xx(i) yy(i)]', 20, white, [0 0], 1);  % draw random dot in SemiC
                 Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  % Cursor
                 % if the point goes further than the semi-circle, move the point to
                 % the closest point
@@ -335,6 +334,16 @@ catch err
     end
     abort_experiment;
 end
+end
+
+function fixPoint(seconds, color, stimText)
+global theWindow;
+% stimText = '+';
+% Screen(theWindow,'FillRect', bgcolor, window_rect);
+start_fix = GetSecs; % Start_time_of_Fixation_Stimulus
+DrawFormattedText(theWindow, double(stimText), 'center', 'center', color, [], [], [], 1.2);
+Screen('Flip', theWindow);
+waitsec_fromstarttime(start_fix, seconds);
 end
 
 function abort_experiment(varargin)
