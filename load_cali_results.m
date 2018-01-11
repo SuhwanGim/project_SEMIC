@@ -8,7 +8,7 @@ current_path = [pwd '/'];
 filename = '*.mat';
 filelist = dir([current_path filename] );
 ready = 0;
-!ls
+ls;
 while ~ready
     targetFile = input('캘리브레이션 때 입력한 파일명을 정확히 입력해주세요(s+파일명+.mat):','s');
     FullText = strcat('s',targetFile, '.mat');

@@ -74,12 +74,12 @@ Screen('TextFont', theWindow, font); % setting font
 Screen('TextSize', theWindow, fontsize);
 %%
 sTime = GetSecs;
-while GetSecs - sTime < 110
+while GetSecs - sTime < 10
 
     [x,y,button] = GetMouse(theWindow);
     rating_type = 'semicircular';
-    draw_scale('explain_painful_semicircularr');
-    Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  %dif color
+    draw_scale('overall_motor_semicircular');
+    Screen('DrawDots', theWindow, [x y]', 20, [255 164 0 130], [0 0], 1);  %dif color
     % if the point goes further than the semi-circle, move the point to
     % the closest point
     radius = (rb-lb)/2; % radius
@@ -95,7 +95,7 @@ while GetSecs - sTime < 110
         SetMouse(x,y);
     end
     
-    draw_scale('explain_painful_semicircular');
+    draw_scale('overall_motor_semicircular');
     theta = rad2deg(theta);
     theta= 180 - theta; 
     theta = num2str(theta);

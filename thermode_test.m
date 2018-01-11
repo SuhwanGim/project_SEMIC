@@ -11,18 +11,9 @@ function data = thermode_test(runNbr, ip, port, reg, varargin)
 %
 % written by Suhwan Gim (roseno.9@daum.net)
 % 2017-12-06
-% =================EXAMPEL of PROGRAM codes================================
-% dec2bin(100) -> ans = 1100100
-% (MATLAB Value, PATHWAY Value) = (100,1100100)
-% In this experiment,
-% ---------------------------------------------------------
-% Matlab: Program name : Program code (parameter, 8bit)
-% ------------------------------------------------
-%   25  : Pulse 49     :   00011001
-%   50  : SEMIC_41     :   00110010
-%   51  : SEMIC_41.5   :   00110011
-%    ~        ~                ~
-%   64  : SEMIC_48     :   01000000
+%
+% see also load_PathProgram
+% -------------------------------------------------------------------------
 
 %% GLOBAL vaiable
 global theWindow W H; % window property
@@ -30,6 +21,12 @@ global white red red_Alpha orange bgcolor yellow; % color
 global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
 global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
 
+%% Chekc ip/port
+if ~isempty(ip)
+    % do nothing
+else
+    abort_experiment('IP');
+end
 %% Parse varargin
 testmode = false;
 USE_BIOPAC = false;
@@ -55,8 +52,6 @@ for i = 1:length(varargin)
                 channel_n = 3;
                 biopac_channel = 0;
                 ljHandle = BIOPAC_setup(channel_n); % BIOPAC SETUP
-            case {'eyelink'}
-                %
             case {'mouse', 'trackball'}
                 % do nothing
         end
@@ -157,6 +152,7 @@ if testmode
 else
     screens = Screen('Screens');
     window_num = screens(end); % the last window
+    Screen('Preference', 'SkipSyncTests', 1);
     window_info = Screen('Resolution', window_num);
     window_rect = [0 0 window_info.width window_info.height]; % full screen
     fontsize = 32;
@@ -220,10 +216,8 @@ try
                 display_expmessage('실험자는 모든 것이 잘 준비되었는지 체크해주세요 (PATHWAY, BIOPAC, EYELINK, 등등). \n모두 준비되었으면 SPACE BAR를 눌러주세요.'); % until space; see subfunctions
             end
         end
-        % 1 seconds: BIOPAC
-        
-        if trial_Number(j) == 1
-            
+        % 1 seconds: BIOPAC       
+        if trial_Number(j) == 1           
             while (1)
                 [~,~,keyCode] = KbCheck;              
                 % if this is for fMRI experiment, it will start with "s",
@@ -279,7 +273,7 @@ try
         data.dat{runNbr}{trial_Number(j)}.trial_start_t = GetSecs; %Trial start
         
         % 1. ITI (jitter)
-        fixPoint(ITI(j), white, '-') %
+        fixPoint(ITI(j), white, '+') %
         
         % 2. Cue
         cue_t = GetSecs;
@@ -305,8 +299,8 @@ try
         data.dat{runNbr}{trial_Number(j)}.heat_start_timestamp = GetSecs; % heat-stimulus time stamp
         % if checkStatus(ip,port)
         ready = 0;
-        ready2 = 0;
-        while ~ready2
+
+        while GetSecs-start_trigger > 10
             start_while=GetSecs;
             while ~ready
                 waitsec_fromstarttime(start_while, 1)
@@ -315,6 +309,7 @@ try
                 if strcmp(systemState, 'Pathway State: TEST') && strcmp(testState,'Test State: RUNNING')
                     ready = 1;
                     sTime = GetSecs;
+                    start_trigger=GetSecs;
                     break;
                 else
                     ready = 0;
@@ -346,7 +341,7 @@ try
             msg = double(msg);
             DrawFormattedText(theWindow, msg, 'center', 250, white, [], [], [], 1.2);
             draw_scale('overall_avoidance_semicircular')
-            Screen('DrawDots', theWindow, [x y], 10, orange, [0 0], 1);
+            Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
             Screen('Flip', theWindow);
             
             % Saving data
@@ -392,7 +387,7 @@ try
             msg = double(overall_unpl_Q_txt{j});
             DrawFormattedText(theWindow, msg, 'center', 250, white, [], [], [], 1.2);
             draw_scale('overall_avoidance_semicircular')
-            Screen('DrawDots', theWindow, [x y], 10, orange, [0 0], 1);
+            Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
             Screen('Flip', theWindow);
             
             if button(1)
@@ -427,7 +422,7 @@ try
         Screen('Flip', theWindow);
         end_trial = GetSecs;
         data.dat{runNbr}{trial_Number(j)}.end_trial_t = end_trial;
-        data.dat{runNbr}{trial_Number(j)}.ramp_up_cnd = ramp_up_con(j);
+%         data.dat{runNbr}{trial_Number(j)}.ramp_up_cnd = ramp_up_con(j);
         if mod(trial_Number(j),2) == 0, save(data.datafile, '-append', 'data'); end % save data every two trials
         waitsec_fromstarttime(end_trial, 1); % For your rest,
     end
@@ -530,6 +525,8 @@ for i = 1:length(varargin)
                 str = 'Experiment aborted by error.';
             case {'manual'}
                 str = 'Experiment aborted by the experimenter.';
+            case {'IP'}
+                str = 'No information about IP adress';
         end
     end
 end

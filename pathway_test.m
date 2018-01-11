@@ -7,7 +7,7 @@ function pathway_test(ip, port)
 % See this, ---------------------------------------------------------
 % Matlab: Program name : Program code (parameter, 8bit)
 % ---------------------------------------------------------
-%   25  : Pulse 49     :   00011001
+%   23  : SEMIC_50     :   00011001
 %
 % writen by Suhwan Gim
 %%

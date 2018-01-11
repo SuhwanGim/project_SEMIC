@@ -54,6 +54,7 @@ if testmode
 else
     screens = Screen('Screens');
     window_num = screens(end); % the last window
+    Screen('Preference', 'SkipSyncTests', 1);
     window_info = Screen('Resolution', window_num);
     window_rect = [0 0 window_info.width window_info.height]; % full screen
     fontsize = 32;
@@ -93,7 +94,7 @@ anchor_y = H/2+10+scale_H;
 motorN = 4; % number of motor practice trial
 NumOfTr = 12;
 stimText = '+';
-init_stim={'00110010' '00111100' '01000110'}; % Initial degrees of a heat pain [44 46 48]
+init_stim={'00101111' '00111001' '01000011'}; % Initial degrees of a heat pain [43.4 45.4 47.4]
 rating_type = 'semicircular';
 % save?
 save(reg.datafile,'reg','init_stim');
@@ -104,16 +105,10 @@ deg = 180-normrnd(0.5, 0.1, 20, 1)*180; % convert 0-1 values to 0-180 degree
 deg(deg > 180) = 180;
 deg(deg < 0) = 0;
 th = deg2rad(deg);
-x = radius*cos(th)+cir_center(1);
-y = cir_center(2)-radius*sin(th);
+% x = radius*cos(th)+cir_center(1);
+% y = cir_center(2)-radius*sin(th);
 %% SETUP: the pathway program 
 PathPrg = load_PathProgram('SEMIC');
-%% SETUP: PTB=Screen
-theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
-Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); % For alpha value of e.g.,[R G B alpha]
-Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
-Screen('TextFont', theWindow, font); % setting font
-Screen('TextSize', theWindow, fontsize);
 %% Setup: generate sequence of skin site and LMH (Low, middle and high)
 rng('shuffle');
 % reg.skin_site = repmat({1,2,3,4,5,6}, 1, 3); % Five combitnations
@@ -129,8 +124,13 @@ for z = 1:4 % four skin_site %Each skin site stimulated by LMH heat-pain
     end
 end
 
-
-%% START
+%% START: Screen
+theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
+Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); % For alpha value of e.g.,[R G B alpha]
+Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
+Screen('TextFont', theWindow, font); % setting font
+Screen('TextSize', theWindow, fontsize);
+%% START: Experiment
 %: Motor_practice --> calibration
 try
     %PART0. Motor_practice (3-4 trials)
@@ -177,7 +177,6 @@ try
                 if button(1)
                     button_click_timestamp=GetSecs; %
                     draw_scale('overall_motor_semicircular');
-                    Screen('DrawDots', theWindow, [xx(i) yy(i)]', 20, white, [0 0], 1);  % draw random dot in SemiC
                     Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
                     Screen('Flip',theWindow);
                     WaitSecs(.5);
@@ -194,7 +193,7 @@ try
     %PART1. Calibrtaion 
     % 0. Instructions
     display_expmessage('지금부터는 Calibration을 시작하겠습니다.\n참가자는 편안하게 계시고 진행자의 지시를 따라주시기 바랍니다.');
-    WaitSecs(1);
+    WaitSecs(3);
     random_value = randperm(3);
     for i=1:NumOfTr %Total trial
         % manipulate the current stim
