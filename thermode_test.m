@@ -8,7 +8,6 @@ function data = thermode_test(runNbr, ip, port, reg, varargin)
 %using TCP/IP (for example, connect each other or connect same router).
 %However, if didn't, this function will not working
 % 
-%
 % written by Suhwan Gim (roseno.9@daum.net)
 % 2017-12-06
 %
@@ -140,7 +139,6 @@ end
 %% SETUP: Experiment settings
 rating_type = 'semicircular';
 NumberOfCue = 25;
-
 %% SETUP: Screen
 Screen('Clear');
 Screen('CloseAll');
@@ -299,7 +297,7 @@ try
         data.dat{runNbr}{trial_Number(j)}.heat_start_timestamp = GetSecs; % heat-stimulus time stamp
         % if checkStatus(ip,port)
         ready = 0;
-
+        start_trigger = GetSecs;
         while GetSecs-start_trigger > 10
             start_while=GetSecs;
             while ~ready

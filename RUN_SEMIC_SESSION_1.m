@@ -7,6 +7,6 @@ ip = '115.145.189.133';
 port = 20121;
 addpath(genpath(pwd));
 %% 1. PATHWAY TEST
-pathway_test(ip, port);
+pathway_test(ip, port, 'basic');
 %% 2. Calibration
 calibration(ip, port);

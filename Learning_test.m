@@ -38,8 +38,6 @@ for i = 1:length(varargin)
                 channel_n = 3;
                 biopac_channel = 0;
                 ljHandle = BIOPAC_setup(channel_n); % BIOPAC SETUP
-            case {'eyelink'}
-                %
             case {'mouse', 'trackball'}
                 % do nothing
         end
@@ -93,7 +91,7 @@ if start_trial==1
     stim_level = repmat(["LV1"; "LV2"; "LV3"; "LV4";"LV2"; "LV3"; "LV4";"LV5"],2,1); % A group of [low cue,High cue]x2
     program = repmat([stim_degree(1:4);stim_degree(2:5)],2,1); % A group of [low cue,High cue]x2
     cue_settings = repmat(["LOW";"LOW";"LOW";"LOW";"HIGH";"HIGH";"HIGH";"HIGH"],2,1);
-    cue_mean = repmat([0.3; 0.3; 0.3;0.3; 0.7; 0.7; 0.7; 0.7;],2,1) + randn(16,1).*0.07; % (LOWx4 HIGHx4) x 2 = 16 trials
+    cue_mean = repmat([0.16; 0.33; 0.5; 0.66; 0.33; 0.5; 0.66; 0.83;],2,1) + randn(16,1).*0.02; % (LOWx4 HIGHx4) x 2 = 16 trials
     cue_var = abs(repmat([0.05;],16,1) + randn(16,1).*0.003); % 
     % randomization
     rn=randperm(length(cue_mean));
