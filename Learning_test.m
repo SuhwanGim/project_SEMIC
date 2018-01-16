@@ -13,8 +13,9 @@ global theWindow W H; % window property
 global white red red_Alpha orange bgcolor yellow; % color
 global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
 global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
-%% parameter 
+%% SETUP: Parameter 
 runNbr = 1;
+N = 12; % Number of Trial 
 %% Parse varargin
 testmode = false;
 USE_BIOPAC = false;
@@ -73,7 +74,7 @@ PathPrg = load_PathProgram('SEMIC');
 if start_trial==1
     rng('shuffle');
     % Number of trial
-    trial_Number=(1:16)'; % and transpose % 4 (stim level) x 2 (two cues) x 2 (two overall questions)
+    trial_Number=(1:N)'; % and transpose % 4 (stim level) x 2 (two cues) x 2 (two overall questions)
     % Run number
     run_Number = repmat(runNbr,length(trial_Number),1);
     % Find the dec value
@@ -87,7 +88,8 @@ if start_trial==1
         end
     end
     stim_degree=cell2mat(degree);
-    % Program, cue_settings, mean, variance
+    % Program, cue_settings, mean, variance (Compare to the thermode_test,
+    % this procedure didn't suffle the sequecne. 
     stim_level = repmat(["LV1"; "LV2"; "LV3"; "LV4";"LV2"; "LV3"; "LV4";"LV5"],2,1); % A group of [low cue,High cue]x2
     program = repmat([stim_degree(1:4);stim_degree(2:5)],2,1); % A group of [low cue,High cue]x2
     cue_settings = repmat(["LOW";"LOW";"LOW";"LOW";"HIGH";"HIGH";"HIGH";"HIGH"],2,1);
