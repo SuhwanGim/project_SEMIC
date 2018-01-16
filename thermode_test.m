@@ -7,7 +7,7 @@ function data = thermode_test(runNbr, ip, port, reg, varargin)
 %If you want to use this function, you should have a connected computers
 %using TCP/IP (for example, connect each other or connect same router).
 %However, if didn't, this function will not working
-% 
+%
 % written by Suhwan Gim (roseno.9@daum.net)
 % 2017-12-06
 %
@@ -71,14 +71,14 @@ data.subject = SID;
 data.datafile = fname;
 data.starttime = datestr(clock, 0); % date-time
 data.starttime_getsecs = GetSecs; % in the same format of timestamps for each trial
-%% SETUP: the pathway program 
+%% SETUP: the pathway program
 PathPrg = load_PathProgram('SEMIC');
 %% SETUP: Generate a trial sequence
 % =========================================================================
 %   1. Run number - Trial number - ITI - Delay - Delay2, Cue mean - Cue
 %   settings - Cue variance - program - quetions - condition of quetions
-%   2. ITI - Delay - Delay 2  
-%   : Total 15 seconds per one trial. Each is 3 to 7 seconds 
+%   2. ITI - Delay - Delay 2
+%   : Total 15 seconds per one trial. Each is 3 to 7 seconds
 %   (5 combination: [3 5 7] [3 6 6] [4 4 7] [4 5 6] [5 5 5])
 %   3. Cue mean (2 levels: 0-1). e.g., 0.3(LOW), 0.7(HIGH)
 %       : added random number (such as + and - 0.01~0.05)
@@ -91,7 +91,7 @@ if start_trial==1
     % Run number
     run_Number = repmat(runNbr,length(trial_Number),1);
     % Find the dec value
-    for iiii=1:numel(reg.FinalLMH_5Level)        
+    for iiii=1:numel(reg.FinalLMH_5Level)
         for iii=1:length(PathPrg) %find degree
             if reg.FinalLMH_5Level(iiii) == PathPrg{iii,1}
                 degree{iiii,1} = bin2dec(PathPrg{iii,2});
@@ -106,7 +106,7 @@ if start_trial==1
     program = repmat([stim_degree(1:4);stim_degree(2:5)],2,1); % A group of [low cue,High cue]x2
     cue_settings = repmat(["LOW";"LOW";"LOW";"LOW";"HIGH";"HIGH";"HIGH";"HIGH"],2,1);
     cue_mean = repmat([0.3; 0.3; 0.3;0.3; 0.7; 0.7; 0.7; 0.7;],2,1) + randn(16,1).*0.07; % (LOWx4 HIGHx4) x 2 = 16 trials
-    cue_var = abs(repmat([0.05;],16,1) + randn(16,1).*0.003); % 
+    cue_var = abs(repmat([0.05;],16,1) + randn(16,1).*0.003); %
     % randomization
     rn=randperm(length(cue_mean));
     program = program(rn);
@@ -128,7 +128,7 @@ if start_trial==1
     overall_unpl_Q_cond = repmat({'other_painful';'self_painful'},10,1);
     rn=randperm(numel(overall_unpl_Q_txt));
     overall_unpl_Q_txt = overall_unpl_Q_txt(rn);
-    overall_unpl_Q_cond = overall_unpl_Q_cond(rn); 
+    overall_unpl_Q_cond = overall_unpl_Q_cond(rn);
     %ts = [trial_Number, run_Number, ITI, Delay, cue_mean, cue_var, ts_program, ramp_up_con];
     ts{runNbr} = [run_Number, trial_Number, ITI, Delay, Delay2, cue_settings, cue_mean, cue_var, stim_level, program, overall_unpl_Q_cond, overall_unpl_Q_txt];
     % save the trial_sequences
@@ -211,13 +211,13 @@ try
                 elseif keyCode(KbName('q'))==1
                     abort_experiment;
                 end
-                display_expmessage('실험자는 모든 것이 잘 준비되었는지 체크해주세요 (PATHWAY, BIOPAC, EYELINK, 등등). \n모두 준비되었으면 SPACE BAR를 눌러주세요.'); % until space; see subfunctions
+                display_expmessage('실험자는 모든 것이 잘 준비되었는지 체크해주세요 (PATHWAY, BIOPAC, 등등). \n모두 준비되었으면 SPACE BAR를 눌러주세요.'); % until space; see subfunctions
             end
         end
-        % 1 seconds: BIOPAC       
-        if trial_Number(j) == 1           
+        % 1 seconds: BIOPAC
+        if trial_Number(j) == 1
             while (1)
-                [~,~,keyCode] = KbCheck;              
+                [~,~,keyCode] = KbCheck;
                 % if this is for fMRI experiment, it will start with "s",
                 % but if behavioral, it will start with "r" key.
                 if dofmri
@@ -252,7 +252,7 @@ try
                 Screen('Flip', theWindow);
                 waitsec_fromstarttime(fmri_t2, 4); % ADJUST THIS
             end
-                        
+            
             if USE_BIOPAC
                 bio_t = GetSecs;
                 data.dat{runNbr}{trial_Number(j)}.biopac_triggertime = bio_t; %BIOPAC timestamp
@@ -274,16 +274,16 @@ try
         fixPoint(ITI(j), white, '+') %
         
         % 2. Cue
-        cue_t = GetSecs;
-        data.dat{runNbr}{trial_Number(j)}.cue_timestamp = cue_t; %Cue time stamp
+        data.dat{runNbr}{trial_Number(j)}.cue_timestamp = GetSecs; %Cue time stamp
         draw_scale('overall_avoidance_semicircular');
-        [data.dat{runNbr}{trial_Number(j)}.cue_x, data.dat{runNbr}{trial_Number(j)}.cue_theta] = draw_social_cue(cue_mean(j), cue_var(j), NumberOfCue, rating_type); % draw & save details: draw_socia_cue(m, std, n, rating_type)
+        [~ , data.dat{runNbr}{trial_Number(j)}.cue_theta] = draw_social_cue(cue_mean(j), cue_var(j), NumberOfCue, rating_type); % draw & save details: draw_socia_cue(m, std, n, rating_type)
         Screen('Flip', theWindow);
+        cue_t = GetSecs;
         waitsec_fromstarttime(cue_t, 2); % 2 seconds
         data.dat{runNbr}{trial_Number(j)}.cue_end_timestamp = GetSecs;
         
         % 3. Delay
-        fixPoint(Delay(j), white, '+')    
+        fixPoint(Delay(j), white, '+')
         
         % 4. HEAT and Ratings
         cir_center = [(rb+lb)/2, bb];
@@ -297,8 +297,8 @@ try
         data.dat{runNbr}{trial_Number(j)}.heat_start_timestamp = GetSecs; % heat-stimulus time stamp
         % if checkStatus(ip,port)
         ready = 0;
-        start_trigger = GetSecs;
-        while GetSecs-start_trigger > 10
+        ready1=0;
+        while ~ready1
             start_while=GetSecs;
             while ~ready
                 waitsec_fromstarttime(start_while, 1)
@@ -307,7 +307,6 @@ try
                 if strcmp(systemState, 'Pathway State: TEST') && strcmp(testState,'Test State: RUNNING')
                     ready = 1;
                     sTime = GetSecs;
-                    start_trigger=GetSecs;
                     break;
                 else
                     ready = 0;
@@ -342,24 +341,29 @@ try
             Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
             Screen('Flip', theWindow);
             
-            % Saving data
+            
+            % Saving data 
             data.dat{runNbr}{trial_Number(j)}.con_time_fromstart(rec_i,1) = GetSecs-sTime;
             data.dat{runNbr}{trial_Number(j)}.con_xy(rec_i,:) = [x-cir_center(1) cir_center(2)-y]./radius;
             data.dat{runNbr}{trial_Number(j)}.con_clicks(rec_i,:) = button;
-            data.dat{runNbr}{trial_Number(j)}.con_r_theta(rec_i,:) = [curr_r/radius curr_theta/180];
-                      
+            data.dat{runNbr}{trial_Number(j)}.con_r_theta(rec_i,:) = [curr_r/radius curr_theta/180]; %radius and degree? 
+            
+            if GetSecs - sTime > 10
+                break;
+            else
+                %do nothing
+            end
         end
         
         %5. Delay2
         fixPoint(Delay2(j), white, '+')
         %6. Overall ratings
-        cir_center = [(rb+lb)/2, bb];
         SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
-        % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
         rec_i = 0;
-        % if checkStatus(ip,port)
-        data.dat{runNbr}{trial_Number(j)}.overall_rating_timestamp=GetSecs;
-        while GetSecs - data.dat{runNbr}{trial_Number(j)}.overall_rating_timestamp > 5
+        ready2=0;
+        sTime=GetSecs;
+        while ~ready2
+            data.dat{runNbr}{trial_Number(j)}.overall_rating_time_stamp=sTime; % overall rating time stamp
             [x,y,button]=GetMouse(theWindow);
             rec_i= rec_i+1;
             % if the point goes further than the semi-circle, move the point to
@@ -388,43 +392,50 @@ try
             Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
             Screen('Flip', theWindow);
             
-            if button(1)
-                draw_scale('overall_avoidance_semicircular');
-                Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
-                Screen('Flip',theWindow);
-                WaitSecs(1);
-                break; % break for "if"
-            end
             
             % Saving data
             data.dat{runNbr}{trial_Number(j)}.ovr_time_fromstart(rec_i,1) = GetSecs-sTime;
             data.dat{runNbr}{trial_Number(j)}.ovr_xy(rec_i,:) = [x-cir_center(1) cir_center(2)-y]./radius;
             data.dat{runNbr}{trial_Number(j)}.ovr_clicks(rec_i,:) = button;
-            data.dat{runNbr}{trial_Number(j)}.ovr_r_theta(rec_i,:) = [curr_r/radius curr_theta/180];                     
-%             if GetSecs - sTime > 10 % 7 = plateau + ramp-down
-%                 start_stopsignal=GetSecs;
-%                 waitsec_fromstarttime(start_stopsignal, 2)
-%                 resp = main(ip,port,0); %get system status
-%                 systemState = resp{4}; testState = resp{5};
-%                 if strcmp(systemState, 'Pathway State: READY') && strcmp(testState,'Test State: IDLE')
-%                     data.dat{runNbr}{trial_Number(j)}.heat_exit_txt = main(ip,port,5); % Triggering stop signal
-%                     ready2 = 1;
-%                     data.dat{runNbr}{trial_Number(j)}.heat_exit_timestamp = GetSecs;
-%                     break;
-%                 end
-%             end
-        end
+            data.dat{runNbr}{trial_Number(j)}.ovr_r_theta(rec_i,:) = [curr_r/radius curr_theta/180];
+            
+            
+            if button(1)
+                draw_scale('overall_avoidance_semicircular');
+                Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
+                Screen('Flip',theWindow);
+                WaitSecs(0.5);
+                ready3=0;
+                while ~ready3 %GetSecs - sTime> 5
+                    msg = double(' ');
+                    DrawFormattedText(theWindow, msg, 'center', 250, white, [], [], [], 1.2);
+                    Screen('Flip',theWindow);
+                    if  GetSecs - sTime > 5
+                        break
+                    end
+                end
+                break;
+            elseif GetSecs - sTime > 5
+                ready2=1;
+                break;
+            else
+                %do nothing
+            end
+            
+        end %end of a overall rating 
         
         SetMouse(0,0);
         Screen(theWindow,'FillRect',bgcolor, window_rect);
         Screen('Flip', theWindow);
         end_trial = GetSecs;
+        % Saving trial sequence(i)
+        data.dat{runNbr}{trial_Number(j)}.ts = ts{1,1}(j,:);
         data.dat{runNbr}{trial_Number(j)}.end_trial_t = end_trial;
-%         data.dat{runNbr}{trial_Number(j)}.ramp_up_cnd = ramp_up_con(j);
+        % data.dat{runNbr}{trial_Number(j)}.ramp_up_cnd = ramp_up_con(j);
         if mod(trial_Number(j),2) == 0, save(data.datafile, '-append', 'data'); end % save data every two trials
         waitsec_fromstarttime(end_trial, 1); % For your rest,
     end
-    
+    data.endtime_getsecs=GetSecs;
     ShowCursor();
     Screen('Clear');
     Screen('CloseAll');
@@ -536,3 +547,18 @@ disp(str); %present this text in command window
 
 end
 
+
+
+%%
+%             if GetSecs - sTime > 10 % 7 = plateau + ramp-down
+%                 start_stopsignal=GetSecs;
+%                 waitsec_fromstarttime(start_stopsignal, 2)
+%                 resp = main(ip,port,0); %get system status
+%                 systemState = resp{4}; testState = resp{5};
+%                 if strcmp(systemState, 'Pathway State: READY') && strcmp(testState,'Test State: IDLE')
+%                     data.dat{runNbr}{trial_Number(j)}.heat_exit_txt = main(ip,port,5); % Triggering stop signal
+%                     ready2 = 1;
+%                     data.dat{runNbr}{trial_Number(j)}.heat_exit_timestamp = GetSecs;
+%                     break;
+%                 end
+%             end
