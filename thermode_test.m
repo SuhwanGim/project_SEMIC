@@ -66,7 +66,7 @@ savedir = 'SEMIC_test_data';
 %[fname, start_trial, SID] = subjectinfo_check(savedir); % subfunction
 if exist(fname, 'file'), load(fname, 'data'); load(fname,'ts'); end
 % save data using the canlab_dataset object
-data.version = 'SEMIC_v1_12-06-2017_Cocoanlab';
+data.version = 'SEMIC_v1_01-19-2018_Cocoanlab';
 data.subject = SID;
 data.datafile = fname;
 data.starttime = datestr(clock, 0); % date-time
@@ -107,7 +107,7 @@ if start_trial==1
     cue_settings = repmat(["LOW";"LOW";"LOW";"LOW";"HIGH";"HIGH";"HIGH";"HIGH"],2,1);
     cue_mean = repmat([0.3; 0.3; 0.3;0.3; 0.7; 0.7; 0.7; 0.7;],2,1) + randn(16,1).*0.07; % (LOWx4 HIGHx4) x 2 = 16 trials
     cue_var = abs(repmat([0.05;],16,1) + randn(16,1).*0.003); %
-    % randomization
+    % randomization of cue mena, settings and variance and program
     rn=randperm(length(cue_mean));
     program = program(rn);
     stim_level = stim_level(rn);
@@ -116,10 +116,16 @@ if start_trial==1
     cue_var = cue_var(rn);
     % ITI-Delay1-Delay2 combination
     %:In this task, the combination from 17th to 20th will not use.
-    ITI_Delay = repmat({3, 5, 7; 3, 6, 6; 4, 4, 7; 4, 5, 6; 5, 5, 5}, 4, 1); % Five combitnations
+    bin = {3, 5, 7; 3, 6, 6; 4, 4, 7; 4, 5, 6; 5, 5, 5};
+    for i=1:length(bin)
+        rng('shuffle');
+        rn=randperm(3);
+        bin(i,:)=bin(i,rn);
+    end
+    ITI_Delay = repmat(bin, 4, 1); % Five combitnations
     rn=randperm(size(ITI_Delay,1)); % length of vector
     ITI_Delay = ITI_Delay(rn,:);
-    ITI_Delay = ITI_Delay(1:16,:);
+    ITI_Delay = ITI_Delay(1:length(trial_Number),:);
     ITI = cell2mat(ITI_Delay(:,1));
     Delay = cell2mat(ITI_Delay(:,2));
     Delay2 = cell2mat(ITI_Delay(:,3));
