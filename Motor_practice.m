@@ -52,7 +52,7 @@ scriptdir = '/Users/cocoan/Dropbox/github/';
 savedir = 'Motor_Semic_data';
 [fname,~ , SID] = subjectinfo_check_SEMIC(savedir,1); % subfunction %start_trial
 % save data using the canlab_dataset object
-mot.version = 'SEMIC_Motor_task_v1_21-12-2017_Cocoanlab';
+mot.version = 'SEMIC_Motor_task_v1_22-01-2018_Cocoanlab';
 mot.subject = SID;
 mot.datafile = fname;
 mot.starttime = datestr(clock, 0); % date-time
@@ -181,14 +181,16 @@ try
     
     % TRIAL START
     for i=1:numel(xx)
-        mot.dat{i}.trial_start_timestamp=GetSecs; % trial_star_timestamp
+        mot.dat{i}.trial_start_timestamp=GetSecs; % trial_start_timestamp
         % 1. Fixation point
         fixPoint(ISI(i), white, stimText);
         % 2. Moving dot part
         ready = 0;
-        mot.dat{i}.moving_start_timestamp = GetSecs;
-        SetMouse(cir_center(1), cir_center(2));
-        while GetSecs - moving_start_timestamp < 5
+        rec_i
+        
+        mot.dat{i}.move_start_timestamp = GetSecs; % 2 timestamp
+        SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
+        while GetSecs - mot.dat{i}.move_start_timestamp < 5
             while ~ready
                 [x,y,button] = GetMouse(theWindow);
                 draw_scale('overall_motor_semicircular');
@@ -210,26 +212,44 @@ try
                 end
                 Screen('Flip',theWindow);
                 
+                
                 if button(1)
                     mot.dat{i}.button_click_timestamp=GetSecs; %
+                    mot.dat{i}.button_click_bool=1; % 1 = Click, 0 = not click
                     draw_scale('overall_motor_semicircular');
                     Screen('DrawDots', theWindow, [xx(i) yy(i)]', 20, white, [0 0], 1);  % draw random dot in SemiC
                     Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
                     Screen('Flip',theWindow);
-                    WaitSecs(.5);
+                    WaitSecs(.1);
                     ready = 1;
                     break;
+                elseif GetSecs - mot.dat{i}.move_start_timestamp > 5
+                    mot.dat{i}.move_end_timestamp = GetSecs;
+                    mot.dat{i}.button_click_bool=0; 
+                    ready = 1;
+                    break;
+                else
+                    %do nothing
                 end
+                
+                mot.dat{i}.time_fromstart(rec_i,1) = GetSecs-sTime;
+                mot.dat{i}.xy(rec_i,:) = [x-cir_center(1) cir_center(2)-y]./radius;
+                mot.dat{i}.clicks(rec_i,:) = button;
+                mot.dat{i}.r_theta(rec_i,:) = [curr_r/radius curr_theta/180]; %radius and degree?
             end
             fixPoint(0, white, '');
             Screen('Flip', theWindow);
         end
-        mot.dat{i}.moving_end_timestamp = GetSecs;
+        mot.dat{i}.trial_end_timestamp=GetSecs; % trial_star_timestamp
         if mod(i,2) == 0, save(mot.datafile, '-append', 'mot'); end % save data every two trials
     end
-    mot.dat{i}.task_end_timestamp=GetSecs;
+    mot.task_end_timestamp=GetSecs;
     save(mot.datafile, '-append', 'mot');
+    % closing messages
+    display_expmessage('지금까지 조이스틱 연습을 하였습니다. 연구자의 안내를 기다려 주세요.');
+    WaitSecs(5);
     
+    % Close the screen 
     sca;
     ShowCursor();
     Screen('CloseAll');
