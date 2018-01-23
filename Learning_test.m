@@ -260,7 +260,7 @@ try
         data.dat{runNbr}{trial_Number(j)}.trial_start_t = GetSecs; %Trial start
         
         % 1. ITI (jitter)
-        fixPoint(ITI(j), white, '-') %
+        fixPoint(ITI(j), white, '+') %
         
         % 2. Cue
         cue_t = GetSecs;
@@ -274,16 +274,16 @@ try
         % 3. Delay
         fixPoint(Delay(j), white, '+')    
         % 4. HEAT and Ratings
-        cir_center = [(rb+lb)/2, bb];
-        SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
-        % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
-        rec_i = 0;
+        rec_i = 0; 
         % thermodePrime(ip, port, ts_program(j))
         tic;
         data.dat{runNbr}{trial_Number(j)}.heat_start_txt = main(ip,port,1,program(j)); % Triggering heat signal
         data.dat{runNbr}{trial_Number(j)}.duration_heat_trigger = toc;
         data.dat{runNbr}{trial_Number(j)}.heat_start_timestamp = GetSecs; % heat-stimulus time stamp
         % if checkStatus(ip,port)
+        cir_center = [(rb+lb)/2, bb];
+        SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
+        % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
         ready = 0;
         ready2 = 0;
         while ~ready2

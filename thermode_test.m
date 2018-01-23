@@ -291,9 +291,6 @@ try
         fixPoint(Delay(j), white, '+')
         
         % 4. HEAT and Ratings
-        cir_center = [(rb+lb)/2, bb];
-        SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
-        % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
         rec_i = 0;
         % thermodePrime(ip, port, ts_program(j))
         tic;
@@ -303,6 +300,10 @@ try
         % if checkStatus(ip,port)
         ready = 0;
         ready1=0;
+        % set the mouse location to zero point
+        cir_center = [(rb+lb)/2, bb];
+        SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
+        % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
         while ~ready1
             start_while=GetSecs;
             while ~ready
