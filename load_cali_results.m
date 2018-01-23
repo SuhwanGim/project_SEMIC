@@ -3,15 +3,15 @@ function output=load_cali_results()
 %
 clc;
 basedir = pwd;
-cd Cali_Semic_data;
-current_path = [pwd '/'];
+current_path = [pwd '/CALI_SEMIC_data/'];%it should be same as name of cali data folder (see 'savedir' on calibration.m)
 filename = '*.mat';
 filelist = dir([current_path filename] );
 ready = 0;
+cd(current_path);
 ls;
 while ~ready
-    targetFile = input('캘리브레이션 때 입력한 파일명을 정확히 입력해주세요(s+파일명+.mat):','s');
-    FullText = strcat('s',targetFile, '.mat');
+    targetFile = input('Type the "Subject ID" exatly: ','s');
+    FullText = strcat('Calib_',targetFile, '.mat');
     for i=1:length(filelist)
         if strcmp(FullText, filelist(i).name) == 1
             ready=1;
@@ -24,4 +24,5 @@ end
 load(FullText, 'reg');
 output=reg;
 cd(basedir);
+clc;
 end

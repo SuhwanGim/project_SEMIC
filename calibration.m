@@ -32,9 +32,8 @@ global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_y
 global reg; % regression data
 
 %% SETUP: DATA and Subject INFO
-scriptdir = '/Users/cocoan/Dropbox/github/';
-savedir = 'Cali_Semic_data';
-[fname,~ , SID] = subjectinfo_check_SEMIC(savedir,1); % subfunction %start_trial
+savedir = 'CALI_SEMIC_data';
+[fname,~ , SID] = subjectinfo_check_SEMIC(savedir,1,'Cali'); % subfunction %start_trial
 % save data using the canlab_dataset object
 reg.version = 'SEMIC_Calibration_v1_21-12-2017_Cocoanlab';
 reg.subject = SID;

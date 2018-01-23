@@ -48,9 +48,8 @@ global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_y
 %%
 addpath(genpath(pwd));
 %% SETUP: DATA and Subject INFO
-scriptdir = '/Users/cocoan/Dropbox/github/';
-savedir = 'Motor_Semic_data';
-[fname,~ , SID] = subjectinfo_check_SEMIC(savedir,1); % subfunction %start_trial
+savedir = 'MOTOR_SEMIC_data';
+[fname,~ , SID] = subjectinfo_check_SEMIC(savedir,1,'Mot'); % subfunction %start_trial
 % save data using the canlab_dataset object
 mot.version = 'SEMIC_Motor_task_v1_22-01-2018_Cocoanlab';
 mot.subject = SID;

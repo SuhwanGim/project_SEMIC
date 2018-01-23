@@ -22,7 +22,6 @@ USE_BIOPAC = false;
 dofmri = false;
 % need to be specified differently for different computers
 % psytool = 'C:\toolbox\Psychtoolbox';
-scriptdir = '/Users/cocoan/Dropbox/github/';
 for i = 1:length(varargin)
     if ischar(varargin{i})
         switch varargin{i}
@@ -47,8 +46,8 @@ end
 %%
 addpath(genpath(pwd));
 %% SETUP: DATA and Subject INFO
-savedir = 'SEMIC_Learning_data';
-[fname,start_trial, SID] = subjectinfo_check_SEMIC(savedir,runNbr); % subfunction %start_trial
+savedir = 'LEARN_SEMIC_data';
+[fname,start_trial, SID] = subjectinfo_check_SEMIC(savedir,1,'Learn'); % subfunction %start_trial
 %[fname, start_trial, SID] = subjectinfo_check(savedir); % subfunction
 if exist(fname, 'file'), load(fname, 'data'); load(fname,'ts'); end
 % save data using the canlab_dataset object

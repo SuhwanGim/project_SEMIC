@@ -1,14 +1,77 @@
-function [fname,start_trial,SID] = subjectinfo_check_SEMIC(savedir, runNbr)
+function [fname,start_trial,SID] = subjectinfo_check_SEMIC(savedir, runNbr, varagin)
 
-% SUBJECT INFORMATION: file exists?
-% [fname,start_line,SID] = subjectinfo_check
+% Get subject information, and check if the data file exists?
+%
+% :Usage:
+% ::
+%     [fname, start_line, SID] = subjectinfo_check(savedir, varargin)
+%
+%
+% :Inputs:
+%
+%   **savedir:**
+%       The directory where you save the data
+%
+% :Optional Inputs: 
+%
+%   **'Mot':** 
+%       Check the data file for Motor_task.m
+%
+%   **'Main':** 
+%       Check the data file for thermode_test.m
+%
+%   **'Cali':**
+%       Check the data file for calibration.m
+%
+%   **'Learn':**
+%       Check the data file for Learning_phase.m
+%
+% ..
+%    Copyright (C) 2017  Wani Woo (Cocoan lab)
+% ..
 
-% Subject ID
+
+% SETUP: varargin
+mot = false;
+main = false;
+cali = false;
+learn = false;
+
+for i = 1:length(varargin)
+    if ischar(varargin{i})
+        switch varargin{i}
+            % functional commands
+            case {'Mot'}
+                mot = true;
+            case {'Main'}
+                main = true;
+            case {'Cali'}
+                cali = true;
+            case {'Learn'}
+                learn = true;
+        end
+    end
+end
+
+
+% Get Subject ID
 fprintf('\n');
 SID = input('Subject ID? ','s');
 
 % check if the data file exists
-fname = fullfile(savedir, ['s' SID '.mat']);
+if mot
+    fname = fullfile(savedir, ['Motor_' SID '.mat']);
+elseif main
+    fname = fullfile(savedir, ['Main_' SID  '.mat']);
+elseif cali
+    fname = fullfile(savedir, ['Calib_' SID '.mat']);
+elseif learn
+    fname = fullfile(savedir, ['Learning' SID '.mat']);
+else
+    error('Unknown input');
+end
+
+% What to do if the file exits?
 if ~exist(savedir, 'dir')
     mkdir(savedir);
     whattodo = 1;

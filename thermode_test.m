@@ -61,9 +61,8 @@ end
 % addpath(genpath(psytool));
 addpath(genpath(pwd));
 %% SETUP: DATA and Subject INFO
-savedir = 'SEMIC_test_data';
-[fname,start_trial, SID] = subjectinfo_check_SEMIC(savedir,runNbr); % subfunction %start_trial
-%[fname, start_trial, SID] = subjectinfo_check(savedir); % subfunction
+savedir = 'Main_SEMIC_data';
+[fname,start_trial, SID] = subjectinfo_check_SEMIC(savedir,runNbr,'Main'); % subfunction %start_trial
 if exist(fname, 'file'), load(fname, 'data'); load(fname,'ts'); end
 % save data using the canlab_dataset object
 data.version = 'SEMIC_v1_01-19-2018_Cocoanlab';
