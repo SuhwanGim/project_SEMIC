@@ -8,13 +8,17 @@ port = 20121;
 addpath(genpath(pwd));
 %% SETUP: Load calibration data
 reg = load_cali_results();
+
+
+
+
 %% 0. PATHWAY TEST
 pathway_test(ip, port, 'MRI', reg);
 %% 1. T1 & Learning phase
 Learning_test(ip, port, reg,'test');
 %% 2. Motor TASK
 Motor_practice('test');
-%% 3. STUDY % thermode_test(Number of run, ip, port, options...),
+%% 3. Main STUDY % thermode_test(Number of run, ip, port, options...),
 %% PATHWAY TEST
 pathway_test(ip, port, 'MRI', reg);
 %% RUN1

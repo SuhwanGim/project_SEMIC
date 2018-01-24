@@ -1,4 +1,4 @@
-function [fname,start_trial,SID] = subjectinfo_check_SEMIC(savedir, runNbr, varagin)
+function [fname,start_trial,SID] = subjectinfo_check_SEMIC(savedir, runNbr, varargin)
 
 % Get subject information, and check if the data file exists?
 %
@@ -33,7 +33,7 @@ function [fname,start_trial,SID] = subjectinfo_check_SEMIC(savedir, runNbr, vara
 
 % SETUP: varargin
 mot = false;
-main = false;
+main2 = false; % It's distinct main.m (related to pathway function)
 cali = false;
 learn = false;
 
@@ -44,7 +44,7 @@ for i = 1:length(varargin)
             case {'Mot'}
                 mot = true;
             case {'Main'}
-                main = true;
+                main2 = true;
             case {'Cali'}
                 cali = true;
             case {'Learn'}
@@ -61,7 +61,7 @@ SID = input('Subject ID? ','s');
 % check if the data file exists
 if mot
     fname = fullfile(savedir, ['Motor_' SID '.mat']);
-elseif main
+elseif main2
     fname = fullfile(savedir, ['Main_' SID  '.mat']);
 elseif cali
     fname = fullfile(savedir, ['Calib_' SID '.mat']);
