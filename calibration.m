@@ -145,7 +145,6 @@ try
     end
     % 2. Moving dot part
     for i=1:motorN % Four trials
-        trial_start_timestamp=GetSecs; % trial_star_timestamp
         % -1.1. Fixation point
         fixPoint(2, white, stimText);
         % -1.2. Moving dot part
@@ -195,6 +194,7 @@ try
     WaitSecs(3);
     random_value = randperm(3);
     for i=1:NumOfTr %Total trial
+        reg.trial_start_timestamp{i,1}=GetSecs; % trial_star_timestamp
         % manipulate the current stim
         if i<4
             current_stim=bin2dec(init_stim{random_value(i)});
@@ -306,6 +306,7 @@ try
         end    
         
         %Calculating regression line 
+        reg.trial_end_timestamp{i,1}=GetSecs;
         cali_regression (degree, vas_rating, i, NumOfTr); % cali_regression (stim_degree in this trial, rating, order of trial, Number of Trial)       
         save(reg.datafile, '-append', 'reg');
     end %trial 

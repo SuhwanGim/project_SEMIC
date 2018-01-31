@@ -1,3 +1,4 @@
+
 function data = thermode_test(runNbr, ip, port, reg, varargin)
 %%
 % This function triggers heat-pain, report ratings using TCP/IP
@@ -65,7 +66,7 @@ savedir = 'Main_SEMIC_data';
 [fname,start_trial, SID] = subjectinfo_check_SEMIC(savedir,runNbr,'Main'); % subfunction %start_trial
 if exist(fname, 'file'), load(fname, 'data'); load(fname,'ts'); end
 % save data using the canlab_dataset object
-data.version = 'SEMIC_v1_01-19-2018_Cocoanlab';
+data.version = 'SEMIC_v1_01-31-2018_Cocoanlab';
 data.subject = SID;
 data.datafile = fname;
 data.starttime = datestr(clock, 0); % date-time
@@ -104,7 +105,7 @@ if start_trial==1
     stim_level = repmat(["LV1"; "LV2"; "LV3"; "LV4";"LV2"; "LV3"; "LV4";"LV5"],2,1); % A group of [low cue,High cue]x2
     program = repmat([stim_degree(1:4);stim_degree(2:5)],2,1); % A group of [low cue,High cue]x2
     cue_settings = repmat(["LOW";"LOW";"LOW";"LOW";"HIGH";"HIGH";"HIGH";"HIGH"],2,1);
-    cue_mean = repmat([0.3; 0.3; 0.3;0.3; 0.7; 0.7; 0.7; 0.7;],2,1) + randn(16,1).*0.07; % (LOWx4 HIGHx4) x 2 = 16 trials
+    cue_mean = repmat([0.28; 0.28; 0.28;0.28; 0.73; 0.73; 0.73; 0.73;],2,1) + randn(16,1).*0.07; % (LOWx4 HIGHx4) x 2 = 16 trials
     cue_var = abs(repmat([0.05;],16,1) + randn(16,1).*0.003); %
     % randomization of cue mena, settings and variance and program
     rn=randperm(length(cue_mean));
@@ -276,6 +277,7 @@ try
         data.dat{runNbr}{trial_Number(j)}.trial_start_t = GetSecs; %Trial start
         
         % 1. ITI (jitter)
+        data.dat{runNbr}{trial_Number(j)}.ITI_timestamp = GetSecs;
         fixPoint(ITI(j), white, '+') %
         
         % 2. Cue
@@ -288,36 +290,21 @@ try
         data.dat{runNbr}{trial_Number(j)}.cue_end_timestamp = GetSecs;
         
         % 3. Delay
+        data.dat{runNbr}{trial_Number(j)}.Delay1_timestamp = GetSecs;
         fixPoint(Delay(j), white, '+')
         
         % 4. HEAT and Ratings
         rec_i = 0;
-        % thermodePrime(ip, port, ts_program(j))
-        tic;
-        data.dat{runNbr}{trial_Number(j)}.heat_start_txt = main(ip,port,1,program(j)); % Triggering heat signal
-        data.dat{runNbr}{trial_Number(j)}.duration_heat_trigger = toc;
-        data.dat{runNbr}{trial_Number(j)}.heat_start_timestamp = GetSecs; % heat-stimulus time stamp
-        % if checkStatus(ip,port)
         ready = 0;
         ready1=0;
+        ready3=0;
         % set the mouse location to zero point
         cir_center = [(rb+lb)/2, bb];
         SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
         % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
+        start_while=GetSecs;
+        data.dat{runNbr}{trial_Number(j)}.start_rating_timestamp = start_while;
         while ~ready1
-            start_while=GetSecs;
-            while ~ready
-                waitsec_fromstarttime(start_while, 1)
-                resp = main(ip,port,0); %get system status
-                systemState = resp{4}; testState = resp{5};
-                if strcmp(systemState, 'Pathway State: TEST') && strcmp(testState,'Test State: RUNNING')
-                    ready = 1;
-                    sTime = GetSecs;
-                    break;
-                else
-                    ready = 0;
-                end
-            end
             [x,y,button]=GetMouse(theWindow);
             rec_i= rec_i+1;
             % if the point goes further than the semi-circle, move the point to
@@ -340,7 +327,7 @@ try
                 y = cir_center(2)-radius*sin(theta);
                 SetMouse(x,y);
             end
-            msg = '현재 아픈 정도를 최대한 정확하게 실시간으로 보고해주세요';
+            msg = '이번 자극이 얼마나 아플 것이라고 예상하시나요?';
             msg = double(msg);
             DrawFormattedText(theWindow, msg, 'center', 250, white, [], [], [], 1.2);
             draw_scale('overall_avoidance_semicircular')
@@ -348,13 +335,40 @@ try
             Screen('Flip', theWindow);
             
             
+            % thermodePrime(ip, port, ts_program(j))
+            if ready3 == 0
+                if GetSecs - start_while > 5
+                    tic;
+                    data.dat{runNbr}{trial_Number(j)}.heat_start_txt = main(ip,port,1,program(j)); % Triggering heat signal
+                    data.dat{runNbr}{trial_Number(j)}.duration_heat_trigger = toc;
+                    data.dat{runNbr}{trial_Number(j)}.heat_start_timestamp = GetSecs; % heat-stimulus time stamp
+                    ready3=1;
+                else
+                %do nothing
+                end
+            else
+                %do nothing
+            end
+            
+%             while ~ready
+%                 resp = main(ip,port,0); %get system status
+%                 systemState = resp{4}; testState = resp{5};
+%                 if strcmp(systemState, 'Pathway State: TEST') && strcmp(testState,'Test State: RUNNING')
+%                     ready = 1;
+%                     data.dat{runNbr}{trial_Number(j)}.escape_loop_timestamp = GetSecs;
+%                     break;
+%                 else
+%                     ready = 0;
+%                 end
+%             end
+            
             % Saving data 
-            data.dat{runNbr}{trial_Number(j)}.con_time_fromstart(rec_i,1) = GetSecs-sTime;
+            data.dat{runNbr}{trial_Number(j)}.con_time_fromstart(rec_i,1) = GetSecs-start_while;
             data.dat{runNbr}{trial_Number(j)}.con_xy(rec_i,:) = [x-cir_center(1) cir_center(2)-y]./radius;
             data.dat{runNbr}{trial_Number(j)}.con_clicks(rec_i,:) = button;
             data.dat{runNbr}{trial_Number(j)}.con_r_theta(rec_i,:) = [curr_r/radius curr_theta/180]; %radius and degree? 
             
-            if GetSecs - sTime > 10
+            if GetSecs - start_while > 14.5
                 break;
             else
                 %do nothing
@@ -362,6 +376,7 @@ try
         end
         
         %5. Delay2
+        data.dat{runNbr}{trial_Number(j)}.Delay2_timestamp = GetSecs;
         fixPoint(Delay2(j), white, '+')
         %6. Overall ratings
         SetMouse(cir_center(1), cir_center(2)); % set mouse at the center

@@ -4,7 +4,7 @@ clear;
 close all;
 %% SETUP: PARAMETER
 %ip = '115.145.189.133';
-ip = '203.252.46.249';
+ip = '203.252.54.3';
 port = 20121;
 addpath(genpath(pwd));
 %% 1. PATHWAY TEST

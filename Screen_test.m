@@ -101,7 +101,7 @@ while ~ready2
     theta= 180 - theta;
     theta = num2str(theta);
     DrawFormattedText(theWindow, theta, 'center', 'center', white, [], [], [], 1.2); %Display the degree of the cursur based on cir_center
-    % disp(theta);
+    disp(theta);
     Screen('Flip',theWindow);
     if button(1)
         draw_scale('overall_avoidance_semicircular');
@@ -119,7 +119,7 @@ while ~ready2
         end
         
         break;
-    elseif GetSecs - sTime > 5
+    elseif GetSecs - sTime > 10
         ready2=1;
         break;
     else

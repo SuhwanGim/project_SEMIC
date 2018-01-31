@@ -12,7 +12,7 @@ end
 %% Each plot 1 RUN
 
 col2 = [0.9922    0.6824    0.3804];
-i=2; % first run
+i=1; % first run
 for j = 1:16
     subplot(4,4,j);
     h = plot(data.dat{1,i}{1,j}.con_xy(:,1), data.dat{i}{j}.con_xy(:,2), 'color', col2, 'linewidth', .3);

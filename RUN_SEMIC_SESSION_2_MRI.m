@@ -3,7 +3,8 @@ clc;
 clear;
 close all;
 %% SETUP: PARAMETER
-ip = '115.145.189.133'; % or LocalHost?
+%ip = '115.145.189.133'; % or LocalHost?
+ip = '203.252.54.4';
 port = 20121;
 addpath(genpath(pwd));
 %% SETUP: Load calibration data
@@ -23,18 +24,24 @@ Motor_practice('test');
 pathway_test(ip, port, 'MRI', reg);
 %% RUN1
 data1 = thermode_test(1, ip, port, reg,'test');
+%% PATHWAY TEST
+pathway_test(ip, port, 'MRI', reg);
 %% RUN2
 data2 = thermode_test(2, ip, port, reg,'test');
 %% PATHWAY TEST
 pathway_test(ip, port, 'MRI', reg);
 %% RUN3
 data3 = thermode_test(3, ip, port, reg,'test');
+%% PATHWAY TEST
+pathway_test(ip, port, 'MRI', reg);
 %% RUN4
 data4 = thermode_test(4, ip, port, reg,'test');
 %% PATHWAY TEST
 pathway_test(ip, port, 'MRI', reg);
 %% RUN5
 data5 = thermode_test(5, ip, port, reg,'test');
+%% PATHWAY TEST
+pathway_test(ip, port, 'MRI', reg);
 %% RUN6
 data6 = thermode_test(6, ip, port, reg,'test');
 
