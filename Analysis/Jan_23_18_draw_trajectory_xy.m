@@ -23,3 +23,9 @@ for j = 1:16
 end
 
 %% 같은 조건 별로 모든 run
+
+
+%% To see rating trends with thermal degrees 
+plot(1:12,reg.stim_rating)
+hold on; 
+plot(1:12, reg.stim_degree')

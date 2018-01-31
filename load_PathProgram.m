@@ -1,13 +1,13 @@
 function data=load_PathProgram(type)
 % The purpose of this functino is for parsing the Pathway program list. You
-% can freely add list based on your project.
+% can freely add a list based on your project.
 %
 % dec2bin(100) -> ans = 1100100
 % [MATLAB Value, PATHWAY Value] = (100,1100100)
 %%
 
 switch type
-    case 'SEMIC'
+    case 'SEMIC' % project name
         data = {50 '00011000' 'SEMIC_50';... 
             39 '00011001' 'SEMIC_39' ; ...
             39.2 '00011010' 'SEMIC_39.2' ; ...
