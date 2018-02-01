@@ -7,6 +7,7 @@ global theWindow W H; % window property
 global white red orange bgcolor; % color
 global t r; % pressure device udp channel
 global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
+global lb1 rb1;
 global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd anchor_lms anchor_lms_y anchor_lms_x; % anchors
 
 switch scale
@@ -442,6 +443,27 @@ switch scale
         
         Screen('TextSize', theWindow, fontsize); % fonsize for instructions
         
+    case 'cont_predict_semicircular' %For SEMIC project
+        xcenter = (lb1+rb1)/2;
+        ycenter = bb;
+        
+        radius = (rb1-lb1)/2; % radius
+        x = reshape(repmat(linspace(lb1,rb1,1000),2,1),1,2000); x([1 2000]) = [];
+        xy = [x; bb - sqrt(radius.^2 - (x-xcenter).^2)];
+        
+        Screen('TextSize', theWindow, 28); % fonsize for anchors
+        Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        anchor_W = Screen(theWindow,'DrawText', double('전혀'), 0, 0, bgcolor);
+        anchor_W2 = Screen(theWindow,'DrawText', double('최대'), 0, 0, bgcolor);
+        
+        % Screen(theWindow, 'FillRect', bgcolor, window_rect); % reset
+        
+        Screen(theWindow,'DrawLines', xy, 3, 255);
+        Screen(theWindow,'DrawText', double('전혀'), lb1-anchor_W/2, ycenter+20, 255);
+        Screen(theWindow,'DrawText', double('최대'), rb1-anchor_W2/2, ycenter+20, 255);
+        
+        Screen('TextSize', theWindow, fontsize); % fonsize for instructions
+        
         
     case 'overall_motor'
         xy = [lb H/2+scale_H; rb H/2+scale_H; rb H/2];
@@ -473,7 +495,9 @@ switch scale
         
         Screen('TextSize', theWindow, fontsize); % fonsize for instructions
         
+        
     case 'explain_painful_semicircular'
+        
         xcenter = (lb+rb)/2;
         ycenter = bb;
         

@@ -1,3 +1,4 @@
+
 function data = thermode_test(runNbr, ip, port, reg, varargin)
 %%
 % This function triggers heat-pain, report ratings using TCP/IP
@@ -58,12 +59,12 @@ savedir = 'Main_SEMIC_data';
 [fname,start_trial, SID] = subjectinfo_check_SEMIC(savedir,runNbr,'Main'); % subfunction %start_trial
 if exist(fname, 'file'), load(fname, 'data'); load(fname,'ts'); end
 % save data using the canlab_dataset object
-data.version = 'SEMIC_v1_02-01-2018_Cocoanlab';
+data.version = 'SEMIC_v1_01-31-2018_Cocoanlab';
 data.subject = SID;
 data.datafile = fname;
 data.starttime = datestr(clock, 0); % date-time
 data.starttime_getsecs = GetSecs; % in the same format of timestamps for each trial
-%% SETUP: load the pathway program
+%% SETUP: the pathway program
 PathPrg = load_PathProgram('SEMIC');
 %% SETUP: Generate a trial sequence
 % =========================================================================
@@ -171,7 +172,7 @@ yellow = [255 220 0];
 lb = 1.5*W/5; % in 1280, it's 384
 rb = 3.5*W/5; % in 1280, it's 896 rb-lb = 512
 
-% For bigger rating scale 
+% bigger rating scale 
 lb1 = 1*W/5; % 
 rb1 = 4*W/5; % 
 
@@ -202,7 +203,6 @@ try
         k=1;
     end
     % START: RUN
-    data.run_start_timestamp{runNbr}=GetSecs;
     % Loop of Trials
     for j = k:length(trial_Number)
         % DISPLAY EXPERIMENT MESSAGE:
@@ -271,22 +271,26 @@ try
             end
             
         end
+        data.dat{runNbr}{trial_Number(j)}.trial_start_t = GetSecs; %Trial start
         
-        TrSt_t = GetSecs; %
-        data.dat{runNbr}{trial_Number(j)}.trial_start_t = TrSt_t; %Trial start
  %========================================================================%       
         % 1. ITI (jitter)
-        fixPoint(TrSt_t, ITI(j), white, '+') % ITI
-        data.dat{runNbr}{trial_Number(j)}.ITI_endtimestamp = GetSecs;
+        data.dat{runNbr}{trial_Number(j)}.ITI_timestamp = GetSecs;
+        fixPoint(ITI(j), white, '+') %
+        
         % 2. Cue
+        data.dat{runNbr}{trial_Number(j)}.cue_timestamp = GetSecs; %Cue time stamp
         draw_scale('overall_avoidance_semicircular');
         [~ , data.dat{runNbr}{trial_Number(j)}.cue_theta] = draw_social_cue(cue_mean(j), cue_var(j), NumberOfCue, rating_type); % draw & save details: draw_socia_cue(m, std, n, rating_type)
         Screen('Flip', theWindow);
-        waitsec_fromstarttime(TrSt_t, ITI(j) + 2); % 2 seconds
-        data.dat{runNbr}{trial_Number(j)}.cue_end_timestamp = GetSecs;        
+        cue_t = GetSecs;
+        waitsec_fromstarttime(cue_t, 2); % 2 seconds
+        data.dat{runNbr}{trial_Number(j)}.cue_end_timestamp = GetSecs;
+        
         % 3. Delay
-        fixPoint(TrSt_t , ITI(j) + 2 + Delay(j), white, '+') % Delay
-        data.dat{runNbr}{trial_Number(j)}.Delay1_end_timestamp = GetSecs;
+        data.dat{runNbr}{trial_Number(j)}.Delay1_timestamp = GetSecs;
+        fixPoint(Delay(j), white, '+')
+        
         % 4. HEAT and Ratings
         rec_i = 0;
         ready = 0;
@@ -295,11 +299,11 @@ try
         % set the mouse location to zero point
         cir_center = [(rb1+lb1)/2, bb];
         SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
-        % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not    
+        % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
+        
         start_while=GetSecs;
         data.dat{runNbr}{trial_Number(j)}.start_rating_timestamp = start_while;
-        
-        while GetSecs - TrSt_t < 14.5 + ITI(j) + 2 + Delay(j)
+        while ~ready1
             [x,y,button]=GetMouse(theWindow);
             rec_i= rec_i+1;
             % if the point goes further than the semi-circle, move the point to
@@ -362,19 +366,23 @@ try
             data.dat{runNbr}{trial_Number(j)}.con_xy(rec_i,:) = [x-cir_center(1) cir_center(2)-y]./radius;
             data.dat{runNbr}{trial_Number(j)}.con_clicks(rec_i,:) = button;
             data.dat{runNbr}{trial_Number(j)}.con_r_theta(rec_i,:) = [curr_r/radius curr_theta/180]; %radius and degree? 
+            
+            if GetSecs - start_while > 14.5
+                break;
+            else
+                %do nothing
+            end
         end
-        data.dat{runNbr}{trial_Number(j)}.contRating_end_stamp_end = GetSecs;
         
         %5. Delay2
-        fixPoint(TrSt_t, Delay2(j)+14.5 + ITI(j) + 2 + Delay(j), white, '+')
-        data.dat{runNbr}{trial_Number(j)}.Delay2_end_timestamp_end = GetSecs; 
-       
+        data.dat{runNbr}{trial_Number(j)}.Delay2_timestamp = GetSecs;
+        fixPoint(Delay2(j), white, '+')
         %6. Overall ratings
         SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
         rec_i = 0;
         ready2=0;
         sTime=GetSecs;
-        while GetSecs - TrSt_t < 5 + Delay2(j)+14.5 + ITI(j) + 2 + Delay(j)
+        while ~ready2
             data.dat{runNbr}{trial_Number(j)}.overall_rating_time_stamp=sTime; % overall rating time stamp
             [x,y,button]=GetMouse(theWindow);
             rec_i= rec_i+1;
@@ -427,13 +435,15 @@ try
                     end
                 end
                 break;
+            elseif GetSecs - sTime > 5
+                ready2=1;
+                break;
             else
                 %do nothing
             end
             
         end %end of a overall rating 
-        data.dat{runNbr}{trial_Number(j)}.overallRating_end_timestamp_end = GetSecs; 
-        %
+        
         SetMouse(0,0);
         Screen(theWindow,'FillRect',bgcolor, window_rect);
         Screen('Flip', theWindow);
@@ -443,9 +453,9 @@ try
         data.dat{runNbr}{trial_Number(j)}.end_trial_t = end_trial;
         % data.dat{runNbr}{trial_Number(j)}.ramp_up_cnd = ramp_up_con(j);
         if mod(trial_Number(j),2) == 0, save(data.datafile, '-append', 'data'); end % save data every two trials
-        % waitsec_fromstarttime(end_trial, 1); % For your rest,
+        waitsec_fromstarttime(end_trial, 1); % For your rest,
     end
-    data.run_endtime_timestamp{runNbr}=GetSecs;
+    data.endtime_timestamp=GetSecs;
     
     %closing messege
     while GetSecs - data.endtime_timestamp < 10
@@ -473,13 +483,14 @@ end
 end
 % redundancy is good thing for data, physio, gazepoint, prompt
 %% ::::::::::::::::::::::: SUBFUNCTION ::::::::::::::::::::::::::::::::::
-function fixPoint(t_time, seconds, color, stimText)
+function fixPoint(seconds, color, stimText)
 global theWindow;
 % stimText = '+';
 % Screen(theWindow,'FillRect', bgcolor, window_rect);
+start_fix = GetSecs; % Start_time_of_Fixation_Stimulus
 DrawFormattedText(theWindow, double(stimText), 'center', 'center', color, [], [], [], 1.2);
 Screen('Flip', theWindow);
-waitsec_fromstarttime(t_time, seconds);
+waitsec_fromstarttime(start_fix, seconds);
 end
 
 

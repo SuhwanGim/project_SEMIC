@@ -35,7 +35,7 @@ global reg; % regression data
 savedir = 'CALI_SEMIC_data';
 [fname,~ , SID] = subjectinfo_check_SEMIC(savedir,1,'Cali'); % subfunction %start_trial
 % save data using the canlab_dataset object
-reg.version = 'SEMIC_Calibration_v1_31-01-2018_Cocoanlab';
+reg.version = 'SEMIC_Calibration_v1_01-02-2018_Cocoanlab';
 reg.subject = SID;
 reg.datafile = fname;
 reg.starttime = datestr(clock, 0); % date-time
@@ -110,19 +110,39 @@ th = deg2rad(deg);
 PathPrg = load_PathProgram('SEMIC');
 %% Setup: generate sequence of skin site and LMH (Low, middle and high)
 rng('shuffle');
-% reg.skin_site = repmat({1,2,3,4,5,6}, 1, 3); % Five combitnations
-for i = 1:3 % 4(Skin sites:1 to 4) x 3 (number of stimulation) combination
-    reg.skin_site(i*4-3:i*4,1) = randperm(4); % [1 2 3 4] [2 3 1 4] ......
-end
+% % reg.skin_site = repmat({1,2,3,4,5,6}, 1, 3); % Five combitnations
+% for i = 1:3 % 4(Skin sites:1 to 4) x 3 (number of stimulation) combination
+%     reg.skin_site(i*4-3:i*4,1) = randperm(4); % [1 2 3 4] [2 3 1 4] ......
+% end
+% 
+% for z = 1:4 % four skin_site %Each skin site stimulated by LMH heat-pain
+%     [I, ~] = find(reg.skin_site==z); % [Index, Value]
+%     rn=randperm(3);
+%     for zz=1:size(I,1)
+%         reg.skin_LMH(I(zz)) = rn(zz); 
+%     end
+% end
 
-for z = 1:4 % four skin_site %Each skin site stimulated by LMH heat-pain
-    [I, ~] = find(reg.skin_site==z); % [Index, Value]
-    rn=randperm(3);
-    for zz=1:size(I,1)
-        reg.skin_LMH(I(zz)) = rn(zz); 
+reg.skin_site = zeros(12,1);
+
+while sum(prod(reshape(reg.skin_site, 4, 3))==24)~=3
+    reg.skin_LMH = repmat(1:3, 4, 1)';
+    reg.skin_LMH = reg.skin_LMH(:);
+    
+    reg.skin_site = zeros(12,1);
+    for i = 1:3
+        reg.skin_site(reg.skin_LMH == i) = randperm(4); % site mix
     end
+    
+    for i = 1:4
+        idx = (i-1)*3+1:(i-1)*3+3;
+        temp = reg.skin_site(idx);
+        mix_temp = randperm(3);
+        reg.skin_site(idx) = temp(mix_temp);
+        reg.skin_LMH(idx) = mix_temp;
+    end
+    
 end
-
 %% START: Screen
 theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
 Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); % For alpha value of e.g.,[R G B alpha]
