@@ -282,6 +282,10 @@ try
         draw_scale('overall_avoidance_semicircular');
         [~ , data.dat{runNbr}{trial_Number(j)}.cue_theta] = draw_social_cue(cue_mean(j), cue_var(j), NumberOfCue, rating_type); % draw & save details: draw_socia_cue(m, std, n, rating_type)
         Screen('Flip', theWindow);
+                    %-------------Ready------------------
+                main(ip,port,1,program(j)); %select the program
+                main(ip,port,2); %ready to pre-start
+                
         waitsec_fromstarttime(TrSt_t, ITI(j) + 2); % 2 seconds
         data.dat{runNbr}{trial_Number(j)}.cue_end_timestamp = GetSecs;        
         % 3. Delay
@@ -334,7 +338,7 @@ try
             if ready3 == 0
                 if GetSecs - start_while > 1
                     tic;
-                    data.dat{runNbr}{trial_Number(j)}.heat_start_txt = main(ip,port,1,program(j)); % Triggering heat signal
+                    data.dat{runNbr}{trial_Number(j)}.heat_start_txt = main(ip,port,2); % start heat signal
                     data.dat{runNbr}{trial_Number(j)}.duration_heat_trigger = toc;
                     data.dat{runNbr}{trial_Number(j)}.heat_start_timestamp = GetSecs; % heat-stimulus time stamp
                     ready3=1;
@@ -505,7 +509,7 @@ EXP_start_text = double(msg);
 
 % display
 Screen(theWindow,'FillRect',bgcolor, window_rect);
-DrawFormattedText(theWindow, EXP_start_text, 'center', 150, white, [], [], [], 1.5);
+DrawFormattedText(theWindow, EXP_start_text, 'center', 'center', white, [], [], [], 1.5);
 Screen('Flip', theWindow);
 
 end
