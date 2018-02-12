@@ -443,28 +443,6 @@ switch scale
         
         Screen('TextSize', theWindow, fontsize); % fonsize for instructions
         
-    case 'cont_predict_semicircular' %For SEMIC project
-        xcenter = (lb1+rb1)/2;
-        ycenter = bb;
-        
-        radius = (rb1-lb1)/2; % radius
-        x = reshape(repmat(linspace(lb1,rb1,1000),2,1),1,2000); x([1 2000]) = [];
-        xy = [x; bb - sqrt(radius.^2 - (x-xcenter).^2)];
-        
-        Screen('TextSize', theWindow, 28); % fonsize for anchors
-        Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        anchor_W = Screen(theWindow,'DrawText', double('전혀'), 0, 0, bgcolor);
-        anchor_W2 = Screen(theWindow,'DrawText', double('최대'), 0, 0, bgcolor);
-        
-        % Screen(theWindow, 'FillRect', bgcolor, window_rect); % reset
-        
-        Screen(theWindow,'DrawLines', xy, 3, 255);
-        Screen(theWindow,'DrawText', double('전혀'), lb1-anchor_W/2, ycenter+20, 255);
-        Screen(theWindow,'DrawText', double('최대'), rb1-anchor_W2/2, ycenter+20, 255);
-        
-        Screen('TextSize', theWindow, fontsize); % fonsize for instructions
-        
-        
     case 'overall_motor'
         xy = [lb H/2+scale_H; rb H/2+scale_H; rb H/2];
         Screen(theWindow, 'FillPoly', 255, xy);
@@ -526,6 +504,50 @@ switch scale
         Screen(theWindow,'DrawText', double('6'), rb-anchor_W6/2+40, ycenter, 255); %최대
         
         Screen('TextSize', theWindow, fontsize); % fonsize for instructions
+        
+        
+    case 'cont_predict_semicircular' %For SEMIC project
+        % For bigger rating scale, we use this
+        % lb1 = 4*W/20;
+        % rb1 = 16*W/20;
+        
+        xcenter = (lb1+rb1)/2;
+        ycenter = H*3/4+100;
+        %ycenter = bb;
+        
+        
+        %       radius = (rb1-lb1)/2; % radius
+        %       x = reshape(repmat(linspace(lb1,rb1,1000),2,1),1,2000); x([1 2000]) = [];
+        %       xy = [x; bb - sqrt(radius.^2 - (x-xcenter).^2)];
+        skip_step = 15;
+        end_step = 50; %even number
+        start_step = 1;
+        
+        for j=start_step:(end_step/2) - skip_step
+            i=j-start_step+1; % 1 to (end_step-start_step)
+                lb_temp = j*W/end_step; rb_temp = (end_step-j)*W/end_step;
+                radius = (rb_temp-lb_temp)/2; % radius
+                x_temp = reshape(repmat(linspace(lb_temp, rb_temp,1000),2,1),1,2000); x_temp([1 2000]) = [];
+                y_temp = ycenter - sqrt(radius.^2 - (x_temp-xcenter).^2);
+                x(:,i*1998-1997:i*1998) = x_temp;
+                y(:,i*1998-1997:i*1998) = y_temp;
+                %xy = [x; bb - sqrt(radius.^2 - (x-xcenter).^2)];
+        end
+        xy = [x; y];
+        
+        Screen('TextSize', theWindow, 28); % fonsize for anchors
+        Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        anchor_W = Screen(theWindow,'DrawText', double('전혀'), 0, 0, bgcolor);
+        anchor_W2 = Screen(theWindow,'DrawText', double('최대'), 0, 0, bgcolor);
+        
+        % Screen(theWindow, 'FillRect', bgcolor, window_rect); % reset
+        
+        Screen(theWindow,'DrawLines', xy, 1, [255 255 255 30]);
+        Screen(theWindow,'DrawText', double('전혀'), x(1)-anchor_W/2, ycenter+20, 255); %lb1 
+        Screen(theWindow,'DrawText', double('최대'), max(x)-anchor_W2/2, ycenter+20, 255); %rb1
+        
+        Screen('TextSize', theWindow, fontsize); % fonsize for instructions
+        
 end
 
 end

@@ -18,32 +18,32 @@ pathway_test(ip, port, 'MRI', reg);
 %% 1. T1 & Learning phase
 Learning_test(ip, port, reg,'test');
 %% 2. Motor TASK
-Motor_practice('test');
+Motor_practice('test','fmri');
 %% 3. Main STUDY % thermode_test(Number of run, ip, port, options...),
 %% PATHWAY TEST
 pathway_test(ip, port, 'MRI', reg);
 %% RUN1
-data1 = thermode_test(1, ip, port, reg,'test');
+thermode_test(1, ip, port, reg,'test');
 %% PATHWAY TEST
 pathway_test(ip, port, 'MRI', reg);
 %% RUN2
-data2 = thermode_test(2, ip, port, reg,'test');
+thermode_test(2, ip, port, reg,'test');
 %% PATHWAY TEST
 pathway_test(ip, port, 'MRI', reg);
 %% RUN3
-data3 = thermode_test(3, ip, port, reg,'test');
+thermode_test(3, ip, port, reg,'test');
 %% PATHWAY TEST
 pathway_test(ip, port, 'MRI', reg);
 %% RUN4
-data4 = thermode_test(4, ip, port, reg,'test');
+thermode_test(4, ip, port, reg,'test');
 %% PATHWAY TEST
 pathway_test(ip, port, 'MRI', reg);
 %% RUN5
-data5 = thermode_test(5, ip, port, reg,'test');
+thermode_test(5, ip, port, reg,'test');
 %% PATHWAY TEST
 pathway_test(ip, port, 'MRI', reg);
 %% RUN6
-data6 = thermode_test(6, ip, port, reg,'test');
+thermode_test(6, ip, port, reg,'test');
 
 
 

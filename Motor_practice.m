@@ -20,6 +20,7 @@ Screen('CloseAll');
 %% Parse varargin
 testmode = false;
 dofmri = false;
+USE_BIOPAC = false;
 for i = 1:length(varargin)
     if ischar(varargin{i})
         switch varargin{i}
@@ -69,6 +70,7 @@ else
     screens = Screen('Screens');
     window_num = screens(end); % the last window
     window_info = Screen('Resolution', window_num);
+    Screen('Preference', 'SkipSyncTests', 1);
     window_rect = [0 0 window_info.width window_info.height]; % full screen
     fontsize = 32;
     HideCursor();
@@ -165,33 +167,51 @@ try
     
     if dofmri
         % gap between 5 key push and the first stimuli (disdaqs: data.disdaq_sec)
-        % 5 seconds: "ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½..."
+        % 4 seconds: "ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½..."
+        mot.dat{1}{1}.runscan_starttime = GetSecs;
         Screen(theWindow, 'FillRect', bgcolor, window_rect);
         DrawFormattedText(theWindow, double('½ÃÀÛÇÕ´Ï´Ù...'), 'center', 'center', white, [], [], [], 1.2);
         Screen('Flip', theWindow);
-        mot.dat.runscan_starttime = GetSecs;
-        WaitSecs(4);
+        waitsec_fromstarttime(mot.dat{1}{1}.runscan_starttime,4);
         
-        % 5 seconds: Blank
+        % 4 seconds: Blank
+        fmri_t2 = GetSecs;
         Screen(theWindow,'FillRect',bgcolor, window_rect);
         Screen('Flip', theWindow);
-        WaitSecs(4); % ADJUST THIS
+        waitsec_fromstarttime(fmri_t2, 4); % ADJUST THIS
     end
     
-    % TRIAL START
+    if USE_BIOPAC
+        bio_t = GetSecs;
+        mot.dat.biopac_triggertime = bio_t; %BIOPAC timestamp
+        BIOPAC_trigger(ljHandle, biopac_channel, 'on');
+        Screen(theWindow,'FillRect',bgcolor, window_rect);
+        Screen('Flip', theWindow);
+        waitsec_fromstarttime(bio_t, 2); % ADJUST THIS
+    end
+    
+    %?
+    if USE_BIOPAC
+        BIOPAC_trigger(ljHandle, biopac_channel, 'off');
+    end
+    
+    
+    % -------------------------TRIAL START---------------------------------
     for i=1:numel(xx)
-        mot.dat{i}.trial_start_timestamp=GetSecs; % trial_start_timestamp
+        mot.dat{1}{i}.ts_timestamp=GetSecs; % trial_start_timestamp
         % 1. Fixation point
         fixPoint(ISI(i), white, stimText);
         % 2. Moving dot part
         ready = 0;
-        rec_i
+        rec_i = 0;
         
-        mot.dat{i}.move_start_timestamp = GetSecs; % 2 timestamp
+        mot.dat{1}{i}.move_start_timestamp = GetSecs; % 2 timestamp
         SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
-        while GetSecs - mot.dat{i}.move_start_timestamp < 5
+        while GetSecs - mot.dat{1}{i}.move_start_timestamp < 5
             while ~ready
                 [x,y,button] = GetMouse(theWindow);
+                rec_i= rec_i+1;
+                
                 draw_scale('overall_motor_semicircular');
                 Screen('DrawDots', theWindow, [xx(i) yy(i)]', 20, white, [0 0], 1);  % draw random dot in SemiC
                 Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  % Cursor
@@ -199,6 +219,10 @@ try
                 % the closest point
                 radius = (rb-lb)/2; % radius
                 theta = atan2(cir_center(2)-y,x-cir_center(1));
+                % current euclidean distance
+                curr_r = sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2);
+                % current angle (0 - 180 deg)
+                curr_theta = rad2deg(-theta+pi);
                 if y > bb
                     y = bb;
                     SetMouse(x,y);
@@ -212,9 +236,14 @@ try
                 Screen('Flip',theWindow);
                 
                 
+                mot.dat{1}{i}.time_fromstart(rec_i,1) = GetSecs - mot.dat{1}{i}.move_start_timestamp;
+                mot.dat{1}{i}.xy(rec_i,:) = [x-cir_center(1) cir_center(2)-y]./radius;
+                mot.dat{1}{i}.clicks(rec_i,:) = button;
+                mot.dat{1}{i}.r_theta(rec_i,:) = [curr_r/radius curr_theta/180]; %radius and degree?
+                
                 if button(1)
-                    mot.dat{i}.button_click_timestamp=GetSecs; %
-                    mot.dat{i}.button_click_bool=1; % 1 = Click, 0 = not click
+                    mot.dat{1}{i}.button_click_timestamp=GetSecs; %
+                    mot.dat{1}{i}.button_click_bool=1; % 1 = Click, 0 = not click
                     draw_scale('overall_motor_semicircular');
                     Screen('DrawDots', theWindow, [xx(i) yy(i)]', 20, white, [0 0], 1);  % draw random dot in SemiC
                     Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
@@ -222,24 +251,19 @@ try
                     WaitSecs(.1);
                     ready = 1;
                     break;
-                elseif GetSecs - mot.dat{i}.move_start_timestamp > 5
-                    mot.dat{i}.move_end_timestamp = GetSecs;
-                    mot.dat{i}.button_click_bool=0; 
+                elseif GetSecs - mot.dat{1}{i}.move_start_timestamp  > 5
+                    mot.dat{1}{i}.move_end_timestamp = GetSecs;
+                    mot.dat{1}{i}.button_click_bool=0; 
                     ready = 1;
                     break;
                 else
                     %do nothing
                 end
-                
-                mot.dat{i}.time_fromstart(rec_i,1) = GetSecs-sTime;
-                mot.dat{i}.xy(rec_i,:) = [x-cir_center(1) cir_center(2)-y]./radius;
-                mot.dat{i}.clicks(rec_i,:) = button;
-                mot.dat{i}.r_theta(rec_i,:) = [curr_r/radius curr_theta/180]; %radius and degree?
             end
             fixPoint(0, white, '');
             Screen('Flip', theWindow);
         end
-        mot.dat{i}.trial_end_timestamp=GetSecs; % trial_star_timestamp
+        mot.dat{1}{i}.trial_end_timestamp=GetSecs; % trial_star_timestamp
         if mod(i,2) == 0, save(mot.datafile, '-append', 'mot'); end % save data every two trials
     end
     mot.task_end_timestamp=GetSecs;

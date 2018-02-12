@@ -25,4 +25,5 @@ load(FullText, 'reg');
 output=reg;
 cd(basedir);
 clc;
+disp(output.version); %show a version of datafile
 end

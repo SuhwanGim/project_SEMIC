@@ -11,7 +11,7 @@ global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_y
 Screen('Clear');
 Screen('CloseAll');
 window_num = 0;
-window_rect = [1 1 800 640]; % in the test mode, use a little smaller screen
+window_rect = [1 1 1280 720]; % in the test mode, use a little smaller screen
 fontsize = 20;
 
 
@@ -62,7 +62,7 @@ SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
 
 %% EXPERIEMENT START
 sTime=GetSecs;
-while GetSecs - sTime < 10
+while GetSecs - sTime < 5
     [x,y,button]=GetMouse(theWindow);
     % if the point goes further than the semi-circle, move the point to
     % the closest point
@@ -83,13 +83,15 @@ while GetSecs - sTime < 10
         SetMouse(x,y);
     end
     
+   
     
     Screen(theWindow,'FillRect',bgcolor, window_rect);
     msg = '예상해보십시요';
     msg = double(msg);
     DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 1.5);
     draw_scale('cont_predict_semicircular');
-    
+    %draw_scale('overall_avoidance_semicircular');
+    Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
     Screen('Flip', theWindow);
 end
 
