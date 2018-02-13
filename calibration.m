@@ -35,7 +35,7 @@ global reg; % regression data
 savedir = 'CALI_SEMIC_data';
 [fname,~ , SID] = subjectinfo_check_SEMIC(savedir,1,'Cali'); % subfunction %start_trial
 % save data using the canlab_dataset object
-reg.version = 'SEMIC_Calibration_v1_01-02-2018_Cocoanlab';
+reg.version = 'SEMIC_Calibration_v1_13-02-2018_Cocoanlab';
 reg.subject = SID;
 reg.datafile = fname;
 reg.starttime = datestr(clock, 0); % date-time

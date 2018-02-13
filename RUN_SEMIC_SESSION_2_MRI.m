@@ -4,7 +4,7 @@ clear;
 close all;
 %% SETUP: PARAMETER
 %ip = '115.145.189.133'; % or LocalHost?
-ip = '203.252.54.4';
+ip = '203.252.54.5';
 port = 20121;
 addpath(genpath(pwd));
 %% SETUP: Load calibration data

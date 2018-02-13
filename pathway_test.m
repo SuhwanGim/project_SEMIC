@@ -12,13 +12,19 @@ function pathway_test(ip, port, type, reg)
 % writen by Suhwan Gim
 %%
 clc;
-txt=input('지금부터 피부 테스트를 진행하겠습니다. 준비가 되셨으면 아무 키나 입력해주세요','s');
+txt=input('For experiment, participants experience some test. If researcher ready to strat, please type the any text.','s');
 switch type
     case 'basic'
         if ~isempty(txt)
-            disp('잠시만 기다려주세요');
-            WaitSecs(0.5);
+            disp('Please wait a second');
             main(ip, port, 1, 24);
+            WaitSecs(0.5);
+            disp('Ready to start');
+            main(ip, port, 2);
+            WaitSecs(1);
+            disp('Start');
+            main(ip, port, 2);
+            WaitSecs(0.5);
         end
     case 'MRI'
         if ~isempty(txt)
@@ -31,9 +37,14 @@ switch type
                     % do nothing
                 end
             end
-            disp('잠시만 기다려주세요');
-            WaitSecs(0.5);
+            disp('Please wait a second');
             main(ip, port, 1, degree);
+            disp('Ready to start');
+            main(ip, port, 2);
+            WaitSecs(1);
+            disp('Start');
+            main(ip, port, 2);
+            WaitSecs(0.5);
         end
 end
 

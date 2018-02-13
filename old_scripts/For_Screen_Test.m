@@ -32,8 +32,10 @@ lb = 1.5*W/5; % in 1280, it's 384
 rb = 3.5*W/5; % in 1280, it's 896 rb-lb = 512
 
 % bigger rating scale 
-lb1 = 1*W/5; % 
-rb1 = 4*W/5; % 
+% see draw_scale.m 
+% 1*w/50, 49*W/50
+lb1 = 1*W/50; % 
+rb1 = 49*W/50; % 
 
 
 % rating scale upper and bottom bounds
@@ -53,16 +55,23 @@ anchor_y = H/2+10+scale_H;
 
 theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
 Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
+Screen('Preference', 'SkipSyncTests', 1);
 Screen('TextFont', theWindow, font); % setting font
 Screen('TextSize', theWindow, fontsize);
 
 
-cir_center = [(rb+lb)/2, bb];
-SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
+% cir_center = [(rb+lb)/2, bb];
+% SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
+
+xcenter = (lb1+rb1)/2;
+ycenter = H*3/4+100;
+
+cir_center = [(lb1+rb1)/2 H*3/4+100];
+SetMouse(cir_center(1), cir_center(2));
 
 %% EXPERIEMENT START
 sTime=GetSecs;
-while GetSecs - sTime < 5
+while GetSecs - sTime < 15
     [x,y,button]=GetMouse(theWindow);
     % if the point goes further than the semi-circle, move the point to
     % the closest point
@@ -72,8 +81,8 @@ while GetSecs - sTime < 5
     curr_r = sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2);
     % current angle (0 - 180 deg)
     curr_theta = rad2deg(-theta+pi);
-    if y > bb
-        y = bb;
+    if y > cir_center(2)
+        y = cir_center(2);
         SetMouse(x,y);
     end
     % send to arc of semi-circle

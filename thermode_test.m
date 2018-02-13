@@ -11,7 +11,7 @@ function data = thermode_test(runNbr, ip, port, reg, varargin)
 % written by Suhwan Gim (roseno.9@daum.net)
 % 2017-12-06
 %
-% see also load_PathProgram
+% see also load_PathProgram calibraion
 % -------------------------------------------------------------------------
 
 %% GLOBAL vaiable
@@ -58,7 +58,7 @@ savedir = 'Main_SEMIC_data';
 [fname,start_trial, SID] = subjectinfo_check_SEMIC(savedir,runNbr,'Main'); % subfunction %start_trial
 if exist(fname, 'file'), load(fname, 'data'); load(fname,'ts'); end
 % save data using the canlab_dataset object
-data.version = 'SEMIC_v1_02-01-2018_Cocoanlab';
+data.version = 'SEMIC_v1_02-12-2018_Cocoanlab';
 data.subject = SID;
 data.datafile = fname;
 data.starttime = datestr(clock, 0); % date-time
@@ -113,7 +113,7 @@ if start_trial==1
     end
     % ITI-Delay1-Delay2 combination
     %:In this task, the combination from 17th to 20th will not use.
-    bin = {3, 5, 7; 3, 6, 6; 4, 4, 7; 4, 5, 6; 5, 5, 5};
+    bin = [3, 5, 7; 3, 6, 6; 4, 4, 7; 4, 5, 6; 5, 5, 5]-0.5;
     for i=1:length(bin)
         rng('shuffle');
         rn=randperm(3);
@@ -123,9 +123,9 @@ if start_trial==1
     rn=randperm(size(ITI_Delay,1)); % length of vector
     ITI_Delay = ITI_Delay(rn,:);
     ITI_Delay = ITI_Delay(1:length(trial_Number),:);
-    ITI = cell2mat(ITI_Delay(:,1));
-    Delay = cell2mat(ITI_Delay(:,2));
-    Delay2 = cell2mat(ITI_Delay(:,3));
+    ITI = ITI_Delay(:,1);
+    Delay = ITI_Delay(:,2);
+    Delay2 = ITI_Delay(:,3);
     % Overall_ratings Question randomization
     overall_unpl_Q_txt= repmat({'다른 사람들은 이 자극을 얼마나 아파했을 것 같나요?'; '방금 경험한 자극이 얼마나 아팠나요? '},12,1);
     overall_unpl_Q_cond = repmat({'other_painful';'self_painful'},12,1);
@@ -177,8 +177,8 @@ lb = 1.5*W/5; % in 1280, it's 384
 rb = 3.5*W/5; % in 1280, it's 896 rb-lb = 512
 
 % For bigger rating scale
-lb1 = 1*W/5; %
-rb1 = 4*W/5; %
+lb1 = 1*W/50; % 
+rb1 = 49*W/50; % 
 
 % rating scale upper and bottom bounds
 tb = H/5+100;           % in 800, it's 310
@@ -304,8 +304,14 @@ try
             ready1=0;
             ready3=0;
             % set the mouse location to zero point
-            cir_center = [(rb1+lb1)/2, bb];
+            
+            % xcenter = (lb1+rb1)/2;
+            % ycenter = H*3/4+100;
+            
+            cir_center = [(lb1+rb1)/2 H*3/4+100];           
+            % cir_center = [(rb1+lb1)/2, bb]; --> 
             SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
+
             % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
             start_while=GetSecs;
             data.dat{runNbr}{trial_Number(j)}.start_rating_timestamp = start_while;
@@ -323,8 +329,8 @@ try
                 curr_theta = rad2deg(-theta+pi);
                 % For control a mouse cursor:
                 % send to diameter of semi-circle
-                if y > bb
-                    y = bb;
+                if y > cir_center(2) %bb
+                    y = cir_center(2); %bb;
                     SetMouse(x,y);
                 end
                 % send to arc of semi-circle
@@ -369,6 +375,7 @@ try
             data.dat{runNbr}{trial_Number(j)}.Delay2_end_timestamp_end = GetSecs;
             
             %6. Overall ratings
+            cir_center = [(rb+lb)/2, bb];
             SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
             rec_i = 0;
             ready2=0;
@@ -458,7 +465,8 @@ try
             ready1=0;
             ready3=0;
             % set the mouse location to zero point
-            cir_center = [(rb1+lb1)/2, bb];
+                 %%cir_center = [(rb1+lb1)/2, bb];
+            cir_center = [(lb1+rb1)/2 H*3/4+100];
             SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
             % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
             start_while=GetSecs;
@@ -477,8 +485,8 @@ try
                 curr_theta = rad2deg(-theta+pi);
                 % For control a mouse cursor:
                 % send to diameter of semi-circle
-                if y > bb
-                    y = bb;
+                if y > cir_center(2)%%bb
+                    y = cir_center(2); %%bb;
                     SetMouse(x,y);
                 end
                 % send to arc of semi-circle
@@ -523,6 +531,7 @@ try
             data.dat{runNbr}{trial_Number(j)}.Delay2_end_timestamp_end = GetSecs;
             
             %6. Overall ratings
+            cir_center = [(rb+lb)/2, bb];
             SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
             rec_i = 0;
             ready2=0;
