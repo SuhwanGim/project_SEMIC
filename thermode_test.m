@@ -101,7 +101,8 @@ if start_trial==1
         stim_level = ["LV1"; "LV2"; "LV3"; "LV4";"LV1"; "LV2"; "LV3"; "LV4";"LV2"; "LV3"; "LV4";"LV5";"LV2"; "LV3"; "LV4";"LV5";"LV1";"LV2";"LV2";"LV3";"LV3";"LV4";"LV4";"LV5"]; % A group of [low cue,High cue]x2
         program = [stim_degree(1:4);stim_degree(1:4);stim_degree(2:5);stim_degree(2:5);stim_degree(1);stim_degree(2:4);stim_degree(2:4);stim_degree(5)]; % A group of [low cue,High cue]x2
         cue_settings = ["LOW";"LOW";"LOW";"LOW";"LOW";"LOW";"LOW";"LOW";"HIGH";"HIGH";"HIGH";"HIGH";"HIGH";"HIGH";"HIGH";"HIGH";"NO";"NO";"NO";"NO";"NO";"NO";"NO";"NO";];
-        cue_mean = [0.22; 0.22; 0.22;0.22;0.22; 0.22; 0.22;0.22; 0.77; 0.77; 0.77; 0.77; 0.77; 0.77; 0.77; 0.77; 99;99;99;99;99;99;99;99;]; % (LOWx4 HIGHx4) x 2 = 16 trials
+        %cue_mean = [0.22; 0.22; 0.22;0.22;0.22; 0.22; 0.22;0.22; 0.77; 0.77; 0.77; 0.77; 0.77; 0.77; 0.77; 0.77; 99;99;99;99;99;99;99;99;]; % (LOWx4 HIGHx4) x 2 = 16 trials
+        cue_mean = [0.22; 0.22; 0.22;0.22;0.22; 0.22; 0.22;0.22; 0.77; 0.77; 0.77; 0.77; 0.77; 0.77; 0.77; 0.77; 0.99;0.99;0.99;0.99;0.99;0.99;0.99;0.99;]; % (LOWx4 HIGHx4) x 2 = 16 trials
         cue_var = abs(repmat(0.05,24,1) + randn(24,1).*0.003); %
         %randomizaiton
         rn = randperm(24);
@@ -449,14 +450,17 @@ try
             data.dat{runNbr}{trial_Number(j)}.end_trial_t = end_trial;
             
         else
-            %ONLY PAIN TRIAL
-            
+            %ONLY PAIN TRIAL          
+            % 1. ITI (jitter)
+            DrawFormattedText(theWindow, double('+'), 'center', 'center', white, [], [], [], 1.2);
+            Screen('Flip', theWindow);
             %-------------Ready for themal------------------
             main(ip,port,1,program(j)); %select the program
             main(ip,port,2); %ready to pre-start
             
-            % 1. ITI (jitter)
-            fixPoint(TrSt_t, ITI(j), white, '+') % ITI
+            waitsec_fromstarttime(TrSt_t, ITI(j));
+            
+            % fixPoint(TrSt_t, ITI(j), white, '+') % ITI
             data.dat{runNbr}{trial_Number(j)}.ITI_endtimestamp = GetSecs;
             
             % 2. HEAT and Ratings
@@ -470,8 +474,8 @@ try
             SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
             % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
             start_while=GetSecs;
-            data.dat{runNbr}{trial_Number(j)}.start_rating_timestamp = start_while;
             
+            data.dat{runNbr}{trial_Number(j)}.start_rating_timestamp = start_while;
             while GetSecs - TrSt_t < 14.5 + ITI(j)
                 [x,y,button]=GetMouse(theWindow);
                 rec_i= rec_i+1;
