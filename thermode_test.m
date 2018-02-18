@@ -1,17 +1,18 @@
 function data = thermode_test(runNbr, ip, port, reg, varargin)
 %%
-% This function triggers heat-pain, report ratings using TCP/IP
-%communication. runNbr is number of run. ip and port is obtained from
-%"Pathway" device. And there are some optional inputs.
+% This function triggers thermal-pain externally using TCP/IP communication
+%and shows ratings.The 'runNbr' is number of run. The 'ip' and 'port' are
+%obtained from the "Pathway" device. And there are some optional inputs.
 %
-%If you want to use this function, you should have a connected computers
-%using TCP/IP (for example, connect each other or connect same router).
-%However, if didn't, this function will not working
+%To using this function, two computers (or more) should have a connected
+%each other or same router. However, if didn't, this function will not
+%working properly.
 %
-% written by Suhwan Gim (roseno.9@daum.net)
-% 2017-12-06
+% Written by Suhwan Gim (roseno.9@daum.net)
+% 2018-02-18
 %
-% see also load_PathProgram calibraion
+% see also load_PathProgram calibration
+%
 % -------------------------------------------------------------------------
 
 %% GLOBAL vaiable
@@ -95,22 +96,31 @@ if start_trial==1
     stim_degree=cell2mat(degree);
     % Make stritedfied randomization of [Program, cue_settings, mean,
     % variance]
-    program = zeros(24,1);
-    cue_mean = zeros(24,1);
-    while ((numel(find(diff(program)==0))) > 2) && ((numel(find(diff(cue_mean)==0))) > 2)
-        stim_level = ["LV1"; "LV2"; "LV3"; "LV4";"LV1"; "LV2"; "LV3"; "LV4";"LV2"; "LV3"; "LV4";"LV5";"LV2"; "LV3"; "LV4";"LV5";"LV1";"LV2";"LV2";"LV3";"LV3";"LV4";"LV4";"LV5"]; % A group of [low cue,High cue]x2
-        program = [stim_degree(1:4);stim_degree(1:4);stim_degree(2:5);stim_degree(2:5);stim_degree(1);stim_degree(2:4);stim_degree(2:4);stim_degree(5)]; % A group of [low cue,High cue]x2
-        cue_settings = ["LOW";"LOW";"LOW";"LOW";"LOW";"LOW";"LOW";"LOW";"HIGH";"HIGH";"HIGH";"HIGH";"HIGH";"HIGH";"HIGH";"HIGH";"NO";"NO";"NO";"NO";"NO";"NO";"NO";"NO";];
-        cue_mean = [0.22; 0.22; 0.22;0.22;0.22; 0.22; 0.22;0.22; 0.77; 0.77; 0.77; 0.77; 0.77; 0.77; 0.77; 0.77; 99;99;99;99;99;99;99;99;]; % (LOWx4 HIGHx4) x 2 = 16 trials
-        %cue_mean = [99;99;99;99;99;99;99;99; 99;99;99;99;99;99;99;99; 99;99;99;99;99;99;99;99]; % (LOWx4 HIGHx4) x 2 = 16 trials
+    program = zeros(18,1);
+    cue_mean = zeros(18,1);
+    while ~((numel(find(diff(program)==0))) < 2) && ~((numel(find(diff(cue_mean)==0))) < 2)
+        % A DESIGN within a one run divided three parts (1+2+3 = 18 trials)
+        % 1) Only pain trials: [LV2, 3, 4] x 2 = 6 trials
+        % 2) Self Q (overall questions): 2 (social cues: Low/High) x 4 (temp levels: LV 1  to 4 / LV2 to 5) = 8 trials
+        % 3) Other Q (overall questions): 2 (Social cues: Low/High) x 2 (temp levels Lv3 and 4 / Lv 2 and 3) = 4 trials
+        stim_level = ["LV2"; "LV3"; "LV4"; "LV2";"LV3"; "LV4"; "LV1"; "LV2";"LV3"; "LV4"; "LV2";"LV3"; "LV4"; "LV5";"LV3";"LV4";"LV2";"LV3"]; % A group of [low cue,High cue]x2
+        program = [stim_degree(2:4);stim_degree(2:4);stim_degree(1:4);stim_degree(2:5);stim_degree(3:4);stim_degree(2:3)]; % A group of [low cue,High cue]x2
+        cue_settings = ["NO";"NO";"NO";"NO";"NO";"NO";"LOW";"LOW";"LOW";"LOW";"HIGH";"HIGH";"HIGH";"HIGH";"LOW";"LOW";"HIGH";"HIGH"];
+        cue_mean = [99;99;99;99;99;99;0.22; 0.22; 0.22;0.22; 0.77; 0.77; 0.77; 0.77;0.22; 0.22; 0.77; 0.77;]; % (LOWx4 HIGHx4) x 2 = 16 trials
         cue_var = abs(repmat(0.05,24,1) + randn(24,1).*0.003); %
-        %randomizaiton
-        rn = randperm(24);
+        overall_unpl_Q_txt= [repmat({'다른 사람들은 얼마나 아팠을까요?'},3,1); repmat({'얼마나 아팠나요?'},3,1); repmat({'얼마나 아팠나요?'},8,1); repmat({'다른 사람들은 얼마나 아팠을까요?'},4,1)];
+        overall_unpl_Q_cond = [repmat({'other_painful'},3,1); repmat({'self_painful'},3,1); repmat({'self_painful'},8,1); repmat({'other_painful'},4,1);];
+        %generate a randome sequence
+        rn = randperm(numel(cue_settings));
+        %randomization
         stim_level = stim_level(rn);
         program =  program(rn);
         cue_settings = cue_settings(rn);
         cue_mean = cue_mean(rn);
         cue_var = cue_var(rn);
+        overall_unpl_Q_txt = overall_unpl_Q_txt(rn);
+        overall_unpl_Q_cond = overall_unpl_Q_cond(rn);
+        i=i+1;
     end
     % ITI-Delay1-Delay2 combination
     bin = [3, 5, 7; 3, 6, 6; 4, 4, 7; 4, 5, 6; 5, 5, 5];%-0.5;
@@ -126,13 +136,7 @@ if start_trial==1
     ITI = ITI_Delay(:,1);
     Delay = ITI_Delay(:,2);
     Delay2 = ITI_Delay(:,3);
-    % Overall_ratings Question randomization
-    overall_unpl_Q_txt= repmat({'다른 사람들은 얼마나 아팠을까요?'; '얼마나 아팠나요?'},12,1);
-    overall_unpl_Q_cond = repmat({'other_painful';'self_painful'},12,1);
-    rn=randperm(numel(overall_unpl_Q_txt));
-    overall_unpl_Q_txt = overall_unpl_Q_txt(rn);
-    overall_unpl_Q_cond = overall_unpl_Q_cond(rn);
-    %ts = [trial_Number, run_Number, ITI, Delay, cue_mean, cue_var, ts_program, ramp_up_con];
+    % trial sequences
     ts{runNbr} = [run_Number, trial_Number, ITI, Delay, Delay2, cue_settings, cue_mean, cue_var, stim_level, program, overall_unpl_Q_cond, overall_unpl_Q_txt];
     % save the trial_sequences
     save(data.datafile, 'ts', 'data');
@@ -163,7 +167,7 @@ end
 W = window_rect(3); %width of screen
 H = window_rect(4); %height of screen
 
-font = 'NanumBarunGothic';
+% font = 'NanumBarunGothic';
 
 bgcolor = 80;
 white = 255;
