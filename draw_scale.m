@@ -5,7 +5,6 @@ function draw_scale(scale)
 
 global theWindow W H; % window property
 global white red orange bgcolor; % color
-global t r; % pressure device udp channel
 global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
 global lb1 rb1;
 global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd anchor_lms anchor_lms_y anchor_lms_x; % anchors
@@ -507,9 +506,7 @@ switch scale
         
         
     case 'cont_predict_semicircular' %For SEMIC project
-        % For bigger rating scale, we use this
-        % lb1 = 4*W/20;
-        % rb1 = 16*W/20;
+        % For bigger rating scale, we use both new boundary [lb1 rb1]
         
         xcenter = (lb1+rb1)/2;
         ycenter = H*3/4+100;
@@ -519,19 +516,19 @@ switch scale
         %       radius = (rb1-lb1)/2; % radius
         %       x = reshape(repmat(linspace(lb1,rb1,1000),2,1),1,2000); x([1 2000]) = [];
         %       xy = [x; bb - sqrt(radius.^2 - (x-xcenter).^2)];
-        skip_step = 15;
-        end_step = 50; %even number
+        skip_step = 4;
+        end_step = 20; %even number
         start_step = 1;
         
         for j=start_step:(end_step/2) - skip_step
             i=j-start_step+1; % 1 to (end_step-start_step)
-                lb_temp = j*W/end_step; rb_temp = (end_step-j)*W/end_step; %1*w/50, 49*W/50
-                radius = (rb_temp-lb_temp)/2; % radius
-                x_temp = reshape(repmat(linspace(lb_temp, rb_temp,1000),2,1),1,2000); x_temp([1 2000]) = [];
-                y_temp = ycenter - sqrt(radius.^2 - (x_temp-xcenter).^2);
-                x(:,i*1998-1997:i*1998) = x_temp;
-                y(:,i*1998-1997:i*1998) = y_temp;
-                %xy = [x; bb - sqrt(radius.^2 - (x-xcenter).^2)];
+            lb_temp = j*W/end_step; rb_temp = (end_step-j)*W/end_step; %1*w/50, 49*W/50
+            radius = (rb_temp-lb_temp)/2; % radius
+            x_temp = reshape(repmat(linspace(lb_temp, rb_temp,1000),2,1),1,2000); x_temp([1 2000]) = [];
+            y_temp = ycenter - sqrt(radius.^2 - (x_temp-xcenter).^2);
+            x(:,i*1998-1997:i*1998) = x_temp;
+            y(:,i*1998-1997:i*1998) = y_temp;
+            %xy = [x; bb - sqrt(radius.^2 - (x-xcenter).^2)];
         end
         xy = [x; y];
         
@@ -542,12 +539,53 @@ switch scale
         
         % Screen(theWindow, 'FillRect', bgcolor, window_rect); % reset
         
-        Screen(theWindow,'DrawLines', xy, 1, [255 255 255 30]);
-        Screen(theWindow,'DrawText', double('전혀'), x(1)-anchor_W/2, ycenter+20, 255); %lb1 
+        Screen(theWindow,'DrawLines', xy, 2, [255 255 255 230]);
+        Screen(theWindow,'DrawText', double('전혀'), x(1)-anchor_W/2, ycenter+20, 255); %lb1
         Screen(theWindow,'DrawText', double('최대'), max(x)-anchor_W2/2, ycenter+20, 255); %rb1
         
         Screen('TextSize', theWindow, fontsize); % fonsize for instructions
         
+        
+    case 'overall_predict_semicircular' %For SEMIC project
+        % For bigger rating scale, we use both new boundary [lb1 rb1]
+        
+        xcenter = (lb1+rb1)/2;
+        ycenter = H*3/4+100;
+        %ycenter = bb;
+        
+        
+        %       radius = (rb1-lb1)/2; % radius
+        %       x = reshape(repmat(linspace(lb1,rb1,1000),2,1),1,2000); x([1 2000]) = [];
+        %       xy = [x; bb - sqrt(radius.^2 - (x-xcenter).^2)];
+        end_step = 20; %even number
+        skip_step = 5;
+        start_step = 5;
+        
+        for j=start_step:((end_step/2) - skip_step)
+            i=j-start_step+1; % 1 to (end_step-start_step)
+            lb_temp = j*W/end_step; rb_temp = (end_step-j)*W/end_step; %5*W/20, 15*W/20
+            radius = (rb_temp-lb_temp)/2; % radius
+            x_temp = reshape(repmat(linspace(lb_temp, rb_temp,1000),2,1),1,2000); x_temp([1 2000]) = [];
+            y_temp = ycenter - sqrt(radius.^2 - (x_temp-xcenter).^2);
+            x(:,i*1998-1997:i*1998) = x_temp;
+            y(:,i*1998-1997:i*1998) = y_temp;
+            %xy = [x; bb - sqrt(radius.^2 - (x-xcenter).^2)];
+        end
+        xy = [x; y];
+        
+        Screen('TextSize', theWindow, 28); % fonsize for anchors
+        Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        anchor_W = Screen(theWindow,'DrawText', double('전혀'), 0, 0, bgcolor);
+        anchor_W2 = Screen(theWindow,'DrawText', double('최대'), 0, 0, bgcolor);
+        
+        % Screen(theWindow, 'FillRect', bgcolor, window_rect); % reset
+        
+        Screen(theWindow,'DrawLines', xy, 2, [255 255 255 230]);
+        Screen(theWindow,'DrawText', double('전혀'), x(1)-anchor_W/2, ycenter+20, 255); %lb1
+        Screen(theWindow,'DrawText', double('최대'), max(x)-anchor_W2/2, ycenter+20, 255); %rb1
+        
+        Screen('TextSize', theWindow, fontsize); % fonsize for instructions
+ 
 end
 
 end

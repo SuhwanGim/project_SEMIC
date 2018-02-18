@@ -49,7 +49,7 @@ savedir = 'LEARN_SEMIC_data';
 %[fname, start_trial, SID] = subjectinfo_check(savedir); % subfunction
 if exist(fname, 'file'), load(fname, 'data'); load(fname,'ts'); end
 % save data using the canlab_dataset object
-data.version = 'SEMIC_v1_12-27-2017_Cocoanlab';
+data.version = 'SEMIC_v1_02-13-2018_Cocoanlab';
 data.subject = SID;
 data.datafile = fname;
 data.starttime = datestr(clock, 0); % date-time
@@ -282,8 +282,6 @@ try
             data.dat{runNbr}{trial_Number(j)}.Delay1_end_timestamp = GetSecs;
             % 4. HEAT and Ratings
             rec_i = 0;
-            ready = 0;
-            ready1=0;
             ready3=0;
             % set the mouse location to zero point
             
@@ -360,7 +358,6 @@ try
             cir_center = [(rb+lb)/2, bb];
             SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
             rec_i = 0;
-            ready2=0;
             sTime=GetSecs;
             data.dat{runNbr}{trial_Number(j)}.overall_rating_time_stamp=sTime; % overall rating time stamp
             while GetSecs - TrSt_t < 5 + Delay2(j)+14.5 + ITI(j) + 2 + Delay(j)
@@ -443,8 +440,6 @@ try
             
             % 2. HEAT and Ratings
             rec_i = 0;
-            ready = 0;
-            ready1=0;
             ready3=0;
             % set the mouse location to zero point
                  %%cir_center = [(rb1+lb1)/2, bb];
@@ -516,7 +511,6 @@ try
             cir_center = [(rb+lb)/2, bb];
             SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
             rec_i = 0;
-            ready2=0;
             sTime=GetSecs;
             data.dat{runNbr}{trial_Number(j)}.overall_rating_time_stamp=sTime; % overall rating time stamp
             while GetSecs - TrSt_t < 5 + Delay2(j)+14.5 + ITI(j) % overall rating 5 seconds
@@ -592,15 +586,20 @@ try
         % waitsec_fromstarttime(end_trial, 1); % For your rest,
     end
     data.run_endtime_timestamp{runNbr}=GetSecs;
+    save(data.datafile, '-append', 'data');
     
-    %closing messege
-    while GetSecs - data.endtime_timestamp < 10
-        if runNbr==6
-            display_expmessage('모든 실험이 종료되었습니다\n잠시만 기다려주세요')
-        else
-            display_expmessage('잠시만 기다려주세요.')
+    %closing image until when acquiring T1 image is end
+    DrawFormattedText(theWindow, double('+'), 'center', 'center', color, [], [], [], 1.2);
+    Screen('Flip', theWindow);
+    while (1)
+        [~,~,keyCode] = KbCheck;
+        if keyCode(KbName('q'))==1
+            break
+        elseif keyCode(KbName('space'))== 1
+            break
         end
     end
+    data.close_fixation_timestamp{runNbr} = GetSecs;
     
     ShowCursor();
     Screen('Clear');

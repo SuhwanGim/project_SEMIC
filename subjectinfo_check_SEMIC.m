@@ -4,7 +4,7 @@ function [fname,start_trial,SID] = subjectinfo_check_SEMIC(savedir, runNbr, vara
 %
 % :Usage:
 % ::
-%     [fname, start_line, SID] = subjectinfo_check(savedir, varargin)
+%     [fname, start_line, SID] = subjectinfo_check(savedir, run_number,varargin)
 %
 %
 % :Inputs:

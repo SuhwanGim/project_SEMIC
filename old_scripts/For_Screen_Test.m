@@ -31,11 +31,11 @@ yellow = [255 220 0];
 lb = 1.5*W/5; % in 1280, it's 384
 rb = 3.5*W/5; % in 1280, it's 896 rb-lb = 512
 
-% bigger rating scale 
-% see draw_scale.m 
+% bigger rating scale
+% see draw_scale.m
 % 1*w/50, 49*W/50
-lb1 = 1*W/50; % 
-rb1 = 49*W/50; % 
+lb1 = 1*W/50; %
+rb1 = 49*W/50; %
 
 
 % rating scale upper and bottom bounds
@@ -66,48 +66,92 @@ Screen('TextSize', theWindow, fontsize);
 xcenter = (lb1+rb1)/2;
 ycenter = H*3/4+100;
 
-cir_center = [(lb1+rb1)/2 H*3/4+100];
+cir_center = [(5*W/20+15*W/20)/2 H*3/4+100];
 SetMouse(cir_center(1), cir_center(2));
 
 %% EXPERIEMENT START
 sTime=GetSecs;
-while GetSecs - sTime < 15
-    [x,y,button]=GetMouse(theWindow);
-    % if the point goes further than the semi-circle, move the point to
-    % the closest point
-    radius = (rb1-lb1)/2; % radius
-    theta = atan2(cir_center(2)-y,x-cir_center(1));
-    % current euclidean distance
-    curr_r = sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2);
-    % current angle (0 - 180 deg)
-    curr_theta = rad2deg(-theta+pi);
-    if y > cir_center(2)
-        y = cir_center(2);
-        SetMouse(x,y);
+rating_type = 'semicircular';
+%%
+draw_scale('overall_predict_semicircular');
+draw_social_cue(0.221111111     , 0.05, 25, rating_type); % draw & save details: draw_socia_cue(m, std, n, rating_type)
+Screen('Flip', theWindow);
+while (1)
+    [~,~,keyCode] = KbCheck;
+    if keyCode(KbName('space'))==1
+        draw_scale('overall_predict_semicircular');
+        draw_social_cue(0.77, 0.05, 25, rating_type); % draw & save details: draw_socia_cue(m, std, n, rating_type)
+        Screen('Flip', theWindow);
+    elseif keyCode(KbName('q'))==1
+        abort_man;
+    elseif keyCode(KbName('w'))== 1
+        break
     end
-    % send to arc of semi-circle
-    if sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2) > radius
-        x = radius*cos(theta)+cir_center(1);
-        y = cir_center(2)-radius*sin(theta);
-        SetMouse(x,y);
-    end
-    
-   
-    
-    Screen(theWindow,'FillRect',bgcolor, window_rect);
-    msg = '예상해보십시요';
-    msg = double(msg);
-    DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 1.5);
-    draw_scale('cont_predict_semicircular');
-    %draw_scale('overall_avoidance_semicircular');
-    Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
-    Screen('Flip', theWindow);
 end
 
+msg = '이번 자극이 최대 얼마나 아플까요?';
+msg = double(msg);
+DrawFormattedText(theWindow, msg, 'center', 150, orange, [], [], [], 2);
+Screen('Flip', theWindow);
+waitsec_fromstarttime(sTime, 6);
+
+ready = 0;
+sTime=GetSecs;
+while GetSecs - sTime < 10
+        [x,y,button]=GetMouse(theWindow);
+        % if the point goes further than the semi-circle, move the point to
+        % the closest point
+        radius = (15*W/20-5*W/20)/2; %radius = (rb1-lb1)/2; % radius;
+        theta = atan2(cir_center(2)-y,x-cir_center(1));
+        % current euclidean distance
+        curr_r = sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2);
+        % current angle (0 - 180 deg)
+        curr_theta = rad2deg(-theta+pi);
+        if y > cir_center(2)
+            y = cir_center(2);
+            SetMouse(x,y);
+        end
+        % send to arc of semi-circle
+        if sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2) > radius
+            x = radius*cos(theta)+cir_center(1);
+            y = cir_center(2)-radius*sin(theta);
+            SetMouse(x,y);
+        end
+        
+        
+        
+        Screen(theWindow,'FillRect',bgcolor, window_rect);
+        msg = '예상해보십시요';
+        msg = double(msg);
+        DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 1.5);
+        
+        
+        wdraw_scale('cont_predict_semicircular');
+        
+        %draw_scale('overall_predict_semicircular');
+        
+        
+        Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
+        Screen('Flip', theWindow);
+        
+        if button(1)
+            draw_scale('overall_predict_semicircular')
+            Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
+            break;
+        end
+        
+        
+end
+
+while GetSecs - sTime <10
+    if button(1)
+        Screen('Flip', theWindow);
+    end
+end
 
 Screen('Clear');
 Screen('CloseAll');
 
 
 
-%%
+%%w

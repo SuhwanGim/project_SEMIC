@@ -3,9 +3,12 @@ function [xx, th] = draw_social_cue(m, std, n, rating_type)
 global theWindow W H; % window property
 global white red red_Alpha orange bgcolor; % color
 global window_rect prompt_ex tb bb lb rb scale_H anchor_y anchor_y2 anchor promptW promptH joy_speed; % rating scale
+global lb1 rb1; % For larger semi-circular
 
-cir_center = [(rb+lb)/2, bb];
-radius = (rb-lb)/2; % radius
+% cir_center = [(rb+lb)/2, bb]; previous version 
+%radius = (rb-lb)/2; % radius; also,
+cir_center = [(5*W/20+15*W/20)/2, H*3/4+100];
+radius = (15*W/20-5*W/20)/2;
 
 draw_scale(rating_type);
 

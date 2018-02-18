@@ -28,6 +28,7 @@ end
 global theWindow W H; % window property
 global white red orange bgcolor; % color
 global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
+global lb1 rb1; % For larger semi-circular
 global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
 global reg; % regression data
 
@@ -74,6 +75,10 @@ yellow = [255 220 0];
 lb = 1.5*W/5; % in 1280, it's 384
 rb = 3.5*W/5; % in 1280, it's 896 rb-lb = 512
 
+% For bigger rating scale
+lb1 = 1*W/20; % 
+rb1 = 19*W/20; % 
+
 % rating scale upper and bottom bounds
 tb = H/5+100;           % in 800, it's 310
 bb = H/2+100;           % in 800, it's 450, bb-tb = 340
@@ -86,7 +91,7 @@ anchor_yd = bb+20; % 710
 
 % y location for anchors of rating scales -
 anchor_y = H/2+10+scale_H;
-% anchor_lms = [0.1000 0.2881 0.5966 0.9000] % adjusted for SEMIC
+% anchor_semic = [0.1000 0.2881 0.5966 0.9000] % adjusted for SEMIC
 % anchor_lms = [0.014 0.061 0.172 0.354 0.533].*(rb-lb)+lb; for VAS
 
 %% SETUP: Parameter
@@ -98,8 +103,11 @@ rating_type = 'semicircular';
 % save?
 save(reg.datafile,'reg','init_stim');
 %% 
-cir_center = [(rb+lb)/2, bb];
-radius = (rb-lb)/2; % radius
+% cir_center = [(rb+lb)/2, bb];
+% radius = (rb-lb)/2; % radius
+cir_center = [(5*W/20+15*W/20)/2, H*3/4+100];
+radius = (15*W/20-5*W/20)/2;
+
 deg = 180-normrnd(0.5, 0.1, 20, 1)*180; % convert 0-1 values to 0-180 degree
 deg(deg > 180) = 180;
 deg(deg < 0) = 0;
@@ -174,14 +182,14 @@ try
         while GetSecs - moving_start_timestamp < 5
             while ~ready
                 [x,y,button] = GetMouse(theWindow);
-                draw_scale('overall_motor_semicircular');
+                draw_scale('overall_predict_semicircular');
                 Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  % Cursor
                 % if the point goes further than the semi-circle, move the point to
                 % the closest point
-                radius = (rb-lb)/2; % radius
+                radius = (15*W/20-5*W/20)/2;%radius = (rb-lb)/2; % radius                
                 theta = atan2(cir_center(2)-y,x-cir_center(1));
-                if y > bb
-                    y = bb;
+                if y > cir_center(2) %bb
+                    y = cir_center(2);
                     SetMouse(x,y);
                 end
                 % send to arc of semi-circle
@@ -194,7 +202,7 @@ try
                 
                 if button(1)
                     button_click_timestamp=GetSecs; %
-                    draw_scale('overall_motor_semicircular');
+                    draw_scale('overall_predict_semicircular');
                     Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
                     Screen('Flip',theWindow);
                     WaitSecs(.5);
@@ -230,6 +238,9 @@ try
         end
         
         % 1. Display where the skin site stimulates (1-6)
+        main(ip,port,1,current_stim); % Select the program 
+        WaitSecs(0.5);
+        main(ip,port,2,current_stim); % Pre-start
         msg = strcat('다음 위치의 thermode를 이동하신 후 SPACE 키를 누르십시오 :  ', num2str(reg.skin_site(i)));
         while (1)
             [~,~,keyCode] = KbCheck;
@@ -249,23 +260,28 @@ try
         
         % 3. Stimulation
         start_while=GetSecs;
+        ready=0;
         while GetSecs - start_while < 10 % same as the test,
-            resp = main(ip,port,0); % get system status
-            systemState = resp{4}; testState = resp{5};
-            if strcmp(systemState, 'Pathway State: READY') && strcmp(testState,'Test State: IDLE')
-                Screen('Flip',theWindow); % for a blank screen 
-                main(ip,port,1,current_stim); %trigerring heat-pain % About 0.5~0.6 sec
-                start_stim=GetSecs;
-                waitsec_fromstarttime(start_stim,10);
-                break;
-            else
-                %do nothing
-            end
+               if ~ready
+                   main(ip,port,2); % start thermal pain
+                   ready=1;
+               end               
+%             resp = main(ip,port,0); % get system status
+%             systemState = resp{4}; testState = resp{5};
+%             if strcmp(systemState, 'Pathway State: READY') && strcmp(testState,'Test State: IDLE')
+%                 Screen('Flip',theWindow); % for a blank screen 
+%                 main(ip,port,1,current_stim); %trigerring heat-pain % About 0.5~0.6 sec
+%                 start_stim=GetSecs;
+%                 waitsec_fromstarttime(start_stim,10);
+%                 break;
+%             else
+%                 %do nothing
+%             end
         end
         
         % 4. Ratings
         start_ratings=GetSecs;
-        cir_center = [(rb+lb)/2, bb];
+        %cir_center = [(rb+lb)/2, bb];
         SetMouse(cir_center(1), cir_center(2));
         while GetSecs - start_ratings < 10 % Under 10 seconds,
             [x,y,button] = GetMouse(theWindow);
@@ -274,10 +290,10 @@ try
             
             % if the point goes further than the semi-circle, move the
             % point to the closest point
-            radius = (rb-lb)/2; % radius
+            radius = (15*W/20-5*W/20)/2; %radius = (rb-lb)/2; % radius
             theta = atan2(cir_center(2)-y,x-cir_center(1));
-            if y > bb
-                y = bb;
+            if y > cir_center(2) %bb
+                y = cir_center(2);
                 SetMouse(x,y);
             end
             % send to arc of semi-circle
@@ -287,19 +303,19 @@ try
                 SetMouse(x,y);
             end
             
-            draw_scale('overall_avoidance_semicircular');
+            draw_scale('ooverall_predict_semicircular');
             
             %For draw theta text on 'theWindow' screen
             % theta = num2str(theta); DrawFormattedText(theWindow, theta,
             % 'center', 'center', white, [], [], [], 1.2);
-            disp(theta);
-            disp(i);
-            disp(current_stim);
+%             disp(theta);
+%             disp(i);
+%             disp(current_stim);
             Screen('Flip',theWindow);
             
             % Feedback
             if button(1)
-                draw_scale('overall_avoidance_semicircular');
+                draw_scale('overall_predict_semicircular');
                 Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
                 Screen('Flip',theWindow);
                 WaitSecs(1);
@@ -345,6 +361,7 @@ try
     
     % disp(best skin site)
     disp(reg.studySkinSite);
+    
 catch err
     % ERROR
     disp(err);

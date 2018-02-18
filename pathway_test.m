@@ -21,7 +21,7 @@ switch type
             WaitSecs(0.5);
             disp('Ready to start');
             main(ip, port, 2);
-            WaitSecs(1);
+            WaitSecs(1.5);
             disp('Start');
             main(ip, port, 2);
             WaitSecs(0.5);
@@ -39,9 +39,14 @@ switch type
             end
             disp('Please wait a second');
             main(ip, port, 1, degree);
+            WaitSecs(0.5);
+            clc;
+            
             disp('Ready to start');
             main(ip, port, 2);
-            WaitSecs(1);
+            WaitSecs(1.5);
+            
+            clc;
             disp('Start');
             main(ip, port, 2);
             WaitSecs(0.5);

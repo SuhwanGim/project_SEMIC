@@ -25,11 +25,12 @@ function responseStr = main(hostName, portNum, commandId, parameter)
     % Send message (command) and read message (response)
     [STATUS,readBuffer,readBytes] = client(hostName, portNum,outBuffer,outLength);
 
-    % Format response and display in command Window
-    if STATUS == 0 
-        responseStr = 'Error has occured, message not recieved';
-    else 
-        responseStr = formatresponse(readBuffer,readBytes);
-    end
-    celldisp(responseStr);
+%     % Format response and display in command Window
+%     if STATUS == 0 
+%         responseStr = 'Error has occured, message not recieved';
+%     else 
+%         responseStr = formatresponse(readBuffer,readBytes);
+%     end
+    responseStr=double('½È¾î');
+%    celldisp(responseStr);
 end

@@ -58,7 +58,7 @@ savedir = 'Main_SEMIC_data';
 [fname,start_trial, SID] = subjectinfo_check_SEMIC(savedir,runNbr,'Main'); % subfunction %start_trial
 if exist(fname, 'file'), load(fname, 'data'); load(fname,'ts'); end
 % save data using the canlab_dataset object
-data.version = 'SEMIC_v1_02-12-2018_Cocoanlab';
+data.version = 'SEMIC_v1_02-14-2018_Cocoanlab';
 data.subject = SID;
 data.datafile = fname;
 data.starttime = datestr(clock, 0); % date-time
@@ -101,8 +101,8 @@ if start_trial==1
         stim_level = ["LV1"; "LV2"; "LV3"; "LV4";"LV1"; "LV2"; "LV3"; "LV4";"LV2"; "LV3"; "LV4";"LV5";"LV2"; "LV3"; "LV4";"LV5";"LV1";"LV2";"LV2";"LV3";"LV3";"LV4";"LV4";"LV5"]; % A group of [low cue,High cue]x2
         program = [stim_degree(1:4);stim_degree(1:4);stim_degree(2:5);stim_degree(2:5);stim_degree(1);stim_degree(2:4);stim_degree(2:4);stim_degree(5)]; % A group of [low cue,High cue]x2
         cue_settings = ["LOW";"LOW";"LOW";"LOW";"LOW";"LOW";"LOW";"LOW";"HIGH";"HIGH";"HIGH";"HIGH";"HIGH";"HIGH";"HIGH";"HIGH";"NO";"NO";"NO";"NO";"NO";"NO";"NO";"NO";];
-        %cue_mean = [0.22; 0.22; 0.22;0.22;0.22; 0.22; 0.22;0.22; 0.77; 0.77; 0.77; 0.77; 0.77; 0.77; 0.77; 0.77; 99;99;99;99;99;99;99;99;]; % (LOWx4 HIGHx4) x 2 = 16 trials
-        cue_mean = [0.22; 0.22; 0.22;0.22;0.22; 0.22; 0.22;0.22; 0.77; 0.77; 0.77; 0.77; 0.77; 0.77; 0.77; 0.77; 0.99;0.99;0.99;0.99;0.99;0.99;0.99;0.99;]; % (LOWx4 HIGHx4) x 2 = 16 trials
+        cue_mean = [0.22; 0.22; 0.22;0.22;0.22; 0.22; 0.22;0.22; 0.77; 0.77; 0.77; 0.77; 0.77; 0.77; 0.77; 0.77; 99;99;99;99;99;99;99;99;]; % (LOWx4 HIGHx4) x 2 = 16 trials
+        %cue_mean = [99;99;99;99;99;99;99;99; 99;99;99;99;99;99;99;99; 99;99;99;99;99;99;99;99]; % (LOWx4 HIGHx4) x 2 = 16 trials
         cue_var = abs(repmat(0.05,24,1) + randn(24,1).*0.003); %
         %randomizaiton
         rn = randperm(24);
@@ -113,8 +113,7 @@ if start_trial==1
         cue_var = cue_var(rn);
     end
     % ITI-Delay1-Delay2 combination
-    %:In this task, the combination from 17th to 20th will not use.
-    bin = [3, 5, 7; 3, 6, 6; 4, 4, 7; 4, 5, 6; 5, 5, 5]-0.5;
+    bin = [3, 5, 7; 3, 6, 6; 4, 4, 7; 4, 5, 6; 5, 5, 5];%-0.5;
     for i=1:length(bin)
         rng('shuffle');
         rn=randperm(3);
@@ -128,7 +127,7 @@ if start_trial==1
     Delay = ITI_Delay(:,2);
     Delay2 = ITI_Delay(:,3);
     % Overall_ratings Question randomization
-    overall_unpl_Q_txt= repmat({'다른 사람들은 이 자극을 얼마나 아파했을 것 같나요?'; '방금 경험한 자극이 얼마나 아팠나요? '},12,1);
+    overall_unpl_Q_txt= repmat({'다른 사람들은 얼마나 아팠을까요?'; '얼마나 아팠나요?'},12,1);
     overall_unpl_Q_cond = repmat({'other_painful';'self_painful'},12,1);
     rn=randperm(numel(overall_unpl_Q_txt));
     overall_unpl_Q_txt = overall_unpl_Q_txt(rn);
@@ -148,7 +147,7 @@ Screen('Clear');
 Screen('CloseAll');
 window_num = 0;
 if testmode
-    window_rect = [1 1 800 640]; % in the test mode, use a little smaller screen
+    window_rect = [1 1 1280 720]; % in the test mode, use a little smaller screen [but, wide resoultions]
     %window_rect = [0 0 1900 1200];
     fontsize = 20;
 else
@@ -178,8 +177,8 @@ lb = 1.5*W/5; % in 1280, it's 384
 rb = 3.5*W/5; % in 1280, it's 896 rb-lb = 512
 
 % For bigger rating scale
-lb1 = 1*W/50; % 
-rb1 = 49*W/50; % 
+lb1 = 1*W/20; % 
+rb1 = 19*W/20; % 
 
 % rating scale upper and bottom bounds
 tb = H/5+100;           % in 800, it's 310
@@ -292,6 +291,7 @@ try
             Screen('Flip', theWindow);
             %-------------Ready------------------
             main(ip,port,1,program(j)); %select the program
+            WaitSecs(0.2);
             main(ip,port,2); %ready to pre-start
             
             waitsec_fromstarttime(TrSt_t, ITI(j) + 2); % 2 seconds
@@ -340,9 +340,9 @@ try
                     y = cir_center(2)-radius*sin(theta);
                     SetMouse(x,y);
                 end
-                msg = '이번 자극이 얼마나 아플 것이라고 예상하시나요?';
+                msg = '이번 자극이 최대 얼마나 아플까요?';
                 msg = double(msg);
-                DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 1.2);
+                DrawFormattedText(theWindow, msg, 'center', 150, orange, [], [], [], 2);
                 draw_scale('cont_predict_semicircular');
                 Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
                 Screen('Flip', theWindow);
@@ -356,11 +356,7 @@ try
                         data.dat{runNbr}{trial_Number(j)}.duration_heat_trigger = toc;
                         data.dat{runNbr}{trial_Number(j)}.heat_start_timestamp = GetSecs; % heat-stimulus time stamp
                         ready3=1;
-                    else
-                        %do nothing
                     end
-                else
-                    %do nothing
                 end
                 
                 % Saving data
@@ -376,7 +372,7 @@ try
             data.dat{runNbr}{trial_Number(j)}.Delay2_end_timestamp_end = GetSecs;
             
             %6. Overall ratings
-            cir_center = [(rb+lb)/2, bb];
+            cir_center = [(5*W/20+15*W/20)/2, H*3/4+100];
             SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
             rec_i = 0;
             ready2=0;
@@ -387,7 +383,8 @@ try
                 rec_i= rec_i+1;
                 % if the point goes further than the semi-circle, move the point to
                 % the closest point
-                radius = (rb-lb)/2; % radius
+                % radius = (rb-lb)/2; % radius
+                radius = (15*W/20-5*W/20)/2;
                 theta = atan2(cir_center(2)-y,x-cir_center(1));
                 % current euclidean distance
                 curr_r = sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2);
@@ -395,8 +392,8 @@ try
                 curr_theta = rad2deg(-theta+pi);
                 % For control a mouse cursor:
                 % send to diameter of semi-circle
-                if y > bb
-                    y = bb;
+                if y > cir_center(2)
+                    y = cir_center(2);
                     SetMouse(x,y);
                 end
                 % send to arc of semi-circle
@@ -406,8 +403,8 @@ try
                     SetMouse(x,y);
                 end
                 msg = double(overall_unpl_Q_txt{j});
-                DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 1.2);
-                draw_scale('overall_avoidance_semicircular')
+                DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 2);
+                draw_scale('overall_predict_semicircular')
                 Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
                 Screen('Flip', theWindow);
                 
@@ -420,7 +417,7 @@ try
                 
                 
                 if button(1)
-                    draw_scale('overall_avoidance_semicircular');
+                    draw_scale('overall_predict_semicircular');
                     Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
                     Screen('Flip',theWindow);
                     WaitSecs(0.5);
@@ -456,8 +453,8 @@ try
             Screen('Flip', theWindow);
             %-------------Ready for themal------------------
             main(ip,port,1,program(j)); %select the program
+            WaitSecs(0.2);
             main(ip,port,2); %ready to pre-start
-            
             waitsec_fromstarttime(TrSt_t, ITI(j));
             
             % fixPoint(TrSt_t, ITI(j), white, '+') % ITI
@@ -499,9 +496,9 @@ try
                     y = cir_center(2)-radius*sin(theta);
                     SetMouse(x,y);
                 end
-                msg = '이번 자극이 얼마나 아플 것이라고 예상하시나요?';
+                msg = '이번 자극이 최대 얼마나 아플까요?';
                 msg = double(msg);
-                DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 1.2);
+                DrawFormattedText(theWindow, msg, 'center', 150, orange, [], [], [], 2);
                 draw_scale('cont_predict_semicircular');
                 Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
                 Screen('Flip', theWindow);
@@ -535,7 +532,7 @@ try
             data.dat{runNbr}{trial_Number(j)}.Delay2_end_timestamp_end = GetSecs;
             
             %6. Overall ratings
-            cir_center = [(rb+lb)/2, bb];
+            cir_center = [(5*W/20+15*W/20)/2, H*3/4+100];
             SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
             rec_i = 0;
             ready2=0;
@@ -546,7 +543,8 @@ try
                 rec_i= rec_i+1;
                 % if the point goes further than the semi-circle, move the point to
                 % the closest point
-                radius = (rb-lb)/2; % radius
+                % radius = (rb-lb)/2; % radius
+                radius = (15*W/20-5*W/20)/2;
                 theta = atan2(cir_center(2)-y,x-cir_center(1));
                 % current euclidean distance
                 curr_r = sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2);
@@ -554,8 +552,8 @@ try
                 curr_theta = rad2deg(-theta+pi);
                 % For control a mouse cursor:
                 % send to diameter of semi-circle
-                if y > bb
-                    y = bb;
+                if y > cir_center(2)
+                    y = cir_center(2);
                     SetMouse(x,y);
                 end
                 % send to arc of semi-circle
@@ -565,8 +563,8 @@ try
                     SetMouse(x,y);
                 end
                 msg = double(overall_unpl_Q_txt{j});
-                DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 1.2);
-                draw_scale('overall_avoidance_semicircular')
+                DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 2);
+                draw_scale('overall_predict_semicircular')
                 Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
                 Screen('Flip', theWindow);
                 
@@ -579,7 +577,7 @@ try
                 
                 
                 if button(1)
-                    draw_scale('overall_avoidance_semicircular');
+                    draw_scale('overall_predict_semicircular');
                     Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
                     Screen('Flip',theWindow);
                     WaitSecs(0.5);
@@ -614,13 +612,16 @@ try
         % waitsec_fromstarttime(end_trial, 1); % For your rest,
     end
     data.run_endtime_timestamp{runNbr}=GetSecs;
+    save(data.datafile, '-append', 'data');
     
     %closing messege
-    while GetSecs - data.endtime_timestamp < 10
+    while GetSecs - data.run_endtime_timestamp{runNbr} < 10
         if runNbr==6
             display_expmessage('모든 실험이 종료되었습니다\n잠시만 기다려주세요')
+            WaitSecs(10);
         else
             display_expmessage('잠시만 기다려주세요.')
+            WaitSecs(10);
         end
     end
     
@@ -628,7 +629,6 @@ try
     Screen('Clear');
     Screen('CloseAll');
     disp('Done');
-    save(data.datafile, '-append', 'data');
     
 catch err
     % ERROR

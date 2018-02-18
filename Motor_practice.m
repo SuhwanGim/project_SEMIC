@@ -1,4 +1,4 @@
-function Motor_practice(varargin)
+function Motor_practice(runNbr,varargin)
 
 %%INOFMRATION
 %
@@ -45,14 +45,15 @@ end
 global theWindow W H; % window property
 global white red orange bgcolor yellow; % color
 global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
+global lb1 rb1; % For larger semi-circular
 global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
 %%
 addpath(genpath(pwd));
 %% SETUP: DATA and Subject INFO
 savedir = 'MOTOR_SEMIC_data';
-[fname,~ , SID] = subjectinfo_check_SEMIC(savedir,1,'Mot'); % subfunction %start_trial
+[fname,~ , SID] = subjectinfo_check_SEMIC(savedir,runNbr,'Mot'); % subfunction %start_trial
 % save data using the canlab_dataset object
-mot.version = 'SEMIC_Motor_task_v1_22-01-2018_Cocoanlab';
+mot.version = 'SEMIC_Motor_task_v1_17-02-2018_Cocoanlab';
 mot.subject = SID;
 mot.datafile = fname;
 mot.starttime = datestr(clock, 0); % date-time
@@ -90,6 +91,10 @@ yellow = [255 220 0];
 lb = 1.5*W/5; % in 1280, it's 384
 rb = 3.5*W/5; % in 1280, it's 896 rb-lb = 512
 
+% For bigger rating scale
+lb1 = 1*W/20; % 
+rb1 = 19*W/20; % 
+
 % rating scale upper and bottom bounds
 tb = H/5+100;           % in 800, it's 310
 bb = H/2+100;           % in 800, it's 450, bb-tb = 340
@@ -106,8 +111,10 @@ anchor_y = H/2+10+scale_H;
 
 %% SETUP: SCREEN
 
-cir_center = [(rb+lb)/2, bb];
-radius = (rb-lb)/2; % radius
+% cir_center = [(rb+lb)/2, bb];
+% radius = (rb-lb)/2; % radius
+cir_center = [(5*W/20+15*W/20)/2, H*3/4+100];
+radius = (15*W/20-5*W/20)/2; %%radius = (rb-lb)/2; % radius
 
 deg = 180/7.*randi(6,21,1) + randn(21,1)*10; %divided by seven and add jitter number
 rn = randperm(21);
@@ -133,7 +140,6 @@ Screen('TextFont', theWindow, font); % setting font
 Screen('TextSize', theWindow, fontsize);
 %% TASK
 try
-    mot.task_start_timestamp=GetSecs; % trial_star_timestamp
     % 0. Instruction
     while (1)
         [~,~,keyCode] = KbCheck;
@@ -168,11 +174,11 @@ try
     if dofmri
         % gap between 5 key push and the first stimuli (disdaqs: data.disdaq_sec)
         % 4 seconds: "占쏙옙占쏙옙占쌌니댐옙..."
-        mot.dat{1}{1}.runscan_starttime = GetSecs;
+        mot.dat{runNbr}{1}.runscan_starttime = GetSecs;
         Screen(theWindow, 'FillRect', bgcolor, window_rect);
         DrawFormattedText(theWindow, double('시작합니다...'), 'center', 'center', white, [], [], [], 1.2);
         Screen('Flip', theWindow);
-        waitsec_fromstarttime(mot.dat{1}{1}.runscan_starttime,4);
+        waitsec_fromstarttime(mot.dat{runNbr}{1}.runscan_starttime,4);
         
         % 4 seconds: Blank
         fmri_t2 = GetSecs;
@@ -183,7 +189,7 @@ try
     
     if USE_BIOPAC
         bio_t = GetSecs;
-        mot.dat.biopac_triggertime = bio_t; %BIOPAC timestamp
+        mot.dat.biopac_triggertime{runNbr}{1} = bio_t; %BIOPAC timestamp
         BIOPAC_trigger(ljHandle, biopac_channel, 'on');
         Screen(theWindow,'FillRect',bgcolor, window_rect);
         Screen('Flip', theWindow);
@@ -195,81 +201,92 @@ try
         BIOPAC_trigger(ljHandle, biopac_channel, 'off');
     end
     
-    
+    mot.task_start_timestamp{runNbr}=GetSecs; % trial_star_timestamp
     % -------------------------TRIAL START---------------------------------
     for i=1:numel(xx)
-        mot.dat{1}{i}.ts_timestamp=GetSecs; % trial_start_timestamp
+        TrSt_t = GetSecs;
+        mot.dat{runNbr}{i}.ts_timestamp=TrSt_t; % trial_start_timestamp
         % 1. Fixation point
-        fixPoint(ISI(i), white, stimText);
+        fixPoint(TrSt_t, ISI(i), white, stimText);
+        mot.dat{runNbr}{i}.fix_end_timestamp = GetSecs; % 2 timestamp
         % 2. Moving dot part
         ready = 0;
-        rec_i = 0;
-        
-        mot.dat{1}{i}.move_start_timestamp = GetSecs; % 2 timestamp
+        rec_i = 0;        
+        %SetMouse(cir_center(1), cir_center(2)); % set mouse at the center       
+        cir_center = [(5*W/20+15*W/20)/2, H*3/4+100];
         SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
-        while GetSecs - mot.dat{1}{i}.move_start_timestamp < 5
-            while ~ready
+        %
+        start_while = GetSecs;
+        mot.dat{runNbr}{i}.while_start_timestamp = start_while;
+        while GetSecs - TrSt_t < 5 + ISI(i) 
                 [x,y,button] = GetMouse(theWindow);
-                rec_i= rec_i+1;
+                rec_i= rec_i+1; 
                 
-                draw_scale('overall_motor_semicircular');
+                draw_scale('overall_predict_semicircular')
                 Screen('DrawDots', theWindow, [xx(i) yy(i)]', 20, white, [0 0], 1);  % draw random dot in SemiC
                 Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  % Cursor
                 % if the point goes further than the semi-circle, move the point to
                 % the closest point
-                radius = (rb-lb)/2; % radius
+                radius = (15*W/20-5*W/20)/2; %%radius = (rb-lb)/2; % radius
                 theta = atan2(cir_center(2)-y,x-cir_center(1));
                 % current euclidean distance
                 curr_r = sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2);
                 % current angle (0 - 180 deg)
                 curr_theta = rad2deg(-theta+pi);
-                if y > bb
-                    y = bb;
+                if y > cir_center(2)
+                    y = cir_center(2);
                     SetMouse(x,y);
                 end
+%                 if y > bb
+%                     y = bb;
+%                     SetMouse(x,y);
+%                 end
                 % send to arc of semi-circle
                 if sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2) > radius
                     x = radius*cos(theta)+cir_center(1);
                     y = cir_center(2)-radius*sin(theta);
                     SetMouse(x,y);
                 end
+                draw_scale('overall_predict_semicircular')
+                Screen('DrawDots', theWindow, [xx(i) yy(i)]', 20, white, [0 0], 1);  % draw random dot in SemiC
+                Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  % Cursor
                 Screen('Flip',theWindow);
                 
                 
-                mot.dat{1}{i}.time_fromstart(rec_i,1) = GetSecs - mot.dat{1}{i}.move_start_timestamp;
-                mot.dat{1}{i}.xy(rec_i,:) = [x-cir_center(1) cir_center(2)-y]./radius;
-                mot.dat{1}{i}.clicks(rec_i,:) = button;
-                mot.dat{1}{i}.r_theta(rec_i,:) = [curr_r/radius curr_theta/180]; %radius and degree?
+                mot.dat{runNbr}{i}.time_fromstart(rec_i,1) = GetSecs - start_while;
+                mot.dat{runNbr}{i}.xy(rec_i,:) = [x-cir_center(1) cir_center(2)-y]./radius;
+                mot.dat{runNbr}{i}.clicks(rec_i,:) = button;
+                mot.dat{runNbr}{i}.r_theta(rec_i,:) = [curr_r/radius curr_theta/180]; %radius and degree?
                 
                 if button(1)
-                    mot.dat{1}{i}.button_click_timestamp=GetSecs; %
-                    mot.dat{1}{i}.button_click_bool=1; % 1 = Click, 0 = not click
-                    draw_scale('overall_motor_semicircular');
+                    mot.dat{runNbr}{i}.button_click_timestamp=GetSecs; %
+                    mot.dat{runNbr}{i}.button_click_bool=1; % 1 = Click, 0 = not click
+                    draw_scale('overall_predict_semicircular')
                     Screen('DrawDots', theWindow, [xx(i) yy(i)]', 20, white, [0 0], 1);  % draw random dot in SemiC
                     Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
                     Screen('Flip',theWindow);
                     WaitSecs(.1);
-                    ready = 1;
                     break;
-                elseif GetSecs - mot.dat{1}{i}.move_start_timestamp  > 5
-                    mot.dat{1}{i}.move_end_timestamp = GetSecs;
-                    mot.dat{1}{i}.button_click_bool=0; 
-                    ready = 1;
-                    break;
+                elseif GetSecs - TrSt_t < 5 + ISI(i) 
+                    mot.dat{runNbr}{i}.move_end_timestamp = GetSecs;
+                    mot.dat{runNbr}{i}.button_click_bool=0; 
                 else
                     %do nothing
                 end
-            end
-            fixPoint(0, white, '');
-            Screen('Flip', theWindow);
         end
-        mot.dat{1}{i}.trial_end_timestamp=GetSecs; % trial_star_timestamp
+        while GetSecs - TrSt_t < 5 + ISI(i)
+            if button(1)
+                Screen('Flip',theWindow);
+            end
+        end
+        mot.dat{runNbr}{i}.trial_end_timestamp=GetSecs; % trial_star_timestamp
+        mot.dat{runNbr}{i}.ISI = ISI(i);
         if mod(i,2) == 0, save(mot.datafile, '-append', 'mot'); end % save data every two trials
     end
-    mot.task_end_timestamp=GetSecs;
+    mot.task_end_timestamp{runNbr}=GetSecs;
     save(mot.datafile, '-append', 'mot');
     % closing messages
-    display_expmessage('지금까지 조이스틱 연습을 하였습니다. 연구자의 안내를 기다려 주세요.');
+    display_expmessage('조이스틱 연습이 끝났습니다. 연구자의 안내를 기다려 주세요.');
     WaitSecs(5);
     
     % Close the screen 
@@ -287,14 +304,13 @@ catch err
 end
 end
 
-function fixPoint(seconds, color, stimText)
-global theWindow white red;
+function fixPoint(t_time, seconds, color, stimText)
+global theWindow;
 % stimText = '+';
 % Screen(theWindow,'FillRect', bgcolor, window_rect);
-start_fix = GetSecs; % Start_time_of_Fixation_Stimulus
 DrawFormattedText(theWindow, double(stimText), 'center', 'center', color, [], [], [], 1.2);
 Screen('Flip', theWindow);
-waitsec_fromstarttime(start_fix, seconds);
+waitsec_fromstarttime(t_time, seconds);
 end
 
 function display_runmessage(run_i, run_num, dofmri)

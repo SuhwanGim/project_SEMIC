@@ -19,9 +19,8 @@ function [STATUS, readMessage, readBytes] = client(host, port,writeMessage,nByte
 % (Copyright (c) 2009, Rodney Thomson, All rights reserved)
 % Last updated:
 % March, 25th, 2014
-
 %---------------------------------------------------------------------
-% https://kr.mathworks.com/matlabcentral/fileexchange/21131-tcp-ip-socket-communications-in-matlab?focused=5103244&tab=function
+
     import java.net.Socket
     import java.io.*
 
@@ -74,18 +73,15 @@ function [STATUS, readMessage, readBytes] = client(host, port,writeMessage,nByte
         input_stream   = client_socket.getInputStream;
         d_input_stream = DataInputStream(input_stream);
 
-%         % read data from the socket - wait a short time first
-%         pause(0.5);
-%         readBytes = input_stream.available;
-%         readMessage = zeros(1,readBytes);
-%         fprintf(1, 'Reading %d bytes\n', readBytes); 
-%         for i = 1:readBytes
-%             readMessage(i) = d_input_stream.readUnsignedByte;
-%         end
-%         fprintf(1, 'Message recieved\n'); 
-
-        readBytes = 'Skip this bytes';
-        readMessage ='Skip this messages';
+        % read data from the socket - wait a short time first
+        pause(0.5);
+        readBytes = input_stream.available;
+        readMessage = zeros(1,readBytes);
+        fprintf(1, 'Reading %d bytes\n', readBytes); 
+        for i = 1:readBytes
+            readMessage(i) = d_input_stream.readUnsignedByte;
+        end
+        fprintf(1, 'Message recieved\n'); 
         % clean up
         client_socket.close;
         STATUS = 1;
