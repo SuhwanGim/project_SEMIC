@@ -80,7 +80,7 @@ PathPrg = load_PathProgram('SEMIC');
 if start_trial==1
     rng('shuffle');
     % Number of trial
-    trial_Number=(1:24)'; % and transpose % 4 (stim level) x 2 (two cues) x 2 (two overall questions) + 8(only pain trial:LV2,3,4 x 2 + LV1,5x1)
+    trial_Number=(1:18)'; % and transpose % 4 (stim level) x 2 (two cues) x 2 (two overall questions) + 8(only pain trial:LV2,3,4 x 2 + LV1,5x1)
     % Run number
     run_Number = repmat(runNbr,length(trial_Number),1);
     % Find the dec value
@@ -167,7 +167,7 @@ end
 W = window_rect(3); %width of screen
 H = window_rect(4); %height of screen
 
-% font = 'NanumBarunGothic';
+font = 'NanumBarunGothic';
 
 bgcolor = 80;
 white = 255;
@@ -290,12 +290,12 @@ try
             fixPoint(TrSt_t, ITI(j), white, '+') % ITI
             data.dat{runNbr}{trial_Number(j)}.ITI_endtimestamp = GetSecs;
             % 2. Cue
-            draw_scale('overall_avoidance_semicircular');
+            draw_scale('overall_predict_semicircular');
             [~ , data.dat{runNbr}{trial_Number(j)}.cue_theta] = draw_social_cue(cue_mean(j), cue_var(j), NumberOfCue, rating_type); % draw & save details: draw_socia_cue(m, std, n, rating_type)
             Screen('Flip', theWindow);
             %-------------Ready------------------
             main(ip,port,1,program(j)); %select the program
-            WaitSecs(0.2);
+            WaitSecs(0.5);
             main(ip,port,2); %ready to pre-start
             
             waitsec_fromstarttime(TrSt_t, ITI(j) + 2); % 2 seconds
@@ -452,15 +452,16 @@ try
             
         else
             %ONLY PAIN TRIAL          
-            % 1. ITI (jitter)
+            % 1. ITI (jitter) ( 3 - 7 )
             DrawFormattedText(theWindow, double('+'), 'center', 'center', white, [], [], [], 1.2);
             Screen('Flip', theWindow);
+%             if ITI(j)<=3, ITI(j)=ITI(j)+2;end
             %-------------Ready for themal------------------
+            WaitSecs(1.6);
             main(ip,port,1,program(j)); %select the program
-            WaitSecs(0.2);
+            WaitSecs(0.9);
             main(ip,port,2); %ready to pre-start
-            waitsec_fromstarttime(TrSt_t, ITI(j));
-            
+            waitsec_fromstarttime(TrSt_t, ITI(j));           
             % fixPoint(TrSt_t, ITI(j), white, '+') % ITI
             data.dat{runNbr}{trial_Number(j)}.ITI_endtimestamp = GetSecs;
             
@@ -470,7 +471,7 @@ try
             ready1=0;
             ready3=0;
             % set the mouse location to zero point
-                 %%cir_center = [(rb1+lb1)/2, bb];
+            %%cir_center = [(rb1+lb1)/2, bb];
             cir_center = [(lb1+rb1)/2 H*3/4+100];
             SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
             % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
@@ -610,7 +611,8 @@ try
             data.dat{runNbr}{trial_Number(j)}.ts = ts{1,1}(j,:);
             data.dat{runNbr}{trial_Number(j)}.end_trial_t = end_trial;
         end
-        
+        % send a stop program signal
+        %if end_trial - (data.dat{runNbr}{trial_Number(j)}.contRating_end_stamp_end + 1) < 10, main(ip,port,5); end
         % data.dat{runNbr}{trial_Number(j)}.ramp_up_cnd = ramp_up_con(j);
         if mod(trial_Number(j),2) == 0, save(data.datafile, '-append', 'data'); end % save data every two trials
         % waitsec_fromstarttime(end_trial, 1); % For your rest,

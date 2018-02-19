@@ -210,7 +210,7 @@ try
         fixPoint(TrSt_t, ISI(i), white, stimText);
         mot.dat{runNbr}{i}.fix_end_timestamp = GetSecs; % 2 timestamp
         % 2. Moving dot part
-        ready = 0;
+        %ready = 0;
         rec_i = 0;        
         %SetMouse(cir_center(1), cir_center(2)); % set mouse at the center       
         cir_center = [(5*W/20+15*W/20)/2, H*3/4+100];

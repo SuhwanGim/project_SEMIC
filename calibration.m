@@ -261,7 +261,8 @@ try
         % 3. Stimulation
         start_while=GetSecs;
         ready=0;
-        while GetSecs - start_while < 10 % same as the test,
+        while GetSecs - start_while < 12.5 % same as the test,
+            Screen('Flip', theWindow);
                if ~ready
                    main(ip,port,2); % start thermal pain
                    ready=1;
@@ -279,13 +280,19 @@ try
 %             end
         end
         
+        % Fixation
+        start_fix = GetSecs; % Start_time_of_Fixation_Stimulus
+        DrawFormattedText(theWindow, double(stimText), 'center', 'center', white , [], [], [], 1.2);
+        Screen('Flip', theWindow);
+        waitsec_fromstarttime(start_fix, 2);
+        
         % 4. Ratings
         start_ratings=GetSecs;
         %cir_center = [(rb+lb)/2, bb];
         SetMouse(cir_center(1), cir_center(2));
         while GetSecs - start_ratings < 10 % Under 10 seconds,
             [x,y,button] = GetMouse(theWindow);
-            draw_scale('overall_avoidance_semicircular');
+            draw_scale('overall_predict_semicircular');
             Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  %dif color
             
             % if the point goes further than the semi-circle, move the
@@ -302,8 +309,7 @@ try
                 y = cir_center(2)-radius*sin(theta);
                 SetMouse(x,y);
             end
-            
-            draw_scale('ooverall_predict_semicircular');
+           
             
             %For draw theta text on 'theWindow' screen
             % theta = num2str(theta); DrawFormattedText(theWindow, theta,

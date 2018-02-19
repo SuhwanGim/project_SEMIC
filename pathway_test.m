@@ -19,12 +19,19 @@ switch type
             disp('Please wait a second');
             main(ip, port, 1, 24);
             WaitSecs(0.5);
+            clc;
+            
             disp('Ready to start');
             main(ip, port, 2);
-            WaitSecs(1.5);
+            WaitSecs(2);
+            clc;
+            
             disp('Start');
             main(ip, port, 2);
             WaitSecs(0.5);
+            clc;
+            
+            disp('Done');
         end
     case 'MRI'
         if ~isempty(txt)
@@ -44,12 +51,14 @@ switch type
             
             disp('Ready to start');
             main(ip, port, 2);
-            WaitSecs(1.5);
-            
+            WaitSecs(2);
             clc;
+            
             disp('Start');
             main(ip, port, 2);
             WaitSecs(0.5);
+            clc;
+            disp('Done');
         end
 end
 
