@@ -202,7 +202,7 @@ anchor_y = H/2+10+scale_H;
 try
     theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
     Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
-    Screen('TextFont', theWindow, font); % setting font
+%     Screen('TextFont', theWindow, font); % setting font
     Screen('TextSize', theWindow, fontsize);
     % settings of ts
     if start_trial ~= 1

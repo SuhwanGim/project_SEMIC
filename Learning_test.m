@@ -180,7 +180,7 @@ anchor_y = H/2+10+scale_H;
 try
     theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
     Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
-    Screen('TextFont', theWindow, font); % setting font
+%     Screen('TextFont', theWindow, font); % setting font
     Screen('TextSize', theWindow, fontsize);
     % settings of ts
     if start_trial ~= 1
@@ -354,7 +354,8 @@ try
         data.dat{runNbr}{trial_Number(j)}.Delay2_end_timestamp_end = GetSecs;
         
         %6. Overall ratings
-        cir_center = [(rb+lb)/2, bb];
+        cir_center = [(rb1+lb1)/2 H*3/4+100];
+        % cir_center = [(rb+lb)/2, bb];
         SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
         rec_i = 0;
         sTime=GetSecs;
@@ -364,7 +365,7 @@ try
             rec_i= rec_i+1;
             % if the point goes further than the semi-circle, move the point to
             % the closest point
-            radius = (rb-lb)/2; % radius
+            radius = (rb1-lb1)/2;%radius = (rb-lb)/2; % radius
             theta = atan2(cir_center(2)-y,x-cir_center(1));
             % current euclidean distance
             curr_r = sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2);
@@ -372,8 +373,8 @@ try
             curr_theta = rad2deg(-theta+pi);
             % For control a mouse cursor:
             % send to diameter of semi-circle
-            if y > bb
-                y = bb;
+            if y > cir_center(2)%bb
+                y = cir_center(2);%bb;
                 SetMouse(x,y);
             end
             % send to arc of semi-circle

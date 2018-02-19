@@ -136,7 +136,7 @@ ISI = ISI(rn);
 theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
 Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
-Screen('TextFont', theWindow, font); % setting font
+% Screen('TextFont', theWindow, font); % setting font
 Screen('TextSize', theWindow, fontsize);
 %% TASK
 try
