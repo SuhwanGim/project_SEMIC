@@ -66,7 +66,9 @@ Screen('TextSize', theWindow, fontsize);
 xcenter = (lb1+rb1)/2;
 ycenter = H*3/4+100;
 
-cir_center = [(5*W/20+15*W/20)/2 H*3/4+100];
+cir_center = [(4*W/18+14*W/18)/2, H*3/4+100];
+radius = (14*W/18-4*W/18)/2;
+
 SetMouse(cir_center(1), cir_center(2));
 
 %% EXPERIEMENT START
@@ -101,7 +103,7 @@ while GetSecs - sTime < 10
         [x,y,button]=GetMouse(theWindow);
         % if the point goes further than the semi-circle, move the point to
         % the closest point
-        radius = (15*W/20-5*W/20)/2; %radius = (rb1-lb1)/2; % radius;
+        radius = (14*W/18-4*W/18)/2; %radius = (rb1-lb1)/2; % radius;
         theta = atan2(cir_center(2)-y,x-cir_center(1));
         % current euclidean distance
         curr_r = sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2);

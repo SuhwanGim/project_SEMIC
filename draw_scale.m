@@ -563,7 +563,7 @@ switch scale
         
         for j=start_step:((end_step/2) - skip_step)
             i=j-start_step+1; % 1 to (end_step-start_step)
-            lb_temp = j*W/end_step; rb_temp = (end_step-j)*W/end_step; %5*W/20, 15*W/20
+            lb_temp = j*W/end_step; rb_temp = (end_step-j)*W/end_step; %4*w/18, 14*W
             radius = (rb_temp-lb_temp)/2; % radius
             x_temp = reshape(repmat(linspace(lb_temp, rb_temp,1000),2,1),1,2000); x_temp([1 2000]) = [];
             y_temp = ycenter - sqrt(radius.^2 - (x_temp-xcenter).^2);

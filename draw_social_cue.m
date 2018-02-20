@@ -7,8 +7,9 @@ global lb1 rb1; % For larger semi-circular
 
 % cir_center = [(rb+lb)/2, bb]; previous version 
 %radius = (rb-lb)/2; % radius; also,
-cir_center = [(5*W/20+15*W/20)/2, H*3/4+100];
-radius = (15*W/20-5*W/20)/2;
+% Boundary for draw_scale('overall_predict_semicircular')
+cir_center = [(4*W/18+14*W/18)/2, H*3/4+100];
+radius = (14*W/18-4*W/18)/2;
 
 draw_scale(rating_type);
 
