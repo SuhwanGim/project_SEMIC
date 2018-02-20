@@ -126,17 +126,19 @@ while GetSecs - sTime < 10
         DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 1.5);
         
         
-        wdraw_scale('cont_predict_semicircular');
+        %draw_scale('cont_predict_semicircular');
         
-        %draw_scale('overall_predict_semicircular');
+        draw_scale('overall_predict_semicircular');
         
         
         Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
         Screen('Flip', theWindow);
         
         if button(1)
-            draw_scale('overall_predict_semicircular')
+            draw_scale('cont_predict_semicircular')
             Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
+            Screen('Flip', theWindow);
+            WaitSecs(2);
             break;
         end
         
