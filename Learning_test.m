@@ -187,11 +187,13 @@ try
 %     Screen('TextFont', theWindow, font); % setting font
     Screen('TextSize', theWindow, fontsize);
     % settings of ts
-    if start_trial ~= 1
-        k=start_trial;
-    else
-        k=1;
-    end
+    if start_trial ~= 1,    k=start_trial; else, k=1; end
+    % Explain grid-scale every run
+    exp_scale('predict');
+    
+    
+    
+    
     % START: RUN
     data.run_start_timestamp{runNbr}=GetSecs;
     % Loop of Trials
@@ -322,9 +324,9 @@ try
                 y = cir_center(2)-radius*sin(theta);
                 SetMouse(x,y);
             end
-            msg = '이번 자극이 얼마나 아플 것이라고 예상하시나요?';
-            msg = double(msg);
-            DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 1.2);
+%             msg = '이번 자극이 얼마나 아플 것이라고 예상하시나요?';
+%             msg = double(msg);
+%             DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 1.2);
             draw_scale('cont_predict_semicircular');
             Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
             Screen('Flip', theWindow);
@@ -388,6 +390,7 @@ try
                 SetMouse(x,y);
             end
             msg = double(overall_unpl_Q_txt{j});
+            Screen('TextSize', theWindow, 26);
             DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 1.2);
             draw_scale('overall_predict_semicircular')
             Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);

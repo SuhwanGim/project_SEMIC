@@ -98,7 +98,7 @@ if start_trial==1
     % variance]
     program = zeros(18,1);
     cue_mean = zeros(18,1);
-    while ~((numel(find(diff(program)==0))) < 2) && ~((numel(find(diff(cue_mean)==0))) < 2)
+    while ~((numel(find(diff(program)==0))) < 2) || ~((numel(find(diff(cue_mean)==0))) < 2)
         % A DESIGN within a one run divided three parts (1+2+3 = 18 trials)
         % 1) Only pain trials: [LV2, 3, 4] x 2 = 6 trials
         % 2) Self Q (overall questions): 2 (social cues: Low/High) x 4 (temp levels: LV 1  to 4 / LV2 to 5) = 8 trials
@@ -209,11 +209,12 @@ try
 %     Screen('TextFont', theWindow, font); % setting font
     Screen('TextSize', theWindow, fontsize);
     % settings of ts
-    if start_trial ~= 1
-        k=start_trial;
-    else
-        k=1;
-    end
+    if start_trial ~= 1,    k=start_trial; else, k=1; end
+    % Explain grid-scale every run
+    exp_scale('predict');
+    
+    
+    
     % START: RUN
     data.run_start_timestamp{runNbr}=GetSecs;
     % Loop of Trials
@@ -411,6 +412,7 @@ try
                     SetMouse(x,y);
                 end
                 msg = double(overall_unpl_Q_txt{j});
+                Screen('TextSize', theWindow, 26);
                 DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 2);
                 draw_scale('overall_predict_semicircular')
                 Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
@@ -428,7 +430,7 @@ try
                     draw_scale('overall_predict_semicircular');
                     Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
                     Screen('Flip',theWindow);
-                    WaitSecs(0.5);
+                    WaitSecs(min(0.5, 5-(GetSecs-sTime)));
                     ready3=0;
                     while ~ready3 %GetSecs - sTime> 5
                         msg = double(' ');
@@ -572,6 +574,7 @@ try
                     SetMouse(x,y);
                 end
                 msg = double(overall_unpl_Q_txt{j});
+                Screen('TextSize', theWindow, 26);
                 DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 2);
                 draw_scale('overall_predict_semicircular')
                 Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
@@ -589,7 +592,7 @@ try
                     draw_scale('overall_predict_semicircular');
                     Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
                     Screen('Flip',theWindow);
-                    WaitSecs(0.5);
+                    WaitSecs(min(0.5, 5-(GetSecs-sTime)));
                     ready3=0;
                     while ~ready3 %GetSecs - sTime> 5
                         msg = double(' ');

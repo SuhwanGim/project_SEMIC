@@ -231,7 +231,7 @@ try
                 Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  % Cursor
                 % if the point goes further than the semi-circle, move the point to
                 % the closest point
-                radius = (lb2-rb2)/2; %%radius = (rb-lb)/2; % radius
+                radius = (rb2-lb2)/2; %%radius = (rb-lb)/2; % radius
                 theta = atan2(cir_center(2)-y,x-cir_center(1));
                 % current euclidean distance
                 curr_r = sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2);

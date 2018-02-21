@@ -5,10 +5,9 @@ function exp_scale(scale)
 
 global theWindow W H; % window property
 global white red orange bgcolor; % color
-global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
+global window_rect lb rb tb bb scale_H; % rating scale
 global lb1 rb1 lb2 rb2;
-global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd anchor_lms anchor_lms_y anchor_lms_x; % anchors
-
+global fontsize;
 
  
 Screen(theWindow,'FillRect',bgcolor, window_rect);
@@ -16,21 +15,21 @@ Screen(theWindow,'FillRect',bgcolor, window_rect);
 
 switch scale
     case 'predict'
-        msg = double('이 척도가 화면에 나타나면\n "이번 자극이 최대 얼마나 아플까요?"에 대해 보고를 해 주시면 되겠습니다.');
+        msg = double('이 척도가 화면에 나타나면\n "이번 자극이 최대 얼마나 아플까요?"에 대해 보고를 해 주시면 되겠습니다.(Space)');
         % display
-        Screen('TextSize', theWindow, 28);
+        Screen('TextSize', theWindow, fontsize);
         DrawFormattedText(theWindow, msg, 'center', 1/5*H, white, [], [], [], 1);
         draw_scale('cont_predict_semicircular');
         Screen('Flip', theWindow);
         while (1)
             [~,~,keyCode] = KbCheck;
-            if keyCode(KbName('s'))==1
+            if keyCode(KbName('space'))==1
                 break
             elseif keyCode(KbName('q'))==1
                 abort_experiment;
             end
         end
-        Screen('TextSize', theWindow, 28);
+        Screen('TextSize', theWindow, fontsize);
         msg = double('그러면 지금부터 연습을 시작하겠습니다.\n 척도가 화면에 뜨면 바로 움직여 주세요.');
         DrawFormattedText(theWindow, msg, 'center', 'center', white, [], [], [], 1);
         Screen('Flip', theWindow);
