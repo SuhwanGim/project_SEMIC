@@ -243,8 +243,9 @@ try
         end
         
         % 1. Display where the skin site stimulates (1-6)
+        WaitSecs(1.5);
         main(ip,port,1,current_stim); % Select the program 
-        WaitSecs(0.5);
+        WaitSecs(1);
         main(ip,port,2,current_stim); % Pre-start
         msg = strcat('다음 위치의 thermode를 이동하신 후 SPACE 키를 누르십시오 :  ', num2str(reg.skin_site(i)));
         while (1)
@@ -331,6 +332,11 @@ try
                 Screen('Flip',theWindow);
                 WaitSecs(1);
                 break; % break for "if"
+            end
+        end
+        while GetSecs - start_ratings < 10
+            if button(1)
+                Screen('Flip',theWindow);
             end
         end
         

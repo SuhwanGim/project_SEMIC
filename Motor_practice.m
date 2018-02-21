@@ -45,7 +45,7 @@ end
 global theWindow W H; % window property
 global white red orange bgcolor yellow; % color
 global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
-global lb1 rb1; % For larger semi-circular
+global lb1 rb1 lb2 rb2;% For larger semi-circular
 global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
 %%
 addpath(genpath(pwd));
@@ -91,9 +91,13 @@ yellow = [255 220 0];
 lb = 1.5*W/5; % in 1280, it's 384
 rb = 3.5*W/5; % in 1280, it's 896 rb-lb = 512
 
-% For bigger rating scale
-lb1 = 1*W/20; % 
-rb1 = 19*W/20; % 
+% For cont rating scale 
+lb1 = 1*W/18; %
+rb1 = 17*W/18; %
+
+% For overall rating scale
+lb2 = 4*W/18; %
+rb2 = 14*W/18; %
 
 % rating scale upper and bottom bounds
 tb = H/5+100;           % in 800, it's 310
@@ -213,7 +217,7 @@ try
         %ready = 0;
         rec_i = 0;        
         %SetMouse(cir_center(1), cir_center(2)); % set mouse at the center       
-        cir_center = [(5*W/20+15*W/20)/2, H*3/4+100];
+        cir_center = [(lb2+rb2)/2, H*3/4+100];
         SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
         %
         start_while = GetSecs;
@@ -227,7 +231,7 @@ try
                 Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  % Cursor
                 % if the point goes further than the semi-circle, move the point to
                 % the closest point
-                radius = (15*W/20-5*W/20)/2; %%radius = (rb-lb)/2; % radius
+                radius = (lb2-rb2)/2; %%radius = (rb-lb)/2; % radius
                 theta = atan2(cir_center(2)-y,x-cir_center(1));
                 % current euclidean distance
                 curr_r = sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2);

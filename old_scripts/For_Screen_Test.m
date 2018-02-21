@@ -33,9 +33,13 @@ rb = 3.5*W/5; % in 1280, it's 896 rb-lb = 512
 
 % bigger rating scale
 % see draw_scale.m
-% 1*w/50, 49*W/50
-lb1 = 1*W/50; %
-rb1 = 49*W/50; %
+% For cont rating scale 
+lb1 = 1*W/18; %
+rb1 = 17*W/18; %
+
+% For overall rating scale
+lb2 = 4*W/18; %
+rb2 = 14*W/18; %s
 
 
 % rating scale upper and bottom bounds
@@ -74,9 +78,13 @@ SetMouse(cir_center(1), cir_center(2));
 %% EXPERIEMENT START
 sTime=GetSecs;
 rating_type = 'semicircular';
-%%
+
+%% Explain 
+exp_scale('predict')
+
+%%s
 draw_scale('overall_predict_semicircular');
-draw_social_cue(0.221111111     , 0.05, 25, rating_type); % draw & save details: draw_socia_cue(m, std, n, rating_type)
+draw_social_cue(0.22, 0.05, 25, rating_type); % draw & save details: draw_socia_cue(m, std, n, rating_type)
 Screen('Flip', theWindow);
 while (1)
     [~,~,keyCode] = KbCheck;

@@ -292,7 +292,7 @@ try
         % ycenter = H*3/4+100;
         
         % cir_center = [(lb1+rb1)/2 H*3/4+100];
-        cir_center = [(4*W/18+14*W/18)/2, H*3/4+100];
+        cir_center = [(lb1+rb1)/2, H*3/4+100];
         SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
         
         % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not

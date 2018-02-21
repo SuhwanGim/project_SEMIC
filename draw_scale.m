@@ -6,7 +6,7 @@ function draw_scale(scale)
 global theWindow W H; % window property
 global white red orange bgcolor; % color
 global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
-global lb1 rb1;
+global lb1 rb1 lb2 rb2;
 global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd anchor_lms anchor_lms_y anchor_lms_x; % anchors
 
 switch scale
@@ -532,7 +532,7 @@ switch scale
         end
         xy = [x; y];
         
-        Screen('TextSize', theWindow, 28); % fonsize for anchors
+        Screen('TextSize', theWindow, 24); % fonsize for anchors
         Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         anchor_W = Screen(theWindow,'DrawText', double('전혀'), 0, 0, bgcolor);
         anchor_W2 = Screen(theWindow,'DrawText', double('최대'), 0, 0, bgcolor);
@@ -573,7 +573,7 @@ switch scale
         end
         xy = [x; y];
         
-        Screen('TextSize', theWindow, 28); % fonsize for anchors
+        Screen('TextSize', theWindow, 24); % fonsize for anchors
         Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         anchor_W = Screen(theWindow,'DrawText', double('전혀'), 0, 0, bgcolor);
         anchor_W2 = Screen(theWindow,'DrawText', double('최대'), 0, 0, bgcolor);

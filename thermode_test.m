@@ -19,7 +19,7 @@ function data = thermode_test(runNbr, ip, port, reg, varargin)
 global theWindow W H; % window property
 global white red red_Alpha orange bgcolor yellow; % color
 global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
-global lb1 rb1; % For larger semi-circular
+global lb1 rb1 lb2 rb2;% For larger semi-circular
 global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
 
 %% Chekc ip/port
@@ -180,9 +180,13 @@ yellow = [255 220 0];
 lb = 1.5*W/5; % in 1280, it's 384
 rb = 3.5*W/5; % in 1280, it's 896 rb-lb = 512
 
-% For bigger rating scale
-lb1 = 1*W/20; % 
-rb1 = 19*W/20; % 
+% For cont rating scale 
+lb1 = 1*W/18; %
+rb1 = 17*W/18; %
+
+% For overall rating scale
+lb2 = 4*W/18; %
+rb2 = 14*W/18; %
 
 % rating scale upper and bottom bounds
 tb = H/5+100;           % in 800, it's 310
@@ -344,9 +348,9 @@ try
                     y = cir_center(2)-radius*sin(theta);
                     SetMouse(x,y);
                 end
-                msg = '이번 자극이 최대 얼마나 아플까요?';
-                msg = double(msg);
-                DrawFormattedText(theWindow, msg, 'center', 150, orange, [], [], [], 2);
+%                 msg = '이번 자극이 최대 얼마나 아플까요?';
+%                 msg = double(msg);
+%                 DrawFormattedText(theWindow, msg, 'center', 150, orange, [], [], [], 2);
                 draw_scale('cont_predict_semicircular');
                 Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
                 Screen('Flip', theWindow);
@@ -376,7 +380,7 @@ try
             data.dat{runNbr}{trial_Number(j)}.Delay2_end_timestamp_end = GetSecs;
             
             %6. Overall ratings
-            cir_center = [(5*W/20+15*W/20)/2, H*3/4+100];
+            cir_center = [(lb2+rb2)/2, H*3/4+100];
             SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
             rec_i = 0;
             ready2=0;
@@ -388,7 +392,7 @@ try
                 % if the point goes further than the semi-circle, move the point to
                 % the closest point
                 % radius = (rb-lb)/2; % radius
-                radius = (15*W/20-5*W/20)/2;
+                radius = (rb2-lb2)/2;
                 theta = atan2(cir_center(2)-y,x-cir_center(1));
                 % current euclidean distance
                 curr_r = sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2);
@@ -501,9 +505,9 @@ try
                     y = cir_center(2)-radius*sin(theta);
                     SetMouse(x,y);
                 end
-                msg = '이번 자극이 최대 얼마나 아플까요?';
-                msg = double(msg);
-                DrawFormattedText(theWindow, msg, 'center', 150, orange, [], [], [], 2);
+%                 msg = '이번 자극이 최대 얼마나 아플까요?';
+%                 msg = double(msg);
+%                 DrawFormattedText(theWindow, msg, 'center', 150, orange, [], [], [], 2);
                 draw_scale('cont_predict_semicircular');
                 Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
                 Screen('Flip', theWindow);
@@ -537,7 +541,7 @@ try
             data.dat{runNbr}{trial_Number(j)}.Delay2_end_timestamp_end = GetSecs;
             
             %6. Overall ratings
-            cir_center = [(5*W/20+15*W/20)/2, H*3/4+100];
+            cir_center = [(lb2+rb2)/2, H*3/4+100];
             SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
             rec_i = 0;
             ready2=0;
@@ -549,7 +553,7 @@ try
                 % if the point goes further than the semi-circle, move the point to
                 % the closest point
                 % radius = (rb-lb)/2; % radius
-                radius = (15*W/20-5*W/20)/2;
+                radius = (rb2-lb2)/2;
                 theta = atan2(cir_center(2)-y,x-cir_center(1));
                 % current euclidean distance
                 curr_r = sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2);
