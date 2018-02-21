@@ -133,6 +133,11 @@ if start_trial==1
     rn=randperm(size(ITI_Delay,1)); % length of vector
     ITI_Delay = ITI_Delay(rn,:);
     ITI_Delay = ITI_Delay(1:length(trial_Number),:);
+    
+    no_iti = repmat([5;7], 3, 1);
+    idx = randperm(6);
+    ITI_Delay(contains(cue_settings, 'NO'),:) = [no_iti(idx) NaN(6,1) 12-no_iti(idx)];
+    
     ITI = ITI_Delay(:,1);
     Delay = ITI_Delay(:,2);
     Delay2 = ITI_Delay(:,3);
