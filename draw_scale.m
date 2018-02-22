@@ -558,8 +558,8 @@ switch scale
         %       x = reshape(repmat(linspace(lb1,rb1,1000),2,1),1,2000); x([1 2000]) = [];
         %       xy = [x; bb - sqrt(radius.^2 - (x-xcenter).^2)];
         end_step = 18; %even number
-        skip_step = 5;
-        start_step = 4;
+        skip_step = 4;
+        start_step = 5;
         
         for j=start_step:((end_step/2) - skip_step)
             i=j-start_step+1; % 1 to (end_step-start_step)

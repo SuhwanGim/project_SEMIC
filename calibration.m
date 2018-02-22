@@ -166,16 +166,17 @@ Screen('TextSize', theWindow, fontsize);
 %: Motor_practice --> calibration
 try
     %PART0. Motor_practice (3-4 trials)
-    % 1. Instruction
-    while (1)
-        [~,~,keyCode] = KbCheck;
-        if keyCode(KbName('space'))==1
-            break
-        elseif keyCode(KbName('q'))==1
-            abort_man;
-        end
-        display_expmessage('지금부터 조이스틱 연습을 하겠습니다.\n 준비되었으면 SPACE BAR를 눌러주세요.'); % until space; see subfunctions
-    end
+    % 1. pathwaty test
+    pathway_test(ip, port, 'basic');
+%     while (1)
+%         [~,~,keyCode] = KbCheck;
+%         if keyCode(KbName('space'))==1
+%             break
+%         elseif keyCode(KbName('q'))==1
+%             abort_man;
+%         end
+%         display_expmessage('지금부터 조이스틱 연습을 하겠습니다.\n 준비되었으면 SPACE BAR를 눌러주세요.'); % until space; see subfunctions
+%     end
     % 2. Moving dot part
     for i=1:motorN % Four trials
         % -1.1. Fixation point

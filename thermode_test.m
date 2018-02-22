@@ -190,8 +190,8 @@ lb1 = 1*W/18; %
 rb1 = 17*W/18; %
 
 % For overall rating scale
-lb2 = 4*W/18; %
-rb2 = 14*W/18; %
+lb2 = 5*W/18; %
+rb2 = 13*W/18; %s
 
 % rating scale upper and bottom bounds
 tb = H/5+100;           % in 800, it's 310
@@ -215,6 +215,10 @@ try
     Screen('TextSize', theWindow, fontsize);
     % settings of ts
     if start_trial ~= 1,    k=start_trial; else, k=1; end
+    
+    
+    % Themode_test (with highest degree based on calibration data)
+    pathway_test(ip, port, 'MRI', reg);
     % Explain grid-scale every run
     exp_scale('predict');
     
@@ -315,8 +319,6 @@ try
             data.dat{runNbr}{trial_Number(j)}.Delay1_end_timestamp = GetSecs;
             % 4. HEAT and Ratings
             rec_i = 0;
-            ready = 0;
-            ready1=0;
             ready3=0;
             % set the mouse location to zero point
             
@@ -389,7 +391,6 @@ try
             cir_center = [(lb2+rb2)/2, H*3/4+100];
             SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
             rec_i = 0;
-            ready2=0;
             sTime=GetSecs;
             data.dat{runNbr}{trial_Number(j)}.overall_rating_time_stamp=sTime; % overall rating time stamp
             while GetSecs - TrSt_t < 5 + Delay2(j)+14.5 + ITI(j) + 2 + Delay(j)
@@ -632,14 +633,19 @@ try
     data.run_endtime_timestamp{runNbr}=GetSecs;
     save(data.datafile, '-append', 'data');
     
-    %closing messege
-    while GetSecs - data.run_endtime_timestamp{runNbr} < 10
-        if runNbr==6
-            display_expmessage('모든 실험이 종료되었습니다\n잠시만 기다려주세요')
-            WaitSecs(10);
-        else
-            display_expmessage('잠시만 기다려주세요.')
-            WaitSecs(10);
+    %closing message utill stoke specific keyboard
+    if runNbr==6
+        display_expmessage('모든 실험이 종료되었습니다\n잠시만 기다려주세요')
+    else
+        display_expmessage('잠시만 기다려주세요.')
+    end
+    
+    while (1)
+        [~,~,keyCode] = KbCheck;
+        if keyCode(KbName('q'))==1
+            break
+        elseif keyCode(KbName('space'))== 1
+            break
         end
     end
     
@@ -647,7 +653,7 @@ try
     Screen('Clear');
     Screen('CloseAll');
     disp('Done');
-    
+
 catch err
     % ERROR
     disp(err);

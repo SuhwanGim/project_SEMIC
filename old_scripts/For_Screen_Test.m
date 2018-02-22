@@ -2,7 +2,7 @@
 global theWindow W H; % window property
 global white red red_Alpha orange bgcolor yellow; % color
 global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
-global lb1 rb1;
+global lb1 rb1 lb2 rb2;
 global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
 
 
@@ -38,8 +38,8 @@ lb1 = 1*W/18; %
 rb1 = 17*W/18; %
 
 % For overall rating scale
-lb2 = 4*W/18; %
-rb2 = 14*W/18; %s
+lb2 = 5*W/18; %
+rb2 = 13*W/18; %s
 
 
 % rating scale upper and bottom bounds
@@ -70,8 +70,8 @@ Screen('TextSize', theWindow, fontsize);
 xcenter = (lb1+rb1)/2;
 ycenter = H*3/4+100;
 
-cir_center = [(4*W/18+14*W/18)/2, H*3/4+100];
-radius = (14*W/18-4*W/18)/2;
+cir_center = [(lb2+rb2)/2, H*3/4+100];
+radius = (rb2-lb2)/2;
 
 SetMouse(cir_center(1), cir_center(2));
 
@@ -80,9 +80,9 @@ sTime=GetSecs;
 rating_type = 'semicircular';
 
 %% Explain 
-exp_scale('predict')
+%exp_scale('predict')
 
-%%s
+%% d
 draw_scale('overall_predict_semicircular');
 draw_social_cue(0.22, 0.05, 25, rating_type); % draw & save details: draw_socia_cue(m, std, n, rating_type)
 Screen('Flip', theWindow);
@@ -111,7 +111,7 @@ while GetSecs - sTime < 10
         [x,y,button]=GetMouse(theWindow);
         % if the point goes further than the semi-circle, move the point to
         % the closest point
-        radius = (14*W/18-4*W/18)/2; %radius = (rb1-lb1)/2; % radius;
+        radius = (rb2-lb2)/2; %radius = (rb1-lb1)/2; % radius;
         theta = atan2(cir_center(2)-y,x-cir_center(1));
         % current euclidean distance
         curr_r = sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2);

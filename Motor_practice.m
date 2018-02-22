@@ -96,8 +96,8 @@ lb1 = 1*W/18; %
 rb1 = 17*W/18; %
 
 % For overall rating scale
-lb2 = 4*W/18; %
-rb2 = 14*W/18; %
+lb2 = 5*W/18; %
+rb2 = 13*W/18; %s
 
 % rating scale upper and bottom bounds
 tb = H/5+100;           % in 800, it's 310
@@ -117,8 +117,8 @@ anchor_y = H/2+10+scale_H;
 
 % cir_center = [(rb+lb)/2, bb];
 % radius = (rb-lb)/2; % radius
-cir_center = [(5*W/20+15*W/20)/2, H*3/4+100];
-radius = (15*W/20-5*W/20)/2; %%radius = (rb-lb)/2; % radius
+cir_center = [(lb2+rb2)/2, H*3/4+100];
+radius = (rb2-lb2)/2; %%radius = (rb-lb)/2; % radius
 
 deg = 180/7.*randi(6,21,1) + randn(21,1)*10; %divided by seven and add jitter number
 rn = randperm(21);
@@ -133,7 +133,7 @@ yy = cir_center(2)-radius*sin(th);
 %% SETUP: parameter and ISI
 rating_type = 'semicircular';
 stimText = '+';
-ISI = repmat([3;7;10],7,1);
+ISI = repmat([3;5;7],7,1);
 rn=randperm(21);
 ISI = ISI(rn);
 %% SETUP: PTB WINDOW
@@ -222,7 +222,7 @@ try
         %
         start_while = GetSecs;
         mot.dat{runNbr}{i}.while_start_timestamp = start_while;
-        while GetSecs - TrSt_t < 5 + ISI(i) 
+        while GetSecs - TrSt_t < 6 + ISI(i) 
                 [x,y,button] = GetMouse(theWindow);
                 rec_i= rec_i+1; 
                 
@@ -271,14 +271,12 @@ try
                     Screen('Flip',theWindow);
                     WaitSecs(.1);
                     break;
-                elseif GetSecs - TrSt_t < 5 + ISI(i) 
-                    mot.dat{runNbr}{i}.move_end_timestamp = GetSecs;
-                    mot.dat{runNbr}{i}.button_click_bool=0; 
                 else
-                    %do nothing
+                    mot.dat{runNbr}{i}.button_click_bool=0; 
+                    mot.dat{runNbr}{i}.move_end_timestamp = GetSecs;
                 end
         end
-        while GetSecs - TrSt_t < 5 + ISI(i)
+        while GetSecs - TrSt_t < 6 + ISI(i)
             if button(1)
                 Screen('Flip',theWindow);
             end
@@ -289,9 +287,17 @@ try
     end
     mot.task_end_timestamp{runNbr}=GetSecs;
     save(mot.datafile, '-append', 'mot');
-    % closing messages
+    
+    %closing message utill stoke specific keyboard
     display_expmessage('조이스틱 연습이 끝났습니다. 연구자의 안내를 기다려 주세요.');
-    WaitSecs(5);
+    while (1)
+        [~,~,keyCode] = KbCheck;
+        if keyCode(KbName('q'))==1
+            break
+        elseif keyCode(KbName('space'))== 1
+            break
+        end
+    end
     
     % Close the screen 
     sca;

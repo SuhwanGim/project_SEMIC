@@ -66,7 +66,7 @@ elseif main2
 elseif cali
     fname = fullfile(savedir, ['Calib_' SID '.mat']);
 elseif learn
-    fname = fullfile(savedir, ['Learning' SID '.mat']);
+    fname = fullfile(savedir, ['Learning_' SID '.mat']);
 else
     error('Unknown input');
 end

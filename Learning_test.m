@@ -1,4 +1,4 @@
-function data = Learning_test(ip, port, reg, varargin)
+function learn = Learning_test(ip, port, reg, varargin)
 %%
 %**THERE IS ONLY DIFFERENT THING THAT THIS FUCNTION TRIGGER THERMAL PAIN
 %WITH CONGURENT SOICAL CUE CONCOMPARED WITH THERMODE_TEST
@@ -47,13 +47,13 @@ addpath(genpath(pwd));
 savedir = 'LEARN_SEMIC_data';
 [fname,start_trial, SID] = subjectinfo_check_SEMIC(savedir,1,'Learn'); % subfunction %start_trial
 %[fname, start_trial, SID] = subjectinfo_check(savedir); % subfunction
-if exist(fname, 'file'), load(fname, 'data'); load(fname,'ts'); end
+if exist(fname, 'file'), load(fname, 'learn'); load(fname,'ts'); end
 % save data using the canlab_dataset object
-data.version = 'SEMIC_v1_02-13-2018_Cocoanlab';
-data.subject = SID;
-data.datafile = fname;
-data.starttime = datestr(clock, 0); % date-time
-data.starttime_getsecs = GetSecs; % in the same format of timestamps for each trial
+learn.version = 'SEMIC_v1_02-22-2018_Cocoanlab';
+learn.subject = SID;
+learn.datafile = fname;
+learn.starttime = datestr(clock, 0); % date-time
+learn.starttime_getsecs = GetSecs; % in the same format of timestamps for each trial
 
 %% SETUP: the pathway program
 PathPrg = load_PathProgram('SEMIC');
@@ -117,7 +117,7 @@ if start_trial==1
     %ts = [trial_Number, run_Number, ITI, Delay, cue_mean, cue_var, ts_program, ramp_up_con];
     ts{runNbr} = [run_Number, trial_Number, ITI, Delay, Delay2, cue_settings, cue_mean, cue_var, stim_level, program, overall_unpl_Q_cond, overall_unpl_Q_txt];
     % save the trial_sequences
-    save(data.datafile, 'ts', 'data');
+    save(learn.datafile, 'ts', 'learn');
 else
     [run_Number, trial_Number, ITI, Delay, Delay2, cue_settings, cue_mean, cue_var, stim_level, program, overall_unpl_Q_cond, overall_unpl_Q_txt] = ts{runNbr};
 end
@@ -163,8 +163,8 @@ lb1 = 1*W/18; %
 rb1 = 17*W/18; %
 
 % For overall rating scale
-lb2 = 4*W/18; %
-rb2 = 14*W/18; %
+lb2 = 5*W/18; %
+rb2 = 13*W/18; %s
 
 % rating scale upper and bottom bounds
 tb = H/5+100;           % in 800, it's 310
@@ -195,7 +195,7 @@ try
     
     
     % START: RUN
-    data.run_start_timestamp{runNbr}=GetSecs;
+    learn.run_start_timestamp{runNbr}=GetSecs;
     % Loop of Trials
     for j = k:length(trial_Number)
         % DISPLAY EXPERIMENT MESSAGE:
@@ -234,12 +234,12 @@ try
             
             if dofmri
                 fmri_t = GetSecs;
-                % gap between 5 key push and the first stimuli (disdaqs: data.disdaq_sec)
+                % gap between 5 key push and the first stimuli (disdaqs: learn.disdaq_sec)
                 % 5 seconds: "ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½..."
                 Screen(theWindow, 'FillRect', bgcolor, window_rect);
                 DrawFormattedText(theWindow, double('½ÃÀÛÇÕ´Ï´Ù...'), 'center', 'center', white, [], [], [], 1.2);
                 Screen('Flip', theWindow);
-                data.dat{runNbr}{trial_Number(j)}.runscan_starttime = GetSecs;
+                learn.dat{runNbr}{trial_Number(j)}.runscan_starttime = GetSecs;
                 waitsec_fromstarttime(fmri_t, 4);
                 
                 % 5 seconds: Blank
@@ -251,7 +251,7 @@ try
             
             if USE_BIOPAC
                 bio_t = GetSecs;
-                data.dat{runNbr}{trial_Number(j)}.biopac_triggertime = bio_t; %BIOPAC timestamp
+                learn.dat{runNbr}{trial_Number(j)}.biopac_triggertime = bio_t; %BIOPAC timestamp
                 BIOPAC_trigger(ljHandle, biopac_channel, 'on');
                 Screen(theWindow,'FillRect',bgcolor, window_rect);
                 Screen('Flip', theWindow);
@@ -266,14 +266,14 @@ try
         end
         
         TrSt_t = GetSecs; %
-        data.dat{runNbr}{trial_Number(j)}.trial_start_t = TrSt_t; %Trial start_timestamp
+        learn.dat{runNbr}{trial_Number(j)}.trial_start_t = TrSt_t; %Trial start_timestamp
         %==============TRIAL===================================%
         % 1. ITI (jitter)
         fixPoint(TrSt_t, ITI(j), white, '+') % ITI
-        data.dat{runNbr}{trial_Number(j)}.ITI_endtimestamp = GetSecs;
+        learn.dat{runNbr}{trial_Number(j)}.ITI_endtimestamp = GetSecs;
         % 2. Cue
         draw_scale('overall_predict_semicircular');
-        [~ , data.dat{runNbr}{trial_Number(j)}.cue_theta] = draw_social_cue(cue_mean(j), cue_var(j), NumberOfCue, rating_type); % draw & save details: draw_socia_cue(m, std, n, rating_type)
+        [~ , learn.dat{runNbr}{trial_Number(j)}.cue_theta] = draw_social_cue(cue_mean(j), cue_var(j), NumberOfCue, rating_type); % draw & save details: draw_socia_cue(m, std, n, rating_type)
         Screen('Flip', theWindow);
         %-------------Ready------------------
         main(ip,port,1,program(j)); %select the program
@@ -281,10 +281,10 @@ try
         main(ip,port,2); %ready to pre-start
         
         waitsec_fromstarttime(TrSt_t, ITI(j) + 2); % 2 seconds
-        data.dat{runNbr}{trial_Number(j)}.cue_end_timestamp = GetSecs;
+        learn.dat{runNbr}{trial_Number(j)}.cue_end_timestamp = GetSecs;
         % 3. Delay
         fixPoint(TrSt_t , ITI(j) + 2 + Delay(j), white, '+') % Delay
-        data.dat{runNbr}{trial_Number(j)}.Delay1_end_timestamp = GetSecs;
+        learn.dat{runNbr}{trial_Number(j)}.Delay1_end_timestamp = GetSecs;
         % 4. HEAT and Ratings
         rec_i = 0;
         ready3=0;
@@ -299,7 +299,7 @@ try
         
         % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
         start_while=GetSecs;
-        data.dat{runNbr}{trial_Number(j)}.start_rating_timestamp = start_while;
+        learn.dat{runNbr}{trial_Number(j)}.start_rating_timestamp = start_while;
         
         while GetSecs - TrSt_t < 14.5 + ITI(j) + 2 + Delay(j)
             [x,y,button]=GetMouse(theWindow);
@@ -336,9 +336,9 @@ try
             if ready3 == 0
                 if GetSecs - start_while > 1
                     tic;
-                    data.dat{runNbr}{trial_Number(j)}.heat_start_txt = main(ip,port,2); % start heat signal
-                    data.dat{runNbr}{trial_Number(j)}.duration_heat_trigger = toc;
-                    data.dat{runNbr}{trial_Number(j)}.heat_start_timestamp = GetSecs; % heat-stimulus time stamp
+                    learn.dat{runNbr}{trial_Number(j)}.heat_start_txt = main(ip,port,2); % start heat signal
+                    learn.dat{runNbr}{trial_Number(j)}.duration_heat_trigger = toc;
+                    learn.dat{runNbr}{trial_Number(j)}.heat_start_timestamp = GetSecs; % heat-stimulus time stamp
                     ready3=1;
                 else
                     %do nothing
@@ -347,17 +347,17 @@ try
                 %do nothing
             end
             
-            % Saving data
-            data.dat{runNbr}{trial_Number(j)}.con_time_fromstart(rec_i,1) = GetSecs-start_while;
-            data.dat{runNbr}{trial_Number(j)}.con_xy(rec_i,:) = [x-cir_center(1) cir_center(2)-y]./radius;
-            data.dat{runNbr}{trial_Number(j)}.con_clicks(rec_i,:) = button;
-            data.dat{runNbr}{trial_Number(j)}.con_r_theta(rec_i,:) = [curr_r/radius curr_theta/180]; %radius and degree?
+            % Saving learn
+            learn.dat{runNbr}{trial_Number(j)}.con_time_fromstart(rec_i,1) = GetSecs-start_while;
+            learn.dat{runNbr}{trial_Number(j)}.con_xy(rec_i,:) = [x-cir_center(1) cir_center(2)-y]./radius;
+            learn.dat{runNbr}{trial_Number(j)}.con_clicks(rec_i,:) = button;
+            learn.dat{runNbr}{trial_Number(j)}.con_r_theta(rec_i,:) = [curr_r/radius curr_theta/180]; %radius and degree?
         end
-        data.dat{runNbr}{trial_Number(j)}.contRating_end_stamp_end = GetSecs;
+        learn.dat{runNbr}{trial_Number(j)}.contRating_end_stamp_end = GetSecs;
         
         %5. Delay2
         fixPoint(TrSt_t, Delay2(j)+14.5 + ITI(j) + 2 + Delay(j), white, '+')
-        data.dat{runNbr}{trial_Number(j)}.Delay2_end_timestamp_end = GetSecs;
+        learn.dat{runNbr}{trial_Number(j)}.Delay2_end_timestamp_end = GetSecs;
         
         %6. Overall ratings
         cir_center = [(rb2+lb2)/2 H*3/4+100];
@@ -365,8 +365,8 @@ try
         SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
         rec_i = 0;
         sTime=GetSecs;
-        data.dat{runNbr}{trial_Number(j)}.overall_rating_time_stamp=sTime; % overall rating time stamp
-        while GetSecs - TrSt_t < 5 + Delay2(j)+14.5 + ITI(j) + 2 + Delay(j)
+        learn.dat{runNbr}{trial_Number(j)}.overall_rating_time_stamp=sTime; % overall rating time stamp
+        while GetSecs - TrSt_t < 5 + Delay2(j)+ 14.5 + ITI(j) + 2 + Delay(j)
             [x,y,button]=GetMouse(theWindow);
             rec_i= rec_i+1;
             % if the point goes further than the semi-circle, move the point to
@@ -398,17 +398,17 @@ try
             
             
             % Saving data
-            data.dat{runNbr}{trial_Number(j)}.ovr_time_fromstart(rec_i,1) = GetSecs-sTime;
-            data.dat{runNbr}{trial_Number(j)}.ovr_xy(rec_i,:) = [x-cir_center(1) cir_center(2)-y]./radius;
-            data.dat{runNbr}{trial_Number(j)}.ovr_clicks(rec_i,:) = button;
-            data.dat{runNbr}{trial_Number(j)}.ovr_r_theta(rec_i,:) = [curr_r/radius curr_theta/180];
+            learn.dat{runNbr}{trial_Number(j)}.ovr_time_fromstart(rec_i,1) = GetSecs-sTime;
+            learn.dat{runNbr}{trial_Number(j)}.ovr_xy(rec_i,:) = [x-cir_center(1) cir_center(2)-y]./radius;
+            learn.dat{runNbr}{trial_Number(j)}.ovr_clicks(rec_i,:) = button;
+            learn.dat{runNbr}{trial_Number(j)}.ovr_r_theta(rec_i,:) = [curr_r/radius curr_theta/180];
             
             
             if button(1)
                 draw_scale('overall_predict_semicircular');
                 Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
                 Screen('Flip',theWindow);
-                WaitSecs(0.5);
+                WaitSecs(min(0.5, 5-(GetSecs-sTime)));
                 ready3=0;
                 while ~ready3 %GetSecs - sTime> 5
                     msg = double(' ');
@@ -424,22 +424,22 @@ try
             end
             
         end %end of a overall rating
-        data.dat{runNbr}{trial_Number(j)}.overallRating_end_timestamp_end = GetSecs;
+        learn.dat{runNbr}{trial_Number(j)}.overallRating_end_timestamp_end = GetSecs;
         %
         SetMouse(0,0);
         Screen(theWindow,'FillRect',bgcolor, window_rect);
         Screen('Flip', theWindow);
         end_trial = GetSecs;
         % Saving trial sequence(i)
-        data.dat{runNbr}{trial_Number(j)}.ts = ts{1,1}(j,:);
-        data.dat{runNbr}{trial_Number(j)}.end_trial_t = end_trial;
+        learn.dat{runNbr}{trial_Number(j)}.ts = ts{1,1}(j,:);
+        learn.dat{runNbr}{trial_Number(j)}.end_trial_t = end_trial;
         
-        % data.dat{runNbr}{trial_Number(j)}.ramp_up_cnd = ramp_up_con(j);
-        if mod(trial_Number(j),2) == 0, save(data.datafile, '-append', 'data'); end % save data every two trials
+        % learn.dat{runNbr}{trial_Number(j)}.ramp_up_cnd = ramp_up_con(j);
+        if mod(trial_Number(j),2) == 0, save(learn.datafile, '-append', 'data'); end % save data every two trials
         % waitsec_fromstarttime(end_trial, 1); % For your rest,
     end
-    data.run_endtime_timestamp{runNbr}=GetSecs;
-    save(data.datafile, '-append', 'data');
+    learn.run_endtime_timestamp{runNbr}=GetSecs;
+    save(learn.datafile, '-append', 'data');
     
     %closing image until when acquiring T1 image is end
     DrawFormattedText(theWindow, double('+'), 'center', 'center', white, [], [], [], 1.2);
@@ -452,13 +452,13 @@ try
             break
         end
     end
-    data.close_fixation_timestamp{runNbr} = GetSecs;
+    learn.close_fixation_timestamp{runNbr} = GetSecs;
     
     ShowCursor();
     Screen('Clear');
     Screen('CloseAll');
     disp('Done');
-    save(data.datafile, '-append', 'data');
+    save(learn.datafile, '-append', 'learn');
     
 catch err
     % ERROR

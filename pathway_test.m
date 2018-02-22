@@ -11,30 +11,66 @@ function pathway_test(ip, port, type, reg)
 %
 % writen by Suhwan Gim
 %%
-clc;
-txt=input('For experiment, participants experience some test. If researcher ready to strat, please type the any text.','s');
+
+global theWindow W H; % window property
+global white red orange bgcolor; % color
+global window_rect lb rb tb bb scale_H; % rating scale
+global lb1 rb1 lb2 rb2;
+global fontsize;
+
+
+Screen(theWindow,'FillRect',bgcolor, window_rect);
+
+msg=double('이동한 도자의 상태를 확인하기 위해 테스트를 진행하겠습니다');
+display_expmessage(msg);
+
+while (1)
+    [~,~,keyCode] = KbCheck;
+    if keyCode(KbName('q'))==1
+        break
+    elseif keyCode(KbName('space'))== 1
+        break
+    end
+end
+%trigger
+Screen('Flip', theWindow);
+
 switch type
     case 'basic'
-        if ~isempty(txt)
-            disp('Please wait a second');
-            main(ip, port, 1, 24);
-            WaitSecs(0.5);
-            clc;
-            
-            disp('Ready to start');
-            main(ip, port, 2);
-            WaitSecs(2);
-            clc;
-            
-            disp('Start');
-            main(ip, port, 2);
-            WaitSecs(0.5);
-            clc;
-            
-            disp('Done');
+        for i = 1:4
+            msg = strcat('연구자는 도자를 해당 위치로 이동시켜주세요 (Space): ', num2str(i));
+            while (1)
+                [~,~,keyCode] = KbCheck;
+                if keyCode(KbName('space'))==1
+                    break;
+                elseif keyCode(KbName('q'))==1
+                    abort_experiment;
+                end
+                display_expmessage(msg);
+            end
+            if ~isempty(msg)
+                disp('Please wait a second');
+                main(ip, port, 1, 24);
+                WaitSecs(0.5);
+                clc;
+                
+                disp('Ready to start');
+                main(ip, port, 2);
+                WaitSecs(2);
+                clc;
+                
+                disp('Start');
+                main(ip, port, 2);
+                WaitSecs(0.5);
+                clc;
+                
+                disp('Done');
+            end
         end
+        msg=double('이제부터 조이스틱 연습을 시작하겟습니다(space)');
+        
     case 'MRI'
-        if ~isempty(txt)
+        if ~isempty(msg)
             PathPrg = load_PathProgram('SEMIC');
             % Find the highest themal degree based on the calibration procedure           
             for iii=1:length(PathPrg) %find degree
@@ -60,6 +96,18 @@ switch type
             clc;
             disp('Done');
         end
+        msg=double('확인하였습니다.\n다음으로는 척도 확인 및 연습을 시작하겠습니다(space)');
 end
+
+while (1)
+    [~,~,keyCode] = KbCheck;
+    if keyCode(KbName('q'))==1
+        break
+    elseif keyCode(KbName('space'))== 1
+        break
+    end
+    display_expmessage(msg);
+end
+
 
 end

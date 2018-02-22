@@ -3,13 +3,13 @@ function [xx, th] = draw_social_cue(m, std, n, rating_type)
 global theWindow W H; % window property
 global white red red_Alpha orange bgcolor; % color
 global window_rect prompt_ex tb bb lb rb scale_H anchor_y anchor_y2 anchor promptW promptH joy_speed; % rating scale
-global lb1 rb1; % For larger semi-circular
+global lb1 rb1 lb2 rb2; % For larger semi-circular
 
 % cir_center = [(rb+lb)/2, bb]; previous version 
 %radius = (rb-lb)/2; % radius; also,
 % Boundary for draw_scale('overall_predict_semicircular')
-cir_center = [(4*W/18+14*W/18)/2, H*3/4+100];
-radius = (14*W/18-4*W/18)/2;
+cir_center = [(rb2+lb2)/2, H*3/4+100];
+radius = (rb2-lb2)/2;
 
 draw_scale(rating_type);
 

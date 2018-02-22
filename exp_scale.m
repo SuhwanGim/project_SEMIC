@@ -15,10 +15,10 @@ Screen(theWindow,'FillRect',bgcolor, window_rect);
 
 switch scale
     case 'predict'
-        msg = double('이 척도가 화면에 나타나면\n "이번 자극이 최대 얼마나 아플까요?"에 대해 보고를 해 주시면 되겠습니다.(Space)');
+        msg = double('이 척도가 화면에 나타나면\n "이번 자극이 최대 얼마나 아플까요?"에\n대해 보고를 해 주시면 되겠습니다.(Space)');
         % display
         Screen('TextSize', theWindow, fontsize);
-        DrawFormattedText(theWindow, msg, 'center', 1/5*H, white, [], [], [], 1);
+        DrawFormattedText(theWindow, msg, 'center', 1/5*H, orange, [], [], [], 1.5);
         draw_scale('cont_predict_semicircular');
         Screen('Flip', theWindow);
         while (1)
@@ -31,10 +31,10 @@ switch scale
         end
         Screen('TextSize', theWindow, fontsize);
         msg = double('그러면 지금부터 연습을 시작하겠습니다.\n 척도가 화면에 뜨면 바로 움직여 주세요.');
-        DrawFormattedText(theWindow, msg, 'center', 'center', white, [], [], [], 1);
+        DrawFormattedText(theWindow, msg, 'center', 'center', white, [], [], [], 1.5);
         Screen('Flip', theWindow);
-        WaitSecs(5);
-        rnd=randperm(5,1);
+        WaitSecs(1);
+        rnd=randperm(2,1);
         WaitSecs(rnd);
         start_while = GetSecs;
         

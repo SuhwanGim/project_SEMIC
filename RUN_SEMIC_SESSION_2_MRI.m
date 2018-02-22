@@ -9,9 +9,7 @@ port = 20121;
 addpath(genpath(pwd));
 %% SETUP: Load calibration data
 reg = load_cali_results();
-
-
-
+%% SETUP: Trial sequences
 
 %% 0. PATHWAY TEST
     pathway_test(ip, port, 'MRI', reg);
@@ -20,27 +18,26 @@ reg = load_cali_results();
 %% 2. Motor TASK
     Motor_practice(1,'test','fmri');
 %% 3. Main STUDY % thermode_test(Number of run, ip, port, options...),
-%% PATHWAY TEST
-    pathway_test(ip, port, 'MRI', reg);
+
 %% RUN1
     thermode_test(1, ip, port, reg,'test','biopac1','fmri');
-%% PATHWAY TEST
-    pathway_test(ip, port, 'MRI', reg);
+
 %% RUN2
     thermode_test(2, ip, port, reg,'test','fmri');
-%% PATHWAY TEST
-    pathway_test(ip, port, 'MRI', reg);
+
 %% RUN3
     thermode_test(3, ip, port, reg,'test','fmri');
-%% PATHWAY TEST
-    pathway_test(ip, port, 'MRI', reg);
+
+%% Motor task
+    Motor_practice(2,'test','fmri');
 %% RUN4
     thermode_test(4, ip, port, reg,'test','fmri');
-%% PATHWAY TEST
-    pathway_test(ip, port, 'MRI', reg);
+
 %% RUN5
     thermode_test(5, ip, port, reg,'test');
-%% PATHWAY TEST
-    pathway_test(ip, port, 'MRI', reg);
+   
 %% RUN6
     thermode_test(6, ip, port, reg,'test');
+    
+%% PATHWAY TEST
+    pathway_test(ip, port, 'MRI', reg);
