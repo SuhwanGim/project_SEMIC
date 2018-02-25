@@ -49,7 +49,6 @@ Screen('CloseAll');
 window_num = 0;
 if testmode
     window_rect = [1 1 800 640]; % in the test mode, use a little smaller screen
-    %window_rect = [0 0 1900 1200];
     fontsize = 20;
 else
     screens = Screen('Screens');
@@ -80,8 +79,8 @@ lb1 = 1*W/18; %
 rb1 = 17*W/18; %
 
 % For overall rating scale
-lb2 = 4*W/18; %
-rb2 = 14*W/18; %
+lb2 = 5*W/18; %
+rb2 = 13*W/18; %s
 
 
 % rating scale upper and bottom bounds
@@ -192,7 +191,7 @@ try
                 Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  % Cursor
                 % if the point goes further than the semi-circle, move the point to
                 % the closest point
-                radius = (14*W/18-4*W/18)/2;%radius = (rb-lb)/2; % radius                
+                radius = (rb2-lb2)/2;%radius = (rb-lb)/2; % radius                
                 theta = atan2(cir_center(2)-y,x-cir_center(1));
                 if y > cir_center(2) %bb
                     y = cir_center(2);
@@ -226,7 +225,7 @@ try
     % 0. Instructions
     display_expmessage('지금부터는 Calibration을 시작하겠습니다.\n참가자는 편안하게 계시고 진행자의 지시를 따라주시기 바랍니다.');
     WaitSecs(3);
-    random_value = randperm(3);
+    random_value = randperm(3); %randomized order for 1st, 2nd and 3rd stimulus
     for i=1:NumOfTr %Total trial
         reg.trial_start_timestamp{i,1}=GetSecs; % trial_star_timestamp
         % manipulate the current stim
@@ -244,11 +243,11 @@ try
         end
         
         % 1. Display where the skin site stimulates (1-6)
-        WaitSecs(1.5);
+        WaitSecs(2);
         main(ip,port,1,current_stim); % Select the program 
         WaitSecs(1);
         main(ip,port,2,current_stim); % Pre-start
-        msg = strcat('다음 위치의 thermode를 이동하신 후 SPACE 키를 누르십시오 :  ', num2str(reg.skin_site(i)));
+        msg = strcat('연구자는 다음 위치의 열패드를 이동하신 후 SPACE 키를 누르십시오 :  ', num2str(reg.skin_site(i)));
         while (1)
             [~,~,keyCode] = KbCheck;
             if keyCode(KbName('space'))==1
@@ -295,7 +294,6 @@ try
         
         % 4. Ratings
         start_ratings=GetSecs;
-        %cir_center = [(rb+lb)/2, bb];
         SetMouse(cir_center(1), cir_center(2));
         while GetSecs - start_ratings < 10 % Under 10 seconds,
             [x,y,button] = GetMouse(theWindow);
@@ -317,13 +315,6 @@ try
                 SetMouse(x,y);
             end
            
-            
-            %For draw theta text on 'theWindow' screen
-            % theta = num2str(theta); DrawFormattedText(theWindow, theta,
-            % 'center', 'center', white, [], [], [], 1.2);
-%             disp(theta);
-%             disp(i);
-%             disp(current_stim);
             Screen('Flip',theWindow);
             
             % Feedback
@@ -370,7 +361,7 @@ try
     % End of calibration
     reg.endtime_getsecs = GetSecs;
     save(reg.datafile, '-append', 'reg');
-    msg='캘리브레이션이 종료되었습니다\n이제 실험자의 지시를 따라주시기 바랍니다';
+    msg='캘리브레이션이 종료되었습니다\n이제 연구자의 지시를 따라주시기 바랍니다';
     display_expmessage(msg);
     waitsec_fromstarttime(reg.endtime_getsecs, 10);
     sca;

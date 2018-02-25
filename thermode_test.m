@@ -469,9 +469,9 @@ try
             Screen('Flip', theWindow);
 %             if ITI(j)<=3, ITI(j)=ITI(j)+2;end
             %-------------Ready for themal------------------
-            WaitSecs(1.6);
+            WaitSecs(3);
             main(ip,port,1,program(j)); %select the program
-            WaitSecs(0.9);
+            WaitSecs(0.5);
             main(ip,port,2); %ready to pre-start
             waitsec_fromstarttime(TrSt_t, ITI(j));           
             % fixPoint(TrSt_t, ITI(j), white, '+') % ITI

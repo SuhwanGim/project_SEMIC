@@ -14,6 +14,7 @@ global white red red_Alpha orange bgcolor yellow; % color
 global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
 global lb1 rb1 lb2 rb2;% For larger semi-circular
 global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
+%global reg;
 
 %% SETUP: Parameter
 runNbr = 1;
@@ -130,7 +131,6 @@ Screen('CloseAll');
 window_num = 0;
 if testmode
     window_rect = [1 1 800 640]; % in the test mode, use a little smaller screen
-    %window_rect = [0 0 1900 1200];
     fontsize = 20;
 else
     screens = Screen('Screens');
@@ -145,7 +145,7 @@ end
 W = window_rect(3); %width of screen
 H = window_rect(4); %height of screen
 
-font = 'NanumBarunGothic';
+%font = 'NanumBarunGothic';
 
 bgcolor = 80;
 white = 255;
@@ -179,19 +179,20 @@ anchor_yd = bb+20; % 710
 % y location for anchors of rating scales -
 anchor_y = H/2+10+scale_H;
 % anchor_lms = [0.014 0.061 0.172 0.354 0.533].*(rb-lb)+lb;
-
+%% SETUP: Screen
+theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
+Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
+Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); % For alpha value of e.g.,[R G B alpha]
+%Screen('TextFont', theWindow, font); % setting font
+Screen('TextSize', theWindow, fontsize);
 %% EXPERIEMENT START
 try
-    theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
-    Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
-%     Screen('TextFont', theWindow, font); % setting font
-    Screen('TextSize', theWindow, fontsize);
     % settings of ts
     if start_trial ~= 1,    k=start_trial; else, k=1; end
     % Explain grid-scale every run
+    
+    pathway_test(ip, port, 'MRI',reg);
     exp_scale('predict');
-    
-    
     
     
     % START: RUN
@@ -435,11 +436,11 @@ try
         learn.dat{runNbr}{trial_Number(j)}.end_trial_t = end_trial;
         
         % learn.dat{runNbr}{trial_Number(j)}.ramp_up_cnd = ramp_up_con(j);
-        if mod(trial_Number(j),2) == 0, save(learn.datafile, '-append', 'data'); end % save data every two trials
+        if mod(trial_Number(j),2) == 0, save(learn.datafile, '-append', 'learn'); end % save data every two trials
         % waitsec_fromstarttime(end_trial, 1); % For your rest,
     end
     learn.run_endtime_timestamp{runNbr}=GetSecs;
-    save(learn.datafile, '-append', 'data');
+    save(learn.datafile, '-append', 'learn');
     
     %closing image until when acquiring T1 image is end
     DrawFormattedText(theWindow, double('+'), 'center', 'center', white, [], [], [], 1.2);

@@ -23,8 +23,8 @@ function cali_regression (degree, rating, th, NumOfTr)
 
 %% SETUP: variable
 global reg;
-std_rating=[16.6667 50 83.3333]; % low, mid, and high %from L. Atlas et al. (2010)
-final_rating=[16.6667 33.3333 50 66.6667 83.3333];
+std_rating=[30 50 70]; % low, mid, and high %from L. Atlas et al. (2010)
+final_rating=[30 40 50 80 70];
 
 %% SETUP: Input data
 reg.stim_degree(th)=degree;
