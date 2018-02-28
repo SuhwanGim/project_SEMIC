@@ -103,6 +103,7 @@ if start_trial==1
         % 1) Only pain trials: [LV2, 3, 4] x 2 = 6 trials
         % 2) Self Q (overall questions): 2 (social cues: Low/High) x 4 (temp levels: LV 1  to 4 / LV2 to 5) = 8 trials
         % 3) Other Q (overall questions): 2 (Social cues: Low/High) x 2 (temp levels Lv3 and 4 / Lv 2 and 3) = 4 trials
+        % mean duration: 0.27, max: 0.8552, min: 0.0210, mode= 0.210
         stim_level = ["LV2"; "LV3"; "LV4"; "LV2";"LV3"; "LV4"; "LV1"; "LV2";"LV3"; "LV4"; "LV2";"LV3"; "LV4"; "LV5";"LV3";"LV4";"LV2";"LV3"]; % A group of [low cue,High cue]x2
         program = [stim_degree(2:4);stim_degree(2:4);stim_degree(1:4);stim_degree(2:5);stim_degree(3:4);stim_degree(2:3)]; % A group of [low cue,High cue]x2
         cue_settings = ["NO";"NO";"NO";"NO";"NO";"NO";"LOW";"LOW";"LOW";"LOW";"HIGH";"HIGH";"HIGH";"HIGH";"LOW";"LOW";"HIGH";"HIGH"];
@@ -120,7 +121,7 @@ if start_trial==1
         cue_var = cue_var(rn);
         overall_unpl_Q_txt = overall_unpl_Q_txt(rn);
         overall_unpl_Q_cond = overall_unpl_Q_cond(rn);
-        i=i+1;
+        %i=i+1;
     end
     % ITI-Delay1-Delay2 combination
     bin = [3, 5, 7; 3, 6, 6; 4, 4, 7; 4, 5, 6; 5, 5, 5];%-0.5;
