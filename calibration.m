@@ -33,10 +33,10 @@ global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_y
 global reg; % regression data
 
 %% SETUP: DATA and Subject INFO
-savedir = 'CALI_SEMIC_data';
+savedir = 'Cali_Semic_data';
 [fname,~ , SID] = subjectinfo_check_SEMIC(savedir,1,'Cali'); % subfunction %start_trial
 % save data using the canlab_dataset object
-reg.version = 'SEMIC_Calibration_v1_13-02-2018_Cocoanlab';
+reg.version = 'SEMIC_Calibration_v1_01-03-2018_Cocoanlab';
 reg.subject = SID;
 reg.datafile = fname;
 reg.starttime = datestr(clock, 0); % date-time
@@ -297,6 +297,9 @@ try
         SetMouse(cir_center(1), cir_center(2));
         while GetSecs - start_ratings < 10 % Under 10 seconds,
             [x,y,button] = GetMouse(theWindow);
+            msg = double('얼마나 아팠나요?');
+            Screen('TextSize', theWindow, 26);
+            DrawFormattedText(theWindow, msg, 'center', 'center', white, [], [], [], 2);
             draw_scale('overall_predict_semicircular');
             Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  %dif color
             
@@ -359,7 +362,19 @@ try
 
     
     % End of calibration
+    %reg.stduySkinSite_ts = [reg.stduySkinSite reg.stduySkinSite];
     reg.endtime_getsecs = GetSecs;
+    
+    reg.skinSite_rs = [0,0,0,0,0,0];
+    
+    
+    while ~((numel(find(diff(reg.skinSite_rs)==0))) < 1)
+        rng('shuffle');
+        reg.skinSite_rs = [reg.studySkinSite reg.studySkinSite];
+        reg.skinSite_rs=reg.skinSite_rs(randperm(6));
+    end
+    
+    
     save(reg.datafile, '-append', 'reg');
     msg='캘리브레이션이 종료되었습니다\n이제 연구자의 지시를 따라주시기 바랍니다';
     display_expmessage(msg);

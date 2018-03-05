@@ -33,7 +33,7 @@ rb = 3.5*W/5; % in 1280, it's 896 rb-lb = 512
 
 % bigger rating scale
 % see draw_scale.m
-% For cont rating scale 
+% For cont rating scale
 lb1 = 1*W/18; %
 rb1 = 17*W/18; %
 
@@ -59,8 +59,8 @@ anchor_y = H/2+10+scale_H;
 
 theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
 Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
-Screen('Preference', 'SkipSyncTests', 1);
-Screen('TextFont', theWindow, font); % setting font
+Screen('Preference', 'SkipSyncTests', 0);
+%Screen('TextFont', theWindow, font); % setting font
 Screen('TextSize', theWindow, fontsize);
 
 
@@ -73,93 +73,109 @@ ycenter = H*3/4+100;
 cir_center = [(lb2+rb2)/2, H*3/4+100];
 radius = (rb2-lb2)/2;
 
-SetMouse(cir_center(1), cir_center(2));
 
 %% EXPERIEMENT START
 sTime=GetSecs;
 rating_type = 'semicircular';
 
-%% Explain 
-%exp_scale('predict')
+%% Explain
+exp_scale('predict')
 
-%% d
-draw_scale('overall_predict_semicircular');
-draw_social_cue(0.22, 0.05, 25, rating_type); % draw & save details: draw_socia_cue(m, std, n, rating_type)
-Screen('Flip', theWindow);
-while (1)
-    [~,~,keyCode] = KbCheck;
-    if keyCode(KbName('space'))==1
-        draw_scale('overall_predict_semicircular');
-        draw_social_cue(0.77, 0.05, 25, rating_type); % draw & save details: draw_socia_cue(m, std, n, rating_type)
-        Screen('Flip', theWindow);
-    elseif keyCode(KbName('q'))==1
-        abort_man;
-    elseif keyCode(KbName('w'))== 1
-        break
-    end
-end
-
-msg = '이번 자극이 최대 얼마나 아플까요?';
-msg = double(msg);
-DrawFormattedText(theWindow, msg, 'center', 150, orange, [], [], [], 2);
-Screen('Flip', theWindow);
-waitsec_fromstarttime(sTime, 6);
+% %% d
+% draw_scale('overall_predict_semicircular');
+% draw_social_cue(0.22, 0.05, 25, rating_type); % draw & save details: draw_socia_cue(m, std, n, rating_type)
+% Screen('Flip', theWindow);
+% while (1)
+%     [~,~,keyCode] = KbCheck;
+%     if keyCode(KbName('space'))==1
+%         draw_scale('overall_predict_semicircular');
+%         draw_social_cue(0.77, 0.05, 25, rating_type); % draw & save details: draw_socia_cue(m, std, n, rating_type)
+%         Screen('Flip', theWindow);
+%     elseif keyCode(KbName('q'))==1
+%         abort_man;
+%     elseif keyCode(KbName('w'))== 1
+%         break
+%     end
+% end
+%
+% msg = '이번 자극이 최대 얼마나 아플까요?';
+% msg = double(msg);
+% DrawFormattedText(theWindow, msg, 'center', 150, orange, [], [], [], 2);
+% Screen('Flip', theWindow);
+% waitsec_fromstarttime(sTime, 6);
 
 ready = 0;
 sTime=GetSecs;
-while GetSecs - sTime < 10
+x= cir_center(1);
+y= cir_center(2);
+SetMouse(cir_center(1), cir_center(2));
+while true
+    if joystick
+        [pos, ~] = mat_joy(0);
+        xAlpha=pos(1);
+        x=x+xAlpha*10;
+        yAlpha=pos(2);
+        y=y+yAlpha*10;
+    else
         [x,y,button]=GetMouse(theWindow);
-        % if the point goes further than the semi-circle, move the point to
-        % the closest point
-        radius = (rb2-lb2)/2; %radius = (rb1-lb1)/2; % radius;
-        theta = atan2(cir_center(2)-y,x-cir_center(1));
-        % current euclidean distance
-        curr_r = sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2);
-        % current angle (0 - 180 deg)
-        curr_theta = rad2deg(-theta+pi);
-        if y > cir_center(2)
-            y = cir_center(2);
-            SetMouse(x,y);
-        end
-        % send to arc of semi-circle
-        if sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2) > radius
-            x = radius*cos(theta)+cir_center(1);
-            y = cir_center(2)-radius*sin(theta);
-            SetMouse(x,y);
-        end
-        
-        
-        
-        Screen(theWindow,'FillRect',bgcolor, window_rect);
-        msg = '예상해보십시요';
-        msg = double(msg);
-        DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 1.5);
-        
-        
-        %draw_scale('cont_predict_semicircular');
-        
-        draw_scale('overall_predict_semicircular');
-        
-        
-        Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
+    end
+    % if the point goes further than the semi-circle, move the point to
+    % the closest point
+    radius = (rb2-lb2)/2; %radius = (rb1-lb1)/2; % radius;
+    theta = atan2(cir_center(2)-y,x-cir_center(1));
+    % current euclidean distance
+    curr_r = sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2);
+    % current angle (0 - 180 deg)
+    curr_theta = rad2deg(-theta+pi);
+    if y > cir_center(2)
+        y = cir_center(2);
+        %SetMouse(x,y);
+    end
+    % send to arc of semi-circle
+    if sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2) > radius
+        x = radius*cos(theta)+cir_center(1);
+        y = cir_center(2)-radius*sin(theta);
+        %SetMouse(x,y);
+    end
+    
+    
+    
+    Screen(theWindow,'FillRect',bgcolor, window_rect);
+    msg = '예상해보십시요';
+    msg = double(msg);
+    DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 1.5);
+    
+    
+    %draw_scale('cont_predict_semicircular');
+    
+    draw_scale('overall_predict_semicircular');
+    
+    
+    Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
+    Screen('Flip', theWindow);
+    if GetSecs - sTime >30
+        pause(1);
         Screen('Flip', theWindow);
+        break;
         
-        if button(1)
-            draw_scale('cont_predict_semicircular')
-            Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
-            Screen('Flip', theWindow);
-            WaitSecs(2);
-            break;
-        end
-        
-        
+    end
+    
+    %         if button(1)
+    %             draw_scale('cont_predict_semicircular')
+    %             Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
+    %             Screen('Flip', theWindow);
+    %             WaitSecs(2);
+    %             break;
+    %         end
+    
+    
 end
 
-while GetSecs - sTime <10
-    if button(1)
-        Screen('Flip', theWindow);
-    end
-end
+% while GetSecs - sTime <10
+%     if button(1)
+%         Screen('Flip', theWindow);
+%     end
+% end
 
 Screen('Clear');
 Screen('CloseAll');

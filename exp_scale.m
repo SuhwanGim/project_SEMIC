@@ -21,6 +21,8 @@ switch scale
         DrawFormattedText(theWindow, msg, 'center', 1/5*H, orange, [], [], [], 1.5);
         draw_scale('cont_predict_semicircular');
         Screen('Flip', theWindow);
+        
+        WaitSec(1); %For preventing double-typed 'Space' key
         while (1)
             [~,~,keyCode] = KbCheck;
             if keyCode(KbName('space'))==1

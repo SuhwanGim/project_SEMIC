@@ -289,6 +289,9 @@ try
     save(mot.datafile, '-append', 'mot');
     
     %closing message utill stoke specific keyboard
+    Screen('Flip',theWindow);
+    WaitSecs(5);
+    
     display_expmessage('조이스틱 연습이 끝났습니다. 연구자의 안내를 기다려 주세요.');
     while (1)
         [~,~,keyCode] = KbCheck;

@@ -24,7 +24,7 @@ function cali_regression (degree, rating, th, NumOfTr)
 %% SETUP: variable
 global reg;
 std_rating=[30 50 70]; % low, mid, and high %from L. Atlas et al. (2010)
-final_rating=[30 40 50 80 70];
+final_rating=[30 40 50 60 70];
 
 %% SETUP: Input data
 reg.stim_degree(th)=degree;
@@ -84,7 +84,7 @@ uc_number=uc_number.*5;
 c_number=round(uc_number)./5;
 
 % limit the degree
-c_number(c_number > 49.6) = 49.6;
+c_number(c_number > 49) = 49;
 c_number(c_number < 39) = 39;
 end
 

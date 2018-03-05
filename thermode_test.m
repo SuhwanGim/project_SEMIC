@@ -59,7 +59,7 @@ savedir = 'Main_SEMIC_data';
 [fname,start_trial, SID] = subjectinfo_check_SEMIC(savedir,runNbr,'Main'); % subfunction %start_trial
 if exist(fname, 'file'), load(fname, 'data'); load(fname,'ts'); end
 % save data using the canlab_dataset object
-data.version = 'SEMIC_v1_02-14-2018_Cocoanlab';
+data.version = 'SEMIC_v1_03-01-2018_Cocoanlab';
 data.subject = SID;
 data.datafile = fname;
 data.starttime = datestr(clock, 0); % date-time
@@ -332,8 +332,7 @@ try
 
             % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
             start_while=GetSecs;
-            data.dat{runNbr}{trial_Number(j)}.start_rating_timestamp = start_while;
-            
+            data.dat{runNbr}{trial_Number(j)}.contRating_start_timestamp = start_while;           
             while GetSecs - TrSt_t < 14.5 + ITI(j) + 2 + Delay(j)
                 [x,y,button]=GetMouse(theWindow);
                 rec_i= rec_i+1;
@@ -382,7 +381,7 @@ try
                 data.dat{runNbr}{trial_Number(j)}.con_clicks(rec_i,:) = button;
                 data.dat{runNbr}{trial_Number(j)}.con_r_theta(rec_i,:) = [curr_r/radius curr_theta/180]; %radius and degree?
             end
-            data.dat{runNbr}{trial_Number(j)}.contRating_end_stamp_end = GetSecs;
+            data.dat{runNbr}{trial_Number(j)}.contRating_end_timestamp = GetSecs;
             
             %5. Delay2
             fixPoint(TrSt_t, Delay2(j)+14.5 + ITI(j) + 2 + Delay(j), white, '+')
@@ -393,7 +392,7 @@ try
             SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
             rec_i = 0;
             sTime=GetSecs;
-            data.dat{runNbr}{trial_Number(j)}.overall_rating_time_stamp=sTime; % overall rating time stamp
+            data.dat{runNbr}{trial_Number(j)}.overallRating_start_timestamp=sTime; % overall rating time stamp
             while GetSecs - TrSt_t < 5 + Delay2(j)+14.5 + ITI(j) + 2 + Delay(j)
                 [x,y,button]=GetMouse(theWindow);
                 rec_i= rec_i+1;
@@ -420,7 +419,7 @@ try
                 end
                 msg = double(overall_unpl_Q_txt{j});
                 Screen('TextSize', theWindow, 26);
-                DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 2);
+                DrawFormattedText(theWindow, msg, 'center', 'center', white, [], [], [], 2);
                 draw_scale('overall_predict_semicircular')
                 Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
                 Screen('Flip', theWindow);
@@ -453,7 +452,7 @@ try
                 end
                 
             end %end of a overall rating
-            data.dat{runNbr}{trial_Number(j)}.overallRating_end_timestamp_end = GetSecs;
+            data.dat{runNbr}{trial_Number(j)}.overallRating_end_timestamp = GetSecs;
             %
             SetMouse(0,0);
             Screen(theWindow,'FillRect',bgcolor, window_rect);
@@ -490,7 +489,7 @@ try
             % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
             start_while=GetSecs;
             
-            data.dat{runNbr}{trial_Number(j)}.start_rating_timestamp = start_while;
+            data.dat{runNbr}{trial_Number(j)}.contRating_start_timestamp = start_while;
             while GetSecs - TrSt_t < 14.5 + ITI(j)
                 [x,y,button]=GetMouse(theWindow);
                 rec_i= rec_i+1;
@@ -543,7 +542,7 @@ try
                 data.dat{runNbr}{trial_Number(j)}.con_clicks(rec_i,:) = button;
                 data.dat{runNbr}{trial_Number(j)}.con_r_theta(rec_i,:) = [curr_r/radius curr_theta/180]; %radius and degree?
             end
-            data.dat{runNbr}{trial_Number(j)}.contRating_end_stamp_end = GetSecs;
+            data.dat{runNbr}{trial_Number(j)}.contRating_end_timestamp = GetSecs;
             
             %5. Delay2
             fixPoint(TrSt_t, Delay2(j)+ 14.5 + ITI(j), white, '+')
@@ -555,7 +554,7 @@ try
             rec_i = 0;
             ready2=0;
             sTime=GetSecs;
-            data.dat{runNbr}{trial_Number(j)}.overall_rating_time_stamp=sTime; % overall rating time stamp
+            data.dat{runNbr}{trial_Number(j)}.overallRating_start_timestamp=sTime; % overall rating time stamp
             while GetSecs - TrSt_t < 5 + Delay2(j)+14.5 + ITI(j) % overall rating 5 seconds
                 [x,y,button]=GetMouse(theWindow);
                 rec_i= rec_i+1;
@@ -582,7 +581,7 @@ try
                 end
                 msg = double(overall_unpl_Q_txt{j});
                 Screen('TextSize', theWindow, 26);
-                DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 2);
+                DrawFormattedText(theWindow, msg, 'center', 'center', white, [], [], [], 2);
                 draw_scale('overall_predict_semicircular')
                 Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
                 Screen('Flip', theWindow);
@@ -615,7 +614,7 @@ try
                 end
                 
             end %end of a overall rating
-            data.dat{runNbr}{trial_Number(j)}.overallRating_end_timestamp_end = GetSecs;
+            data.dat{runNbr}{trial_Number(j)}.overallRating_end_timestamp = GetSecs;
             %
             SetMouse(0,0);
             Screen(theWindow,'FillRect',bgcolor, window_rect);
@@ -636,9 +635,13 @@ try
     
     %closing message utill stoke specific keyboard
     if runNbr==6
-        display_expmessage('모든 실험이 종료되었습니다\n잠시만 기다려주세요')
+        Screen('Flip',theWindow);
+        WaitSecs(5);
+        display_expmessage('모든 실험이 종료되었습니다\n잠시만 기다려주세요');
     else
-        display_expmessage('잠시만 기다려주세요.')
+        Screen('Flip',theWindow);
+        WaitSecs(5);
+        display_expmessage('잠시만 기다려주세요.');
     end
     
     while (1)

@@ -9,10 +9,9 @@ port = 20121;
 addpath(genpath(pwd));
 %% SETUP: Load calibration data
 reg = load_cali_results();
-%% SETUP: Trial sequencesfor 
-
-% %% 0. PATHWAY TEST
-%     pathway_test(ip, port, 'MRI', reg);
+%% SETUP: Trial sequences
+%% SETUP: SkinSite sequences
+disp(reg.skinSite_rs); %after 2018/03/01 calibration data
 %% 1. T1 & Learning phase
     Learning_test(ip, port, reg,'test','fmri');
 %% 2. Motor TASK
@@ -36,3 +35,10 @@ reg = load_cali_results();
     thermode_test(6, ip, port, reg,'test');
 %% PATHWAY TEST
     pathway_test(ip, port, 'MRI', reg);
+
+    
+    
+    
+%% SEND DATA
+    sujb_name=;
+    SEMIC_Senddata(subj_name,'mri')
