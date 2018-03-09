@@ -23,6 +23,7 @@ N = 8; % Number of Trial
 testmode = false;
 USE_BIOPAC = false;
 dofmri = false;
+joystick= false;
 % need to be specified differently for different computers
 % psytool = 'C:\toolbox\Psychtoolbox';
 for i = 1:length(varargin)
@@ -37,8 +38,8 @@ for i = 1:length(varargin)
                 channel_n = 3;
                 biopac_channel = 0;
                 ljHandle = BIOPAC_setup(channel_n); % BIOPAC SETUP
-            case {'mouse', 'trackball'}
-                % do nothing
+            case {'joystick'}
+                joystick=true;
         end
     end
 end
@@ -125,6 +126,8 @@ end
 %% SETUP: Experiment settings
 rating_type = 'semicircular';
 NumberOfCue = 25;
+velocity = 5;
+
 %% SETUP: Screen
 Screen('Clear');
 Screen('CloseAll');
@@ -297,13 +300,24 @@ try
         % cir_center = [(lb1+rb1)/2 H*3/4+100];
         cir_center = [(lb1+rb1)/2, H*3/4+100];
         SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
+        x=cir_center(1); y=cir_center(2);
         
         % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
         start_while=GetSecs;
         learn.dat{runNbr}{trial_Number(j)}.start_rating_timestamp = start_while;
         
         while GetSecs - TrSt_t < 14.5 + ITI(j) + 2 + Delay(j)
-            [x,y,button]=GetMouse(theWindow);
+            if joystick
+                [pos, ~] = mat_joy(0);
+                xAlpha=pos(1);
+                x=x+xAlpha*velocity;
+                yAlpha=pos(2);
+                y=y+yAlpha*velocity;
+                %[x y]=[x+pos(1)*velocity y+pos(2)*velocity]
+            else
+                [x,y,button]=GetMouse(theWindow);
+            end
+            %[x,y,button]=GetMouse(theWindow);
             rec_i= rec_i+1;
             % if the point goes further than the semi-circle, move the point to
             % the closest point
@@ -325,9 +339,9 @@ try
                 y = cir_center(2)-radius*sin(theta);
                 SetMouse(x,y);
             end
-%             msg = '이번 자극이 얼마나 아플 것이라고 예상하시나요?';
-%             msg = double(msg);
-%             DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 1.2);
+            %             msg = '이번 자극이 얼마나 아플 것이라고 예상하시나요?';
+            %             msg = double(msg);
+            %             DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 1.2);
             draw_scale('cont_predict_semicircular');
             Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
             Screen('Flip', theWindow);
@@ -364,11 +378,23 @@ try
         cir_center = [(rb2+lb2)/2 H*3/4+100];
         % cir_center = [(rb+lb)/2, bb];
         SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
+         x=cir_center(1); y=cir_center(2);
+        
         rec_i = 0;
         sTime=GetSecs;
         learn.dat{runNbr}{trial_Number(j)}.overall_rating_time_stamp=sTime; % overall rating time stamp
         while GetSecs - TrSt_t < 5 + Delay2(j)+ 14.5 + ITI(j) + 2 + Delay(j)
-            [x,y,button]=GetMouse(theWindow);
+            if joystick
+                [pos, button] = mat_joy(0);
+                xAlpha=pos(1);
+                x=x+xAlpha*velocity;
+                yAlpha=pos(2);
+                y=y+yAlpha*velocity;
+                %[x y]=[x+pos(1)*velocity y+pos(2)*velocity]
+            else
+                [x,y,button]=GetMouse(theWindow);
+            end
+            % [x,y,button]=GetMouse(theWindow);
             rec_i= rec_i+1;
             % if the point goes further than the semi-circle, move the point to
             % the closest point

@@ -21,6 +21,8 @@ Screen('CloseAll');
 testmode = false;
 dofmri = false;
 USE_BIOPAC = false;
+joystick = false;
+
 for i = 1:length(varargin)
     if ischar(varargin{i})
         switch varargin{i}
@@ -35,7 +37,8 @@ for i = 1:length(varargin)
                 ljHandle = BIOPAC_setup(channel_n); % BIOPAC SETUP
             case {'eyelink'}
                 %
-            case {'mouse', 'trackball'}
+            case {'joystick'}
+                joystick = true;
                 % do nothing
         end
     end
@@ -91,7 +94,7 @@ yellow = [255 220 0];
 lb = 1.5*W/5; % in 1280, it's 384
 rb = 3.5*W/5; % in 1280, it's 896 rb-lb = 512
 
-% For cont rating scale 
+% For cont rating scale
 lb1 = 1*W/18; %
 rb1 = 17*W/18; %
 
@@ -136,6 +139,7 @@ stimText = '+';
 ISI = repmat([3;5;7],7,1);
 rn=randperm(21);
 ISI = ISI(rn);
+velocity = 5;
 %% SETUP: PTB WINDOW
 theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
 Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -215,66 +219,75 @@ try
         mot.dat{runNbr}{i}.fix_end_timestamp = GetSecs; % 2 timestamp
         % 2. Moving dot part
         %ready = 0;
-        rec_i = 0;        
-        %SetMouse(cir_center(1), cir_center(2)); % set mouse at the center       
+        rec_i = 0;
+        %SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
         cir_center = [(lb2+rb2)/2, H*3/4+100];
         SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
         %
         start_while = GetSecs;
         mot.dat{runNbr}{i}.while_start_timestamp = start_while;
-        while GetSecs - TrSt_t < 6 + ISI(i) 
-                [x,y,button] = GetMouse(theWindow);
-                rec_i= rec_i+1; 
-                
+        while GetSecs - TrSt_t < 6 + ISI(i)            
+            if joystick
+                [pos, ~] = mat_joy(0);
+                xAlpha=pos(1);
+                x=x+xAlpha*velocity;
+                yAlpha=pos(2);
+                y=y+yAlpha*velocity;
+            else
+                [x,y,button]=GetMouse(theWindow);
+            end
+            %[x,y,button] = GetMouse(theWindow);
+            rec_i= rec_i+1;
+            
+            draw_scale('overall_predict_semicircular')
+            Screen('DrawDots', theWindow, [xx(i) yy(i)]', 20, white, [0 0], 1);  % draw random dot in SemiC
+            Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  % Cursor
+            % if the point goes further than the semi-circle, move the point to
+            % the closest point
+            radius = (rb2-lb2)/2; %%radius = (rb-lb)/2; % radius
+            theta = atan2(cir_center(2)-y,x-cir_center(1));
+            % current euclidean distance
+            curr_r = sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2);
+            % current angle (0 - 180 deg)
+            curr_theta = rad2deg(-theta+pi);
+            if y > cir_center(2)
+                y = cir_center(2);
+                SetMouse(x,y);
+            end
+            %                 if y > bb
+            %                     y = bb;
+            %                     SetMouse(x,y);
+            %                 end
+            % send to arc of semi-circle
+            if sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2) > radius
+                x = radius*cos(theta)+cir_center(1);
+                y = cir_center(2)-radius*sin(theta);
+                SetMouse(x,y);
+            end
+            draw_scale('overall_predict_semicircular')
+            Screen('DrawDots', theWindow, [xx(i) yy(i)]', 20, orange, [0 0], 1);  % draw random dot in SemiC
+            Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  % Cursor
+            Screen('Flip',theWindow);
+            
+            
+            mot.dat{runNbr}{i}.time_fromstart(rec_i,1) = GetSecs - start_while;
+            mot.dat{runNbr}{i}.xy(rec_i,:) = [x-cir_center(1) cir_center(2)-y]./radius;
+            mot.dat{runNbr}{i}.clicks(rec_i,:) = button;
+            mot.dat{runNbr}{i}.r_theta(rec_i,:) = [curr_r/radius curr_theta/180]; %radius and degree?
+            
+            if button(1)
+                mot.dat{runNbr}{i}.button_click_timestamp=GetSecs; %
+                mot.dat{runNbr}{i}.button_click_bool=1; % 1 = Click, 0 = not click
                 draw_scale('overall_predict_semicircular')
                 Screen('DrawDots', theWindow, [xx(i) yy(i)]', 20, white, [0 0], 1);  % draw random dot in SemiC
-                Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  % Cursor
-                % if the point goes further than the semi-circle, move the point to
-                % the closest point
-                radius = (rb2-lb2)/2; %%radius = (rb-lb)/2; % radius
-                theta = atan2(cir_center(2)-y,x-cir_center(1));
-                % current euclidean distance
-                curr_r = sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2);
-                % current angle (0 - 180 deg)
-                curr_theta = rad2deg(-theta+pi);
-                if y > cir_center(2)
-                    y = cir_center(2);
-                    SetMouse(x,y);
-                end
-%                 if y > bb
-%                     y = bb;
-%                     SetMouse(x,y);
-%                 end
-                % send to arc of semi-circle
-                if sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2) > radius
-                    x = radius*cos(theta)+cir_center(1);
-                    y = cir_center(2)-radius*sin(theta);
-                    SetMouse(x,y);
-                end
-                draw_scale('overall_predict_semicircular')
-                Screen('DrawDots', theWindow, [xx(i) yy(i)]', 20, white, [0 0], 1);  % draw random dot in SemiC
-                Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  % Cursor
+                Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
                 Screen('Flip',theWindow);
-                
-                
-                mot.dat{runNbr}{i}.time_fromstart(rec_i,1) = GetSecs - start_while;
-                mot.dat{runNbr}{i}.xy(rec_i,:) = [x-cir_center(1) cir_center(2)-y]./radius;
-                mot.dat{runNbr}{i}.clicks(rec_i,:) = button;
-                mot.dat{runNbr}{i}.r_theta(rec_i,:) = [curr_r/radius curr_theta/180]; %radius and degree?
-                
-                if button(1)
-                    mot.dat{runNbr}{i}.button_click_timestamp=GetSecs; %
-                    mot.dat{runNbr}{i}.button_click_bool=1; % 1 = Click, 0 = not click
-                    draw_scale('overall_predict_semicircular')
-                    Screen('DrawDots', theWindow, [xx(i) yy(i)]', 20, white, [0 0], 1);  % draw random dot in SemiC
-                    Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
-                    Screen('Flip',theWindow);
-                    WaitSecs(.1);
-                    break;
-                else
-                    mot.dat{runNbr}{i}.button_click_bool=0; 
-                    mot.dat{runNbr}{i}.move_end_timestamp = GetSecs;
-                end
+                WaitSecs(.1);
+                break;
+            else
+                mot.dat{runNbr}{i}.button_click_bool=0;
+                mot.dat{runNbr}{i}.move_end_timestamp = GetSecs;
+            end
         end
         while GetSecs - TrSt_t < 6 + ISI(i)
             if button(1)
@@ -302,7 +315,7 @@ try
         end
     end
     
-    % Close the screen 
+    % Close the screen
     sca;
     ShowCursor();
     Screen('CloseAll');

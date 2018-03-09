@@ -32,7 +32,7 @@ end
 testmode = false;
 USE_BIOPAC = false;
 dofmri = false;
-
+joystick = false;
 for i = 1:length(varargin)
     if ischar(varargin{i})
         switch varargin{i}
@@ -45,8 +45,8 @@ for i = 1:length(varargin)
                 channel_n = 3;
                 biopac_channel = 0;
                 ljHandle = BIOPAC_setup(channel_n); % BIOPAC SETUP
-            case {'mouse', 'trackball'}
-                % do nothing
+            case {'joystick'}
+                joystick=true;
         end
     end
 end
@@ -110,7 +110,7 @@ if start_trial==1
         cue_mean = [99;99;99;99;99;99;0.22; 0.22; 0.22;0.22; 0.77; 0.77; 0.77; 0.77;0.22; 0.22; 0.77; 0.77;]; % (LOWx4 HIGHx4) x 2 = 16 trials
         cue_var = abs(repmat(0.05,24,1) + randn(24,1).*0.003); %
         overall_unpl_Q_txt= [repmat({'다른 사람들은 얼마나 아팠을까요?'},3,1); repmat({'얼마나 아팠나요?'},3,1); repmat({'얼마나 아팠나요?'},8,1); repmat({'다른 사람들은 얼마나 아팠을까요?'},4,1)];
-        overall_unpl_Q_cond = [repmat({'other_painful'},3,1); repmat({'self_painful'},3,1); repmat({'self_painful'},8,1); repmat({'other_painful'},4,1);];
+        overall_unpl_Q_cond = [repmat({'other_painful'},6,1); repmat({'self_painful'},8,1); repmat({'other_painful'},4,1);];
         %generate a randome sequence
         rn = randperm(numel(cue_settings));
         %randomization
@@ -152,6 +152,7 @@ end
 %% SETUP: Experiment settings
 rating_type = 'semicircular';
 NumberOfCue = 25;
+velocity = 5;
 %% SETUP: Screen
 Screen('Clear');
 Screen('CloseAll');
@@ -326,15 +327,26 @@ try
             % xcenter = (lb1+rb1)/2;
             % ycenter = H*3/4+100;
             
-            cir_center = [(lb1+rb1)/2 H*3/4+100];           
+            cir_center = [(lb1+rb1)/2 H*3/4+100];
+            % set the mouse or x y position to center of semi-circular
             % cir_center = [(rb1+lb1)/2, bb]; --> 
             SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
-
+            x=cir_center(1); y=cir_center(2);
             % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
             start_while=GetSecs;
-            data.dat{runNbr}{trial_Number(j)}.contRating_start_timestamp = start_while;           
+            data.dat{runNbr}{trial_Number(j)}.contRating_start_timestamp = start_while;
             while GetSecs - TrSt_t < 14.5 + ITI(j) + 2 + Delay(j)
-                [x,y,button]=GetMouse(theWindow);
+                if joystick
+                    [pos, ~] = mat_joy(0);
+                    xAlpha=pos(1);
+                    x=x+xAlpha*velocity;
+                    yAlpha=pos(2);
+                    y=y+yAlpha*velocity;
+                    %[x y]=[x+pos(1)*velocity y+pos(2)*velocity]
+                else
+                    [x,y,button]=GetMouse(theWindow);
+                end
+                % [x,y,button]=GetMouse(theWindow);
                 rec_i= rec_i+1;
                 % if the point goes further than the semi-circle, move the point to
                 % the closest point
@@ -390,11 +402,22 @@ try
             %6. Overall ratings
             cir_center = [(lb2+rb2)/2, H*3/4+100];
             SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
+            x=cir_center(1); y=cir_center(2);
+            
             rec_i = 0;
             sTime=GetSecs;
             data.dat{runNbr}{trial_Number(j)}.overallRating_start_timestamp=sTime; % overall rating time stamp
             while GetSecs - TrSt_t < 5 + Delay2(j)+14.5 + ITI(j) + 2 + Delay(j)
-                [x,y,button]=GetMouse(theWindow);
+                if joystick
+                    [pos, button] = mat_joy(0);
+                    xAlpha=pos(1);
+                    x=x+xAlpha*velocity;
+                    yAlpha=pos(2);
+                    y=y+yAlpha*velocity;
+                else
+                    [x,y,button]=GetMouse(theWindow);
+                end
+                %[x,y,button]=GetMouse(theWindow);
                 rec_i= rec_i+1;
                 % if the point goes further than the semi-circle, move the point to
                 % the closest point
@@ -485,13 +508,24 @@ try
             % set the mouse location to zero point
             %%cir_center = [(rb1+lb1)/2, bb];
             cir_center = [(lb1+rb1)/2 H*3/4+100];
+            
+            x=cir_center(1); y=cir_center(2);
             SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
             % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
             start_while=GetSecs;
             
             data.dat{runNbr}{trial_Number(j)}.contRating_start_timestamp = start_while;
             while GetSecs - TrSt_t < 14.5 + ITI(j)
-                [x,y,button]=GetMouse(theWindow);
+                if joystick
+                    [pos, ~] = mat_joy(0);
+                    xAlpha=pos(1);
+                    x=x+xAlpha*velocity;
+                    yAlpha=pos(2);
+                    y=y+yAlpha*velocity;
+                else
+                    [x,y,button]=GetMouse(theWindow);
+                end
+                %[x,y,button]=GetMouse(theWindow);
                 rec_i= rec_i+1;
                 % if the point goes further than the semi-circle, move the point to
                 % the closest point
@@ -551,12 +585,23 @@ try
             %6. Overall ratings
             cir_center = [(lb2+rb2)/2, H*3/4+100];
             SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
+            x=cir_center(1); y=cir_center(2);
+            
             rec_i = 0;
             ready2=0;
             sTime=GetSecs;
             data.dat{runNbr}{trial_Number(j)}.overallRating_start_timestamp=sTime; % overall rating time stamp
             while GetSecs - TrSt_t < 5 + Delay2(j)+14.5 + ITI(j) % overall rating 5 seconds
-                [x,y,button]=GetMouse(theWindow);
+                if joystick
+                    [pos, button] = mat_joy(0);
+                    xAlpha=pos(1);
+                    x=x+xAlpha*velocity;
+                    yAlpha=pos(2);
+                    y=y+yAlpha*velocity;
+                else
+                    [x,y,button]=GetMouse(theWindow);
+                end
+                % [x,y,button]=GetMouse(theWindow);
                 rec_i= rec_i+1;
                 % if the point goes further than the semi-circle, move the point to
                 % the closest point

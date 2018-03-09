@@ -10,17 +10,14 @@ function calibration(ip, port, varargin)
 %%
 %% Parse varargin
 testmode = false;
+joystick = false;
 for i = 1:length(varargin)
     if ischar(varargin{i})
         switch varargin{i}
             case {'test'}
                 testmode = true;
-            case {'scriptdir'}
-                scriptdir = varargin{i+1};
-            case {'psychtoolbox'}
-                psytool = varargin{i+1};
-            case {'mouse', 'trackball'}
-                % do nothing
+            case {'joystick'}
+                joystick=true;
         end
     end
 end
@@ -104,6 +101,8 @@ NumOfTr = 12;
 stimText = '+';
 init_stim={'00101111' '00111001' '01000011'}; % Initial degrees of a heat pain [43.4 45.4 47.4]
 rating_type = 'semicircular';
+velocity = 5;
+
 % save?
 save(reg.datafile,'reg','init_stim');
 %% 
@@ -183,15 +182,27 @@ try
         % -1.2. Moving dot part
         ready = 0;
         moving_start_timestamp = GetSecs;
+        
         SetMouse(cir_center(1), cir_center(2));
+        x=cir_center(1); y=cir_center(2);
         while GetSecs - moving_start_timestamp < 5
             while ~ready
-                [x,y,button] = GetMouse(theWindow);
+                if joystick
+                    [pos, button] = mat_joy(0);
+                    xAlpha=pos(1);
+                    x=x+xAlpha*velocity;
+                    yAlpha=pos(2);
+                    y=y+yAlpha*velocity;
+                    %[x y]=[x+pos(1)*velocity y+pos(2)*velocity]
+                else
+                    [x,y,button]=GetMouse(theWindow);
+                end
+                %[x,y,button] = GetMouse(theWindow);
                 draw_scale('overall_predict_semicircular');
                 Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  % Cursor
                 % if the point goes further than the semi-circle, move the point to
                 % the closest point
-                radius = (rb2-lb2)/2;%radius = (rb-lb)/2; % radius                
+                radius = (rb2-lb2)/2;%radius = (rb-lb)/2; % radius
                 theta = atan2(cir_center(2)-y,x-cir_center(1));
                 if y > cir_center(2) %bb
                     y = cir_center(2);
@@ -295,8 +306,20 @@ try
         % 4. Ratings
         start_ratings=GetSecs;
         SetMouse(cir_center(1), cir_center(2));
+        x=cir_center(1); y=cir_center(2);
+
         while GetSecs - start_ratings < 10 % Under 10 seconds,
-            [x,y,button] = GetMouse(theWindow);
+             if joystick
+                [pos, button] = mat_joy(0);
+                xAlpha=pos(1);
+                x=x+xAlpha*velocity;
+                yAlpha=pos(2);
+                y=y+yAlpha*velocity;
+                %[x y]=[x+pos(1)*velocity y+pos(2)*velocity]
+            else
+                [x,y,button]=GetMouse(theWindow);
+            end
+            %[x,y,button] = GetMouse(theWindow);
             msg = double('얼마나 아팠나요?');
             Screen('TextSize', theWindow, 26);
             DrawFormattedText(theWindow, msg, 'center', 'center', white, [], [], [], 2);
