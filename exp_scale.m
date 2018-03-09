@@ -1,7 +1,9 @@
 function exp_scale(scale, joystick)
 
 % explane scale (overall and continuous)
-% MESSAGE FOR EACH RUN
+% THIS IS WILL BE EVERY RUN.
+% scale = 'predict'
+% joystick = false or true, but it can be obtain own scripts.
 
 global theWindow W H; % window property
 global white red orange bgcolor; % color
@@ -11,7 +13,7 @@ global fontsize;
 
  
 Screen(theWindow,'FillRect',bgcolor, window_rect);
-
+velocity = cal_vel_joy('overall');
 
 switch scale
     case 'predict'
@@ -38,13 +40,12 @@ switch scale
         WaitSecs(1);
         rnd=randperm(2,1);
         WaitSecs(rnd);
-        start_while = GetSecs;
         
         cir_center = [(lb1+rb1)/2 H*3/4+100];
         
         x=cir_center(1); y=cir_center(2);
         SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
-        
+        start_while = GetSecs;
         while GetSecs-start_while < 10
             if joystick
                 [pos, ~] = mat_joy(0);
