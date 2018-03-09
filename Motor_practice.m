@@ -139,7 +139,7 @@ stimText = '+';
 ISI = repmat([3;5;7],7,1);
 rn=randperm(21);
 ISI = ISI(rn);
-velocity = 5;
+velocity = cal_vel_joy('overall');
 %% SETUP: PTB WINDOW
 theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
 Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -223,12 +223,13 @@ try
         %SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
         cir_center = [(lb2+rb2)/2, H*3/4+100];
         SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
+        x=cir_center(1); y=cir_center(2);
         %
         start_while = GetSecs;
         mot.dat{runNbr}{i}.while_start_timestamp = start_while;
         while GetSecs - TrSt_t < 6 + ISI(i)            
             if joystick
-                [pos, ~] = mat_joy(0);
+                [pos, button] = mat_joy(0);
                 xAlpha=pos(1);
                 x=x+xAlpha*velocity;
                 yAlpha=pos(2);

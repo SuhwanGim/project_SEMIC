@@ -1,4 +1,4 @@
-function exp_scale(scale)
+function exp_scale(scale, joystick)
 
 % explane scale (overall and continuous)
 % MESSAGE FOR EACH RUN
@@ -22,7 +22,7 @@ switch scale
         draw_scale('cont_predict_semicircular');
         Screen('Flip', theWindow);
         
-        WaitSec(1); %For preventing double-typed 'Space' key
+        WaitSecs(1); %For preventing double-typed 'Space' key
         while (1)
             [~,~,keyCode] = KbCheck;
             if keyCode(KbName('space'))==1
@@ -41,9 +41,21 @@ switch scale
         start_while = GetSecs;
         
         cir_center = [(lb1+rb1)/2 H*3/4+100];
+        
+        x=cir_center(1); y=cir_center(2);
         SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
+        
         while GetSecs-start_while < 10
-            [x,y,~]=GetMouse(theWindow);
+            if joystick
+                [pos, ~] = mat_joy(0);
+                xAlpha=pos(1);
+                x=x+xAlpha*velocity;
+                yAlpha=pos(2);
+                y=y+yAlpha*velocity;
+            else
+                [x,y,~]=GetMouse(theWindow);
+            end
+            % [x,y,~]=GetMouse(theWindow);
             radius = (rb1-lb1)/2; % radius
             theta = atan2(cir_center(2)-y,x-cir_center(1));
             % current euclidean distance

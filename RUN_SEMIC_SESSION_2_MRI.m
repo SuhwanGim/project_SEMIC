@@ -40,5 +40,5 @@ disp(reg.skinSite_rs); %after 2018/03/01 calibration data
     
     
 %% SEND DATA
-    sujb_name=;
+    sujb_name='INPUT HERE';
     SEMIC_Senddata(subj_name,'mri')

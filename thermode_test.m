@@ -149,10 +149,6 @@ if start_trial==1
 else
     [run_Number, trial_Number, ITI, Delay, Delay2, cue_settings, cue_mean, cue_var, stim_level, program, overall_unpl_Q_cond, overall_unpl_Q_txt] = ts{runNbr};
 end
-%% SETUP: Experiment settings
-rating_type = 'semicircular';
-NumberOfCue = 25;
-velocity = 5;
 %% SETUP: Screen
 Screen('Clear');
 Screen('CloseAll');
@@ -209,6 +205,11 @@ anchor_yd = bb+20; % 710
 anchor_y = H/2+10+scale_H;
 % anchor_lms = [0.014 0.061 0.172 0.354 0.533].*(rb-lb)+lb;
 
+%% SETUP: Experiment settings
+rating_type = 'semicircular';
+NumberOfCue = 25;
+velocity = cal_vel_joy('overall');
+
 %% EXPERIEMENT START
 try
     theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
@@ -222,7 +223,7 @@ try
     % Themode_test (with highest degree based on calibration data)
     pathway_test(ip, port, 'MRI', reg);
     % Explain grid-scale every run
-    exp_scale('predict');
+    exp_scale('predict',joystick);
     
     
     

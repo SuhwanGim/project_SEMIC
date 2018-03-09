@@ -101,7 +101,7 @@ NumOfTr = 12;
 stimText = '+';
 init_stim={'00101111' '00111001' '01000011'}; % Initial degrees of a heat pain [43.4 45.4 47.4]
 rating_type = 'semicircular';
-velocity = 5;
+velocity = cal_vel_joy('overall');
 
 % save?
 save(reg.datafile,'reg','init_stim');

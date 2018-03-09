@@ -16,7 +16,7 @@ global lb1 rb1 lb2 rb2;% For larger semi-circular
 global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
 %global reg;
 
-%% SETUP: Parameter
+%% SETUP: Design parameters
 runNbr = 1;
 N = 8; % Number of Trial
 %% Parse varargin
@@ -123,10 +123,6 @@ if start_trial==1
 else
     [run_Number, trial_Number, ITI, Delay, Delay2, cue_settings, cue_mean, cue_var, stim_level, program, overall_unpl_Q_cond, overall_unpl_Q_txt] = ts{runNbr};
 end
-%% SETUP: Experiment settings
-rating_type = 'semicircular';
-NumberOfCue = 25;
-velocity = 5;
 
 %% SETUP: Screen
 Screen('Clear');
@@ -188,6 +184,13 @@ Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
 Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); % For alpha value of e.g.,[R G B alpha]
 %Screen('TextFont', theWindow, font); % setting font
 Screen('TextSize', theWindow, fontsize);
+
+%% SETUP: Experiment settings
+rating_type = 'semicircular';
+NumberOfCue = 25;
+velocity = cal_vel_joy('overall');
+
+
 %% EXPERIEMENT START
 try
     % settings of ts
@@ -195,7 +198,7 @@ try
     % Explain grid-scale every run
     
     pathway_test(ip, port, 'MRI',reg);
-    exp_scale('predict');
+    exp_scale('predict',joystick);
     
     
     % START: RUN
@@ -308,7 +311,7 @@ try
         
         while GetSecs - TrSt_t < 14.5 + ITI(j) + 2 + Delay(j)
             if joystick
-                [pos, ~] = mat_joy(0);
+                [pos, button] = mat_joy(0);
                 xAlpha=pos(1);
                 x=x+xAlpha*velocity;
                 yAlpha=pos(2);
