@@ -166,15 +166,7 @@ try
     %PART0. Motor_practice (3-4 trials)
     % 1. pathwaty test
     pathway_test(ip, port, 'basic');
-%     while (1)
-%         [~,~,keyCode] = KbCheck;
-%         if keyCode(KbName('space'))==1
-%             break
-%         elseif keyCode(KbName('q'))==1
-%             abort_man;
-%         end
-%         display_expmessage('지금부터 조이스틱 연습을 하겠습니다.\n 준비되었으면 SPACE BAR를 눌러주세요.'); % until space; see subfunctions
-%     end
+
     % 2. Moving dot part
     for i=1:motorN % Four trials
         % -1.1. Fixation point
@@ -234,7 +226,7 @@ try
     
     %PART1. Calibrtaion 
     % 0. Instructions
-    display_expmessage('지금부터는 Calibration을 시작하겠습니다.\n참가자는 편안하게 계시고 진행자의 지시를 따라주시기 바랍니다.');
+    display_expmessage('지금부터는 캘리브레이션을 시작하겠습니다.\n참가자는 편안하게 계시고 진행자의 지시를 따라주시기 바랍니다.');
     WaitSecs(3);
     random_value = randperm(3); %randomized order for 1st, 2nd and 3rd stimulus
     for i=1:NumOfTr %Total trial
@@ -284,17 +276,6 @@ try
                    main(ip,port,2); % start thermal pain
                    ready=1;
                end               
-%             resp = main(ip,port,0); % get system status
-%             systemState = resp{4}; testState = resp{5};
-%             if strcmp(systemState, 'Pathway State: READY') && strcmp(testState,'Test State: IDLE')
-%                 Screen('Flip',theWindow); % for a blank screen 
-%                 main(ip,port,1,current_stim); %trigerring heat-pain % About 0.5~0.6 sec
-%                 start_stim=GetSecs;
-%                 waitsec_fromstarttime(start_stim,10);
-%                 break;
-%             else
-%                 %do nothing
-%             end
         end
         
         % Fixation

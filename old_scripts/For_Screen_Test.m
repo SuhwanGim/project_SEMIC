@@ -23,7 +23,7 @@ font = 'NanumBarunGothic';
 bgcolor = 80;
 white = 255;
 red = [255 0 0];
-red_Alpha = [255 164 0 130]; % RGB + A(Level of tranceprency: for social Cue)
+red_Alpha = [255  164 0 130]; % RGB + A(Level of tranceprency: for social Cue)
 orange = [255 164 0];
 yellow = [255 220 0];
 
@@ -79,7 +79,7 @@ sTime=GetSecs;
 rating_type = 'semicircular';
 
 %% Explain
-exp_scale('predict')
+exp_scale('predict',joystick)
 
 % %% d
 % draw_scale('overall_predict_semicircular');

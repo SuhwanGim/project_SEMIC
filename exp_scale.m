@@ -17,7 +17,7 @@ velocity = cal_vel_joy('overall');
 
 switch scale
     case 'predict'
-        msg = double('이 척도가 화면에 나타나면\n "이번 자극이 최대 얼마나 아플까요?"에\n대해 보고를 해 주시면 되겠습니다.(Space)');
+        msg = double('이 척도가 화면에 나타나면\n "이번 자극이 최대 얼마나 아플까요?"\n에 대해 보고를 해 주시면 되겠습니다.(Space)');
         % display
         Screen('TextSize', theWindow, fontsize);
         DrawFormattedText(theWindow, msg, 'center', 1/5*H, orange, [], [], [], 1.5);

@@ -14,5 +14,5 @@ calibration(ip, port,'test');
 
 
 %% 
-    sujb_name=;
+    subj_name=;
     SEMIC_Senddata(subj_name,'Calibration')

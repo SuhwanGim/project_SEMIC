@@ -20,7 +20,7 @@ global fontsize;
 
 Screen(theWindow,'FillRect',bgcolor, window_rect);
 
-msg=double('이동한 열패드의 상태를 확인하기 위해 테스트를 진행하겠습니다(space)');
+msg=double('이동한 열패드를 확인하기 위해 테스트를 진행하겠습니다 (space)');
 display_expmessage(msg);
 
 while (1)
@@ -72,7 +72,7 @@ switch type
                 % pause
             end
         end
-        msg=double('이제부터 조이스틱 연습을 시작하겟습니다(space)');
+        msg=double('이제부터 조이스틱 연습을 시작하겠습니다 (space)');
         
     case 'MRI'
         if ~isempty(msg)
@@ -108,7 +108,7 @@ switch type
         while GetSecs - sTime <14.5 + 10
             % pause
         end
-        msg=double('확인하였습니다.\n다음으로는 척도 확인 및 연습을 시작하겠습니다(space)');
+        msg=double('확인하였습니다.\n다음으로는 척도 확인 및 연습을 시작하겠습니다 (space)');
 end
 
 while (1)

@@ -225,8 +225,7 @@ try
     % Explain grid-scale every run
     exp_scale('predict',joystick);
     
-    
-    
+ 
     % START: RUN
     data.run_start_timestamp{runNbr}=GetSecs;
     % Loop of Trials
@@ -807,19 +806,3 @@ Screen('CloseAll'); %relinquish screen control
 disp(str); %present this text in command window
 
 end
-
-
-
-%%
-%             if GetSecs - sTime > 10 % 7 = plateau + ramp-down
-%                 start_stopsignal=GetSecs;
-%                 waitsec_fromstarttime(start_stopsignal, 2)
-%                 resp = main(ip,port,0); %get system status
-%                 systemState = resp{4}; testState = resp{5};
-%                 if strcmp(systemState, 'Pathway State: READY') && strcmp(testState,'Test State: IDLE')
-%                     data.dat{runNbr}{trial_Number(j)}.heat_exit_txt = main(ip,port,5); % Triggering stop signal
-%                     ready2 = 1;
-%                     data.dat{runNbr}{trial_Number(j)}.heat_exit_timestamp = GetSecs;
-%                     break;
-%                 end
-%             end
