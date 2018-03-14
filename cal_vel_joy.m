@@ -26,7 +26,7 @@ hz = 60; %refresh ratio
 %distance between center and line in SEMIC
 switch type
     case 'overall'
-        sec = 6;
+        sec = 4;
         distance=(rb2-lb2)/2;
     case 'cont'
         sec = 11;
