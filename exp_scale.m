@@ -13,7 +13,7 @@ global fontsize;
 
  
 Screen(theWindow,'FillRect',bgcolor, window_rect);
-velocity = cal_vel_joy('overall');
+velocity = cal_vel_joy('cont');
 
 switch scale
     case 'predict'

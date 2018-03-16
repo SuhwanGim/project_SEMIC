@@ -208,7 +208,8 @@ anchor_y = H/2+10+scale_H;
 %% SETUP: Experiment settings
 rating_type = 'semicircular';
 NumberOfCue = 25;
-velocity = cal_vel_joy('overall');
+velocity_ovr = cal_vel_joy('overall');
+velocity_cot = cal_vel_joy('cont');
 
 %% EXPERIEMENT START
 try
@@ -337,11 +338,11 @@ try
             data.dat{runNbr}{trial_Number(j)}.contRating_start_timestamp = start_while;
             while GetSecs - TrSt_t < 14.5 + ITI(j) + 2 + Delay(j)
                 if joystick
-                    [pos, ~] = mat_joy(0);
+                    [pos, button] = mat_joy(0);
                     xAlpha=pos(1);
-                    x=x+xAlpha*velocity;
+                    x=x+xAlpha*velocity_cot;
                     yAlpha=pos(2);
-                    y=y+yAlpha*velocity;
+                    y=y+yAlpha*velocity_cot;
                     %[x y]=[x+pos(1)*velocity y+pos(2)*velocity]
                 else
                     [x,y,button]=GetMouse(theWindow);
@@ -411,9 +412,9 @@ try
                 if joystick
                     [pos, button] = mat_joy(0);
                     xAlpha=pos(1);
-                    x=x+xAlpha*velocity;
+                    x=x+xAlpha*velocity_ovr;
                     yAlpha=pos(2);
-                    y=y+yAlpha*velocity;
+                    y=y+yAlpha*velocity_ovr;
                 else
                     [x,y,button]=GetMouse(theWindow);
                 end
@@ -517,11 +518,11 @@ try
             data.dat{runNbr}{trial_Number(j)}.contRating_start_timestamp = start_while;
             while GetSecs - TrSt_t < 14.5 + ITI(j)
                 if joystick
-                    [pos, ~] = mat_joy(0);
+                    [pos, button] = mat_joy(0);
                     xAlpha=pos(1);
-                    x=x+xAlpha*velocity;
+                    x=x+xAlpha*velocity_cot;
                     yAlpha=pos(2);
-                    y=y+yAlpha*velocity;
+                    y=y+yAlpha*velocity_cot;
                 else
                     [x,y,button]=GetMouse(theWindow);
                 end
@@ -595,9 +596,9 @@ try
                 if joystick
                     [pos, button] = mat_joy(0);
                     xAlpha=pos(1);
-                    x=x+xAlpha*velocity;
+                    x=x+xAlpha*velocity_ovr;
                     yAlpha=pos(2);
-                    y=y+yAlpha*velocity;
+                    y=y+yAlpha*velocity_ovr;
                 else
                     [x,y,button]=GetMouse(theWindow);
                 end

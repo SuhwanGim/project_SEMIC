@@ -47,6 +47,8 @@ switch type
                 end
                 display_expmessage(msg);
             end
+            msg='잠시만 기다려 주세요';
+            display_expmessage(msg);
             
             if ~isempty(msg)
                 %disp('Please wait a second');
@@ -85,7 +87,9 @@ switch type
                     % do nothing
                 end
             end
-            %disp('Please wait a second');
+            msg='잠시만 기다려 주세요';
+            display_expmessage(msg);
+
             main(ip, port, 1, degree);
             WaitSecs(0.5);
             clc;
