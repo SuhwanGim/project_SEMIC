@@ -7,6 +7,10 @@ for j=1:18
     subplot(4,5,j);
     theta = data.dat{i}{j}.con_r_theta(:,2);
     t1 = data.dat{i}{j}.con_time_fromstart;
+    % curr_theta = rad2deg(-theta+pi)/180
+    theta = 180*theta;
+    theta = deg2rad(theta)-pi;
+    theta = -theta;
     theta = rad2deg(theta);
     theta= 180 - theta;
     
@@ -14,7 +18,7 @@ for j=1:18
     %subplot(4,5,j);
     plot(t1, theta);
     title([data.dat{1,i}{1,j}.ts(6) data.dat{1,i}{1,j}.ts(9)]);
-    axis([-1 t1(numel(t1)) 0 180]);
+    axis([-1 t1(numel(t1)) 0 185]);
     xlabel('TIME(0-14.5)') % x-axis label
     ylabel('DEGREE(0-180)') % y-axis label
 end

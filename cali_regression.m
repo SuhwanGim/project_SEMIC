@@ -16,6 +16,7 @@ function cali_regression (degree, rating, th, NumOfTr)
 % FUNCTION WILL DO NOT WORK FUNCTIONALLY.
 %
 % by. Suhwan Gim (roseno.9@daum.net) 
+% 2018.03.19 
 %
 % see also glmfit % glmval %
 % LinearModel.Residuals.Raw: sum of squared errors polyfit: in a
@@ -84,7 +85,7 @@ uc_number=uc_number.*5;
 c_number=round(uc_number)./5;
 
 % limit the degree
-c_number(c_number > 49) = 49;
+c_number(c_number > 49) = 48.8;
 c_number(c_number < 39) = 39;
 end
 

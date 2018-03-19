@@ -52,7 +52,7 @@ switch type
             
             if ~isempty(msg)
                 %disp('Please wait a second');
-                main(ip, port, 1, 24);
+                main(ip, port, 1, 74);
                 WaitSecs(0.5);
                 clc;
                 
