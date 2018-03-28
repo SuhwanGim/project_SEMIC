@@ -25,6 +25,8 @@ function [fname,start_trial,SID] = subjectinfo_check_SEMIC(savedir, runNbr, vara
 %
 %   **'Learn':**
 %       Check the data file for Learning_phase.m
+%   **'Rest' :**
+%       Check the data file for rest_run.m
 %
 % ..
 %    Copyright (C) 2017  Wani Woo (Cocoan lab)
@@ -36,6 +38,7 @@ mot = false;
 main2 = false; % It's distinct main.m (related to pathway function)
 cali = false;
 learn = false;
+rest = false;
 
 for i = 1:length(varargin)
     if ischar(varargin{i})
@@ -49,6 +52,8 @@ for i = 1:length(varargin)
                 cali = true;
             case {'Learn'}
                 learn = true;
+            case {'Rest'}
+                rest = true;
         end
     end
 end
@@ -67,6 +72,8 @@ elseif cali
     fname = fullfile(savedir, ['Calib_' SID '.mat']);
 elseif learn
     fname = fullfile(savedir, ['Learning_' SID '.mat']);
+elseif rest
+    fname = fullfile(saveifr, ['Rest_' SID '.mat']);
 else
     error('Unknown input');
 end

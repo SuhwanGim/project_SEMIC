@@ -682,11 +682,11 @@ try
     %closing message utill stoke specific keyboard
     if runNbr==6
         Screen('Flip',theWindow);
-        WaitSecs(5);
+        WaitSecs(10);
         display_expmessage('모든 실험이 종료되었습니다\n잠시만 기다려주세요');
     else
         Screen('Flip',theWindow);
-        WaitSecs(5);
+        WaitSecs(10);
         display_expmessage('잠시만 기다려주세요.');
     end
     
