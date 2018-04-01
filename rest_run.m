@@ -72,7 +72,7 @@ red_Alpha = [255 164 0 130]; % RGB + A(Level of tranceprency: for social Cue)
 orange = [255 164 0];
 yellow = [255 220 0];
 %% Parameter
-stimText = '';
+stimText = '+';
 seconds = 385; %duration: 6 min 20 seoncds
 
 %%

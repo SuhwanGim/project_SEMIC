@@ -2,7 +2,7 @@ function calibration(ip, port, varargin)
 %%INFORMATION
 % This function is for finding each participant's a pain space. There are
 % sub-fucntions and cali_regression function. This functino is for
-% calculating a linear line. 
+% calculating a linear line.
 % : A calibraition for heat-pain machine
 %
 % See also cali_regression
@@ -31,14 +31,14 @@ global reg; % regression data
 
 %% SETUP: DATA and Subject INFO
 savedir = 'Cali_Semic_data';
-[fname,~ , SID] = subjectinfo_check_SEMIC(savedir,1,'Cali'); % subfunction %start_trial
+[fname, start_trial , SID] = subjectinfo_check_SEMIC(savedir,1,'Cali'); % subfunction %start_trial
 % save data using the canlab_dataset object
 reg.version = 'SEMIC_Calibration_v1_01-03-2018_Cocoanlab';
 reg.subject = SID;
 reg.datafile = fname;
 reg.starttime = datestr(clock, 0); % date-time
 reg.starttime_getsecs = GetSecs; % in the same format of timestamps for each trial
-%% 
+%%
 addpath(genpath(pwd));
 %%
 Screen('Clear');
@@ -71,7 +71,7 @@ yellow = [255 220 0];
 lb = 1.5*W/5; % in 1280, it's 384
 rb = 3.5*W/5; % in 1280, it's 896 rb-lb = 512
 
-% For cont rating scale 
+% For cont rating scale
 lb1 = 1*W/18; %
 rb1 = 17*W/18; %
 
@@ -102,10 +102,11 @@ stimText = '+';
 init_stim={'00101111' '00111001' '01000011'}; % Initial degrees of a heat pain [43.4 45.4 47.4]
 rating_type = 'semicircular';
 velocity = cal_vel_joy('overall');
+start_value =1;
 
 % save?
 save(reg.datafile,'reg','init_stim');
-%% 
+%%
 % cir_center = [(rb+lb)/2, bb];
 % radius = (rb-lb)/2; % radius
 cir_center = [(lb2+rb2)/2, H*3/4+100];
@@ -117,7 +118,7 @@ deg(deg < 0) = 0;
 th = deg2rad(deg);
 % x = radius*cos(th)+cir_center(1);
 % y = cir_center(2)-radius*sin(th);
-%% SETUP: the pathway program 
+%% SETUP: the pathway program
 PathPrg = load_PathProgram('SEMIC');
 %% Setup: generate sequence of skin site and LMH (Low, middle and high)
 rng('shuffle');
@@ -125,12 +126,12 @@ rng('shuffle');
 % for i = 1:3 % 4(Skin sites:1 to 4) x 3 (number of stimulation) combination
 %     reg.skin_site(i*4-3:i*4,1) = randperm(4); % [1 2 3 4] [2 3 1 4] ......
 % end
-% 
+%
 % for z = 1:4 % four skin_site %Each skin site stimulated by LMH heat-pain
 %     [I, ~] = find(reg.skin_site==z); % [Index, Value]
 %     rn=randperm(3);
 %     for zz=1:size(I,1)
-%         reg.skin_LMH(I(zz)) = rn(zz); 
+%         reg.skin_LMH(I(zz)) = rn(zz);
 %     end
 % end
 
@@ -163,73 +164,79 @@ Screen('TextSize', theWindow, fontsize);
 %% START: Experiment
 %: Motor_practice --> calibration
 try
-    %PART0. Motor_practice (3-4 trials)
-    % 1. pathwaty test
-    pathway_test(ip, port, 'basic');
-
-    % 2. Moving dot part
-    for i=1:motorN % Four trials
-        % -1.1. Fixation point
-        fixPoint(2, white, stimText);
-        % -1.2. Moving dot part
-        ready = 0;
-        moving_start_timestamp = GetSecs;
+    if start_trial == 1
+        %PART0. Motor_practice (3-4 trials)
+        % 1. pathwaty test
+        pathway_test(ip, port, 'basic');
         
-        SetMouse(cir_center(1), cir_center(2));
-        x=cir_center(1); y=cir_center(2);
-        while GetSecs - moving_start_timestamp < 5
-            while ~ready
-                if joystick
-                    [pos, button] = mat_joy(0);
-                    xAlpha=pos(1);
-                    x=x+xAlpha*velocity;
-                    yAlpha=pos(2);
-                    y=y+yAlpha*velocity;
-                    %[x y]=[x+pos(1)*velocity y+pos(2)*velocity]
-                else
-                    [x,y,button]=GetMouse(theWindow);
-                end
-                %[x,y,button] = GetMouse(theWindow);
-                draw_scale('overall_predict_semicircular');
-                Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  % Cursor
-                % if the point goes further than the semi-circle, move the point to
-                % the closest point
-                radius = (rb2-lb2)/2;%radius = (rb-lb)/2; % radius
-                theta = atan2(cir_center(2)-y,x-cir_center(1));
-                if y > cir_center(2) %bb
-                    y = cir_center(2);
-                    SetMouse(x,y);
-                end
-                % send to arc of semi-circle
-                if sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2) > radius
-                    x = radius*cos(theta)+cir_center(1);
-                    y = cir_center(2)-radius*sin(theta);
-                    SetMouse(x,y);
-                end
-                Screen('Flip',theWindow);
-                
-                if button(1)
-                    button_click_timestamp=GetSecs; %
+        % 2. Moving dot part
+        for i=1:motorN % Four trials
+            % -1.1. Fixation point
+            fixPoint(2, white, stimText);
+            % -1.2. Moving dot part
+            ready = 0;
+            moving_start_timestamp = GetSecs;
+            
+            SetMouse(cir_center(1), cir_center(2));
+            x=cir_center(1); y=cir_center(2);
+            while GetSecs - moving_start_timestamp < 5
+                while ~ready
+                    if joystick
+                        [pos, button] = mat_joy(0);
+                        xAlpha=pos(1);
+                        x=x+xAlpha*velocity;
+                        yAlpha=pos(2);
+                        y=y+yAlpha*velocity;
+                        %[x y]=[x+pos(1)*velocity y+pos(2)*velocity]
+                    else
+                        [x,y,button]=GetMouse(theWindow);
+                    end
+                    %[x,y,button] = GetMouse(theWindow);
                     draw_scale('overall_predict_semicircular');
-                    Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
+                    Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  % Cursor
+                    % if the point goes further than the semi-circle, move the point to
+                    % the closest point
+                    radius = (rb2-lb2)/2;%radius = (rb-lb)/2; % radius
+                    theta = atan2(cir_center(2)-y,x-cir_center(1));
+                    if y > cir_center(2) %bb
+                        y = cir_center(2);
+                        SetMouse(x,y);
+                    end
+                    % send to arc of semi-circle
+                    if sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2) > radius
+                        x = radius*cos(theta)+cir_center(1);
+                        y = cir_center(2)-radius*sin(theta);
+                        SetMouse(x,y);
+                    end
                     Screen('Flip',theWindow);
-                    WaitSecs(.5);
-                    ready = 1;
-                    break;
+                    
+                    if button(1)
+                        button_click_timestamp=GetSecs; %
+                        draw_scale('overall_predict_semicircular');
+                        Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
+                        Screen('Flip',theWindow);
+                        WaitSecs(.5);
+                        ready = 1;
+                        break;
+                    end
                 end
+                fixPoint(0, white, '');
+                Screen('Flip', theWindow);
             end
-            fixPoint(0, white, '');
-            Screen('Flip', theWindow);
+            moving_end_timestamp = GetSecs;
         end
-        moving_end_timestamp = GetSecs;
+    else
+        start_value = start_trial; 
     end
     
-    %PART1. Calibrtaion 
+    
+    
+    %PART1. Calibrtaion
     % 0. Instructions
     display_expmessage('지금부터는 캘리브레이션을 시작하겠습니다.\n참가자는 편안하게 계시고 진행자의 지시를 따라주시기 바랍니다.');
     WaitSecs(3);
     random_value = randperm(3); %randomized order for 1st, 2nd and 3rd stimulus
-    for i=1:NumOfTr %Total trial
+    for i=start_value:NumOfTr %Total trial
         reg.trial_start_timestamp{i,1}=GetSecs; % trial_star_timestamp
         % manipulate the current stim
         if i<4
@@ -247,7 +254,7 @@ try
         
         % 1. Display where the skin site stimulates (1-6)
         WaitSecs(2);
-        main(ip,port,1,current_stim); % Select the program 
+        main(ip,port,1,current_stim); % Select the program
         WaitSecs(1);
         main(ip,port,2,current_stim); % Pre-start
         msg = strcat('연구자는 다음 위치의 열패드를 이동하신 후 SPACE 키를 누르십시오 :  ', num2str(reg.skin_site(i)));
@@ -272,10 +279,10 @@ try
         ready=0;
         while GetSecs - start_while < 12.5 % same as the test,
             Screen('Flip', theWindow);
-               if ~ready
-                   main(ip,port,2); % start thermal pain
-                   ready=1;
-               end               
+            if ~ready
+                main(ip,port,2); % start thermal pain
+                ready=1;
+            end
         end
         
         % Fixation
@@ -288,9 +295,9 @@ try
         start_ratings=GetSecs;
         SetMouse(cir_center(1), cir_center(2));
         x=cir_center(1); y=cir_center(2);
-
+        
         while GetSecs - start_ratings < 10 % Under 10 seconds,
-             if joystick
+            if joystick
                 [pos, button] = mat_joy(0);
                 xAlpha=pos(1);
                 x=x+xAlpha*velocity;
@@ -303,7 +310,7 @@ try
             %[x,y,button] = GetMouse(theWindow);
             msg = double('얼마나 아팠나요?');
             Screen('TextSize', theWindow, 26);
-            DrawFormattedText(theWindow, msg, 'center', 'center', white, [], [], [], 2);
+            DrawFormattedText(theWindow, msg, 'center', 1/5*H, white, [], [], [], 2);
             draw_scale('overall_predict_semicircular');
             Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  %dif color
             
@@ -321,7 +328,7 @@ try
                 y = cir_center(2)-radius*sin(theta);
                 SetMouse(x,y);
             end
-           
+            
             Screen('Flip',theWindow);
             
             % Feedback
@@ -355,15 +362,15 @@ try
             else
                 % do nothing
             end
-        end    
+        end
         
-        %Calculating regression line 
+        %Calculating regression line
         reg.trial_end_timestamp{i,1}=GetSecs;
-        cali_regression (degree, vas_rating, i, NumOfTr); % cali_regression (stim_degree in this trial, rating, order of trial, Number of Trial)       
+        cali_regression (degree, vas_rating, i, NumOfTr); % cali_regression (stim_degree in this trial, rating, order of trial, Number of Trial)
         save(reg.datafile, '-append', 'reg');
-    end %trial 
+    end %trial
     
-
+    
     
     % End of calibration
     %reg.stduySkinSite_ts = [reg.stduySkinSite reg.stduySkinSite];

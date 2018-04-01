@@ -77,7 +77,7 @@ radius = (rb2-lb2)/2;
 %% EXPERIEMENT START
 sTime=GetSecs;
 rating_type = 'semicircular';
-
+joystick = true;
 %% Explain
 exp_scale('predict',joystick)
 

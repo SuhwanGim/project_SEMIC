@@ -7,6 +7,7 @@ function learn = Learning_test(ip, port, reg, varargin)
 % =========================================================================
 % You can see details of this fucntion (see below)
 % see also thermode_test
+ 
 
 %% GLOBAL vaiable
 global theWindow W H; % window property
@@ -421,7 +422,7 @@ try
             end
             msg = double(overall_unpl_Q_txt{j});
             Screen('TextSize', theWindow, 26);
-            DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 1.2);
+            DrawFormattedText(theWindow, msg, 'center', 1/5*H, white, [], [], [], 1.2);
             draw_scale('overall_predict_semicircular')
             Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
             Screen('Flip', theWindow);

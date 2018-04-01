@@ -443,7 +443,7 @@ try
                 end
                 msg = double(overall_unpl_Q_txt{j});
                 Screen('TextSize', theWindow, 26);
-                DrawFormattedText(theWindow, msg, 'center', 'center', white, [], [], [], 2);
+                DrawFormattedText(theWindow, msg, 'center', 1/5*H, white, [], [], [], 2);
                 draw_scale('overall_predict_semicircular')
                 Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
                 Screen('Flip', theWindow);
@@ -627,7 +627,7 @@ try
                 end
                 msg = double(overall_unpl_Q_txt{j});
                 Screen('TextSize', theWindow, 26);
-                DrawFormattedText(theWindow, msg, 'center', 'center', white, [], [], [], 2);
+                DrawFormattedText(theWindow, msg, 'center', 1/5*H, white, [], [], [], 2);
                 draw_scale('overall_predict_semicircular')
                 Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
                 Screen('Flip', theWindow);

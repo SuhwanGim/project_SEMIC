@@ -12,12 +12,12 @@ function [fname,start_trial,SID] = subjectinfo_check_SEMIC(savedir, runNbr, vara
 %   **savedir:**
 %       The directory where you save the data
 %
-% :Optional Inputs: 
+% :Optional Inputs:
 %
-%   **'Mot':** 
+%   **'Mot':**
 %       Check the data file for Motor_task.m
 %
-%   **'Main':** 
+%   **'Main':**
 %       Check the data file for thermode_test.m
 %
 %   **'Cali':**
@@ -84,7 +84,7 @@ if ~exist(savedir, 'dir')
     whattodo = 1;
 else
     if exist(fname, 'file')
-        if runNbr == 1           
+        if runNbr == 1
             str = ['The Subject ' SID ' data file exists. Press a button for the following options'];
             disp(str);
             whattodo = input('1:Save new file, 2:Save the data from where we left off, Ctrl+C:Abort? ');
@@ -100,7 +100,15 @@ end
 
 if whattodo == 2
     load(fname);
-    start_trial = numel(data.dat{runNbr}) + 1;
+    
+    if cali
+        start_trial = numel(reg.stim_degree) + 1;
+    elseif
+        start_trial = numel(data.dat{runNbr}) + 1;
+    else
+        disp('Unknown strat_point');
+    end
+    
 else
     start_trial = 1;
 end
