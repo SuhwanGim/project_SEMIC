@@ -1,4 +1,4 @@
-function calibration(ip, port, varargin)
+function calibration(SID, ip, port, varargin)
 %%INFORMATION
 % This function is for finding each participant's a pain space. There are
 % sub-fucntions and cali_regression function. This functino is for
@@ -31,7 +31,7 @@ global reg; % regression data
 
 %% SETUP: DATA and Subject INFO
 savedir = 'Cali_Semic_data';
-[fname, start_trial , SID] = subjectinfo_check_SEMIC(savedir,1,'Cali'); % subfunction %start_trial
+[fname, start_trial , SID] = subjectinfo_check_SEMIC(SID, savedir,1,'Cali'); % subfunction %start_trial
 % save data using the canlab_dataset object
 reg.version = 'SEMIC_Calibration_v1_01-03-2018_Cocoanlab';
 reg.subject = SID;
@@ -310,7 +310,7 @@ try
             %[x,y,button] = GetMouse(theWindow);
             msg = double('얼마나 아팠나요?');
             Screen('TextSize', theWindow, 26);
-            DrawFormattedText(theWindow, msg, 'center', 1/5*H, white, [], [], [], 2);
+            DrawFormattedText(theWindow, msg, 'center', 1/2*H-100, white, [], [], [], 2);
             draw_scale('overall_predict_semicircular');
             Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  %dif color
             

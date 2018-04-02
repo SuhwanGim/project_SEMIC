@@ -1,4 +1,4 @@
-function Motor_practice(runNbr,varargin)
+function Motor_practice(SID, runNbr,varargin)
 
 %%INOFMRATION
 %
@@ -54,7 +54,7 @@ global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_y
 addpath(genpath(pwd));
 %% SETUP: DATA and Subject INFO
 savedir = 'MOTOR_SEMIC_data';
-[fname,~ , SID] = subjectinfo_check_SEMIC(savedir,runNbr,'Mot'); % subfunction %start_trial
+[fname,~ , SID] = subjectinfo_check_SEMIC(SID, savedir,runNbr,'Mot'); % subfunction %start_trial
 % save data using the canlab_dataset object
 mot.version = 'SEMIC_Motor_task_v1_17-02-2018_Cocoanlab';
 mot.subject = SID;
@@ -156,7 +156,7 @@ try
         elseif keyCode(KbName('q'))==1
             abort_man;
         end
-        display_expmessage('지금부터 조이스틱 연습을 하겠습니다.\n 준비되었으면 SPACE BAR를 눌러주세요.'); % until space; see subfunctions
+        display_expmessage('지금부터 조이스틱 연습을 하겠습니다.\n 선에 있는 점을 향해 조이스틱을 조작해주시면 됩니다.\n준비되었으면 SPACE BAR를 눌러주세요.'); % until space; see subfunctions
     end
     
     while (1)
@@ -197,7 +197,7 @@ try
     
     if USE_BIOPAC
         bio_t = GetSecs;
-        mot.dat.biopac_triggertime{runNbr}{1} = bio_t; %BIOPAC timestamp
+        mot.dat{runNbr}{1}.biopac_triggertime = bio_t; %BIOPAC timestamp
         BIOPAC_trigger(ljHandle, biopac_channel, 'on');
         Screen(theWindow,'FillRect',bgcolor, window_rect);
         Screen('Flip', theWindow);
@@ -255,11 +255,7 @@ try
                 y = cir_center(2);
                 SetMouse(x,y);
             end
-            %                 if y > bb
-            %                     y = bb;
-            %                     SetMouse(x,y);
-            %                 end
-            % send to arc of semi-circle
+
             if sqrt((x-cir_center(1))^2+ (y-cir_center(2))^2) > radius
                 x = radius*cos(theta)+cir_center(1);
                 y = cir_center(2)-radius*sin(theta);

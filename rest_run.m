@@ -1,4 +1,4 @@
-function rest_run(varargin)
+function rest_run(SID,varargin)
 %Rest run
 %   Input variable
 %       (1) test: 1280 720 resoultion
@@ -31,8 +31,8 @@ global window_rect % rating scale
 global fontsize;
 
 %% SETUP: DATA and Subject INFO
-savedir = 'RUN_SEMIC_data';
-[fname,~, SID] = subjectinfo_check_SEMIC(savedir,1,'Rest'); % subfunction %start_trial
+savedir = 'REST_SEMIC_data';
+[fname,~, SID] = subjectinfo_check_SEMIC(SID,savedir,1,'Rest'); % subfunction %start_trial
 %[fname, start_trial, SID] = subjectinfo_check(savedir); % subfunction
 if exist(fname, 'file'), load(fname, 'rest'); load(fname,'ts'); end
 % save data using the canlab_dataset object
@@ -81,7 +81,8 @@ try
     Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
     
     %Start
-    rest.run_start_timestamp=GetSecs;
+    
+    rest.dat{1}{1}.run_start_timestamp=GetSecs;
     while (1)
         [~,~,keyCode] = KbCheck;
         if keyCode(KbName('space'))==1
@@ -121,7 +122,7 @@ try
         Screen(theWindow, 'FillRect', bgcolor, window_rect);
         DrawFormattedText(theWindow, double('시작합니다...'), 'center', 'center', white, [], [], [], 1.2);
         Screen('Flip', theWindow);
-        rest.dat.runscan_starttime = GetSecs;
+        rest.dat{1}{1}.runscan_starttime = GetSecs;
         waitsec_fromstarttime(fmri_t, 4);
         
         % 5 seconds: Blank
@@ -133,7 +134,7 @@ try
     
     if USE_BIOPAC
         bio_t = GetSecs;
-        rest.dat.biopac_triggertime = bio_t; %BIOPAC timestamp
+        rest.dat{1}{1}.biopac_triggertime = bio_t; %BIOPAC timestamp
         BIOPAC_trigger(ljHandle, biopac_channel, 'on');
         Screen(theWindow,'FillRect',bgcolor, window_rect);
         Screen('Flip', theWindow);
@@ -147,13 +148,13 @@ try
     
     % Start: Gray screen
     t_time=GetSecs;
-    rest.dat.screen_start_timestamp = t_time;
-    DrawFormattedText(theWindow, double(stimText), 'center', 'center', color, [], [], [], 1.2);
+    rest.dat{1}{1}.screen_start_timestamp = t_time;
+    DrawFormattedText(theWindow, double(stimText), 'center', 'center', white, [], [], [], 1.2);
     Screen('Flip', theWindow);
     
     waitsec_fromstarttime(t_time, seconds);
     
-    rest.dat.screen_end_timestamp = GetSecs;
+    rest.dat{1}{1}.screen_end_timestamp = GetSecs;
     
     WaitSecs(10);
     

@@ -1,4 +1,4 @@
-function [fname,start_trial,SID] = subjectinfo_check_SEMIC(savedir, runNbr, varargin)
+function [fname,start_trial,SID] = subjectinfo_check_SEMIC(SID,savedir, runNbr, varargin)
 
 % Get subject information, and check if the data file exists?
 %
@@ -35,7 +35,7 @@ function [fname,start_trial,SID] = subjectinfo_check_SEMIC(savedir, runNbr, vara
 
 % SETUP: varargin
 mot = false;
-main2 = false; % It's distinct main.m (related to pathway function)
+main2 = false; % It's for avoid distinct main.m (related to pathway function)
 cali = false;
 learn = false;
 rest = false;
@@ -61,7 +61,7 @@ end
 
 % Get Subject ID
 fprintf('\n');
-SID = input('Subject ID? ','s');
+% SID = input('Subject ID? ','s');
 
 % check if the data file exists
 if mot
@@ -73,7 +73,7 @@ elseif cali
 elseif learn
     fname = fullfile(savedir, ['Learning_' SID '.mat']);
 elseif rest
-    fname = fullfile(saveifr, ['Rest_' SID '.mat']);
+    fname = fullfile(savedir, ['Rest_' SID '.mat']);
 else
     error('Unknown input');
 end
@@ -103,7 +103,7 @@ if whattodo == 2
     
     if cali
         start_trial = numel(reg.stim_degree) + 1;
-    elseif
+    elseif main2
         start_trial = numel(data.dat{runNbr}) + 1;
     else
         disp('Unknown strat_point');

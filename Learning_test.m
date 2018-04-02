@@ -1,4 +1,4 @@
-function learn = Learning_test(ip, port, reg, varargin)
+function learn = Learning_test(SID, ip, port, reg, varargin)
 %%
 %**THERE IS ONLY DIFFERENT THING THAT THIS FUCNTION TRIGGER THERMAL PAIN
 %WITH CONGURENT SOICAL CUE CONCOMPARED WITH THERMODE_TEST
@@ -48,7 +48,7 @@ end
 addpath(genpath(pwd));
 %% SETUP: DATA and Subject INFO
 savedir = 'LEARN_SEMIC_data';
-[fname,start_trial, SID] = subjectinfo_check_SEMIC(savedir,1,'Learn'); % subfunction %start_trial
+[fname,start_trial, SID] = subjectinfo_check_SEMIC(SID,savedir,1,'Learn'); % subfunction %start_trial
 %[fname, start_trial, SID] = subjectinfo_check(savedir); % subfunction
 if exist(fname, 'file'), load(fname, 'learn'); load(fname,'ts'); end
 % save data using the canlab_dataset object
@@ -422,7 +422,7 @@ try
             end
             msg = double(overall_unpl_Q_txt{j});
             Screen('TextSize', theWindow, 26);
-            DrawFormattedText(theWindow, msg, 'center', 1/5*H, white, [], [], [], 1.2);
+            DrawFormattedText(theWindow, msg, 'center', 1/2*H-100, white, [], [], [], 1.2);
             draw_scale('overall_predict_semicircular')
             Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
             Screen('Flip', theWindow);
@@ -473,8 +473,14 @@ try
     save(learn.datafile, '-append', 'learn');
     
     %closing image until when acquiring T1 image is end
+    msg='연습이 끝났습니다. 구조촬영이 계속 진행 중 입니다. \n몸을 움직이지 마시고 기다려 주시기 바랍니다.';
+    DrawFormattedText(theWindow, double(msg), 'center', 'center', white, [], [], [], 1.2);
+    Screen('Flip', theWindow);
+    WaitSec(10);
+    
     DrawFormattedText(theWindow, double('+'), 'center', 'center', white, [], [], [], 1.2);
     Screen('Flip', theWindow);
+    
     while (1)
         [~,~,keyCode] = KbCheck;
         if keyCode(KbName('q'))==1

@@ -1,6 +1,7 @@
 function SEMIC_Senddata(subj_name, type)
 %
-
+% Copyright 1984-2016 The MathWorks, Inc.
+% This function requires Java.
 
 %% SETTING: MAIL ACCOUNT
 % This mail account created only for this function because this fucntion 
@@ -8,7 +9,7 @@ function SEMIC_Senddata(subj_name, type)
 mail = 'cocoan.matlab@gmail.com';
 password = 'public20170302';
 % mail address of receiver
-rec_mail = 'roseno.9@daum.net';
+rec_mail = 'roseno.9@daum.net'; %Suhwan Gim @Cocoanlab
 
 %% SETTING: SMTP protocol (gmail)
 setpref('Internet','E_mail',mail);
@@ -30,12 +31,18 @@ switch type
     case 'Calibration'
         data_dir ={[pwd '/Cali_Semic_data/' 'Calib_' sbj '.mat']};
         %modify message
+        
         msg_title = ['Calibration_' sbj '_' datestr(now)];
         msg_text = ['Calibration' 'Subject Name:' sbj '      ' 'Time:' datestr(now) '      ' 'data_files'];
+        
+        
     case 'mri'
         data_dir ={[pwd '/LEARN_SEMIC_data/' 'Learning_' sbj '.mat'],...
+            [pwd '/REST_SEMIC_data/' 'Rest_' SID '.mat'],...
             [pwd '/Main_SEMIC_data/' 'Main_' sbj '.mat'],...
             [pwd '/Motor_Semic_data/' 'Motor_' sbj '.mat']};
+        
+        
         %modify message
         msg_title = ['MRI_experiment_' sbj '_' datestr(now)];
         msg_text = ['MRI_experiment' 'Subject Name:' sbj '      ' 'Time:' datestr(now) '      ' 'data_files'];
