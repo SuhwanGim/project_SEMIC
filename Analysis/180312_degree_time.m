@@ -1,8 +1,10 @@
-col2 = [0.9922    0.6824    0.3804];
-trial_number = 18;
+
+col2 = [0.9922 0.6824 0.3804];
+
 
 %%
-i=1;
+trial_number = 18;
+i=1; %Run Number
 for j=1:18
     subplot(4,5,j);
     theta = data.dat{i}{j}.con_r_theta(:,2);
