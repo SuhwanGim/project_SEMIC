@@ -163,6 +163,7 @@ Screen('TextFont', theWindow, font); % setting font
 Screen('TextSize', theWindow, fontsize);
 %% START: Experiment
 %: Motor_practice --> calibration
+
 try
     if start_trial == 1
         %PART0. Motor_practice (3-4 trials)

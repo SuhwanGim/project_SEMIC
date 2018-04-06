@@ -5,7 +5,7 @@ global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
 global lb1 rb1 lb2 rb2;
 global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
 
-
+ sss
 %%
 
 Screen('Clear');

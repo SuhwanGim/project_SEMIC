@@ -9,7 +9,7 @@ addpath(genpath(pwd));
 
 %% 1. Calibration
 SID = 입력하세요;
-calibration(SID, ip, port,'test');
+calibration(SID, ip, port,'joystick','test');
 
 
 

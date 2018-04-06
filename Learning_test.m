@@ -25,6 +25,7 @@ testmode = false;
 USE_BIOPAC = false;
 dofmri = false;
 joystick= false;
+USE_EYELINK = false;
 % need to be specified differently for different computers
 % psytool = 'C:\toolbox\Psychtoolbox';
 for i = 1:length(varargin)
@@ -41,6 +42,8 @@ for i = 1:length(varargin)
                 ljHandle = BIOPAC_setup(channel_n); % BIOPAC SETUP
             case {'joystick'}
                 joystick=true;
+            case {'eyelink', 'eye', 'eyetrack'}
+                USE_EYELINK = true;
         end
     end
 end
@@ -186,11 +189,25 @@ Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); % For 
 %Screen('TextFont', theWindow, font); % setting font
 Screen('TextSize', theWindow, fontsize);
 
+
+%% SETUP: Eyelink
+% need to be revised when the eyelink is here.
+if USE_EYELINK
+    edf_filename = ['Learning_' SID '_' runNbr]; % name should be equal or less than 8
+    edfFile = sprintf('%s.EDF', edf_filename);
+    eyelink_main(edfFile, 'Init');
+    
+    status = Eyelink('Initialize');
+    if status
+        error('Eyelink is not communicating with PC. Its okay baby.');
+    end
+    Eyelink('Command', 'set_idle_mode');
+    waitsec_fromstarttime(GetSecs, .5);
+end
 %% SETUP: Experiment settings
 rating_type = 'semicircular';
 NumberOfCue = 25;
 velocity = cal_vel_joy('overall');
-
 
 %% EXPERIEMENT START
 try
@@ -269,6 +286,13 @@ try
             %?
             if USE_BIOPAC
                 BIOPAC_trigger(ljHandle, biopac_channel, 'off');
+            end
+            
+            % EYELINK
+            if USE_EYELINK
+                Eyelink('StartRecording');
+                learn.dat{runNbr}{trial_Number(j)}.eyetracker_starttime = GetSecs; % eyelink timestamp
+                Eyelink('Message','Task Run start');
             end
             
         end
