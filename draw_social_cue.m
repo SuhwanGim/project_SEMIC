@@ -37,7 +37,7 @@ if semicircular
     % [,color] surpprt RGBA (RGB + Alpha: level of transprency) 0 - 255
     % 
     Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); % For using level of alpha
-    Screen('DrawDots', theWindow, [x y]', 20, red_Alpha, [0 0], 1);  %dif color
+    Screen('DrawDots', theWindow, [x y]', 22, red_Alpha, [0 0], 1);  %dif color
     
     
 else

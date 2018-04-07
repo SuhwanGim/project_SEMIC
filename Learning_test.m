@@ -193,7 +193,8 @@ Screen('TextSize', theWindow, fontsize);
 %% SETUP: Eyelink
 % need to be revised when the eyelink is here.
 if USE_EYELINK
-    edf_filename = ['Learning_' SID '_' runNbr]; % name should be equal or less than 8
+    new_SID = erase(SID,'SEM'); % For limitation of file name 
+    edf_filename = ['L_' new_SID '_' num2str(runNbr)]; % name should be equal or less than 8
     edfFile = sprintf('%s.EDF', edf_filename);
     eyelink_main(edfFile, 'Init');
     
@@ -292,7 +293,7 @@ try
             if USE_EYELINK
                 Eyelink('StartRecording');
                 learn.dat{runNbr}{trial_Number(j)}.eyetracker_starttime = GetSecs; % eyelink timestamp
-                Eyelink('Message','Task Run start');
+                Eyelink('Message','Run start');
             end
             
         end
@@ -303,6 +304,10 @@ try
         % 1. ITI (jitter)
         fixPoint(TrSt_t, ITI(j), white, '+') % ITI
         learn.dat{runNbr}{trial_Number(j)}.ITI_endtimestamp = GetSecs;
+        if USE_EYELINK
+            Eyelink('Message','ITI ends');
+        end
+        
         % 2. Cue
         draw_scale('overall_predict_semicircular');
         [~ , learn.dat{runNbr}{trial_Number(j)}.cue_theta] = draw_social_cue(cue_mean(j), cue_var(j), NumberOfCue, rating_type); % draw & save details: draw_socia_cue(m, std, n, rating_type)
@@ -314,9 +319,16 @@ try
         
         waitsec_fromstarttime(TrSt_t, ITI(j) + 2); % 2 seconds
         learn.dat{runNbr}{trial_Number(j)}.cue_end_timestamp = GetSecs;
+        if USE_EYELINK
+            Eyelink('Message','Social cue ends');
+        end
+        
         % 3. Delay
         fixPoint(TrSt_t , ITI(j) + 2 + Delay(j), white, '+') % Delay
         learn.dat{runNbr}{trial_Number(j)}.Delay1_end_timestamp = GetSecs;
+        if USE_EYELINK
+            Eyelink('Message','Delay1 ends');
+        end        
         % 4. HEAT and Ratings
         rec_i = 0;
         ready3=0;
@@ -333,7 +345,9 @@ try
         % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
         start_while=GetSecs;
         learn.dat{runNbr}{trial_Number(j)}.start_rating_timestamp = start_while;
-        
+        if USE_EYELINK
+            Eyelink('Message','Continuous rating start');
+        end                
         while GetSecs - TrSt_t < 14.5 + ITI(j) + 2 + Delay(j)
             if joystick
                 [pos, button] = mat_joy(0);
@@ -382,6 +396,9 @@ try
                     learn.dat{runNbr}{trial_Number(j)}.heat_start_txt = main(ip,port,2); % start heat signal
                     learn.dat{runNbr}{trial_Number(j)}.duration_heat_trigger = toc;
                     learn.dat{runNbr}{trial_Number(j)}.heat_start_timestamp = GetSecs; % heat-stimulus time stamp
+                    if USE_EYELINK
+                        Eyelink('Message','heat_stimulation_start');
+                    end
                     ready3=1;
                 else
                     %do nothing
@@ -397,10 +414,16 @@ try
             learn.dat{runNbr}{trial_Number(j)}.con_r_theta(rec_i,:) = [curr_r/radius curr_theta/180]; %radius and degree?
         end
         learn.dat{runNbr}{trial_Number(j)}.contRating_end_stamp_end = GetSecs;
+        if USE_EYELINK
+            Eyelink('Message','Continuous rating ends');
+        end
         
         %5. Delay2
         fixPoint(TrSt_t, Delay2(j)+14.5 + ITI(j) + 2 + Delay(j), white, '+')
         learn.dat{runNbr}{trial_Number(j)}.Delay2_end_timestamp_end = GetSecs;
+        if USE_EYELINK
+            Eyelink('Message','Delay2 rating ends');
+        end
         
         %6. Overall ratings
         cir_center = [(rb2+lb2)/2 H*3/4+100];
@@ -410,6 +433,9 @@ try
         
         rec_i = 0;
         sTime=GetSecs;
+        if USE_EYELINK
+            Eyelink('Message','Overall rating starts');
+        end
         learn.dat{runNbr}{trial_Number(j)}.overall_rating_time_stamp=sTime; % overall rating time stamp
         while GetSecs - TrSt_t < 5 + Delay2(j)+ 14.5 + ITI(j) + 2 + Delay(j)
             if joystick
@@ -480,6 +506,9 @@ try
             
         end %end of a overall rating
         learn.dat{runNbr}{trial_Number(j)}.overallRating_end_timestamp_end = GetSecs;
+        if USE_EYELINK
+            Eyelink('Message','Overall rating ends');
+        end
         %
         SetMouse(0,0);
         Screen(theWindow,'FillRect',bgcolor, window_rect);
@@ -493,6 +522,21 @@ try
         if mod(trial_Number(j),2) == 0, save(learn.datafile, '-append', 'learn'); end % save data every two trials
         % waitsec_fromstarttime(end_trial, 1); % For your rest,
     end
+    
+    if USE_EYELINK
+        Eyelink('Message','Run ends');
+         eyelink_main(edfFile, 'Shutdown');
+    end
+    
+    if USE_BIOPAC %end BIOPAC
+        bio_t = GetSecs;
+        learn.dat{runNbr}{trial_Number(j)}.biopac_endtime = bio_t;% biopac end timestamp
+        BIOPAC_trigger(ljHandle, biopac_channel, 'on');
+        waitsec_fromstarttime(bio_t, 0.1);
+        BIOPAC_trigger(ljHandle, biopac_channel, 'off');
+    end
+    
+    
     learn.run_endtime_timestamp{runNbr}=GetSecs;
     save(learn.datafile, '-append', 'learn');
     

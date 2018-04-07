@@ -3,8 +3,13 @@ global theWindow
 % eyelink_main(savefilename, varargin)
 % 
 % varargin: 'Init', 'Shutdown'
+% 
 %
 %
+% edfFile =
+%           M_ = main task
+%           L_ = Learning phase
+%           
 % From Byeol Etoile Kim's github
 % URL:     https://github.com/ByeolEtoileKim/fast_fmri_v1
 %

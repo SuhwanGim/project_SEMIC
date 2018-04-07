@@ -46,7 +46,7 @@ switch scale
         x=cir_center(1); y=cir_center(2);
         SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
         start_while = GetSecs;
-        while GetSecs-start_while < 10
+        while GetSecs-start_while < 11
             if joystick
                 [pos, ~] = mat_joy(0);
                 xAlpha=pos(1);

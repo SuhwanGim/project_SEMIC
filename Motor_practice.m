@@ -296,6 +296,15 @@ try
         if mod(i,2) == 0, save(mot.datafile, '-append', 'mot'); end % save data every two trials
     end
     mot.task_end_timestamp{runNbr}=GetSecs;
+    
+    if USE_BIOPAC %end BIOPAC
+        bio_t = GetSecs;
+        mot.dat{runNbr}{i}.biopac_endtime = bio_t;% biopac end timestamp
+        BIOPAC_trigger(ljHandle, biopac_channel, 'on');
+        waitsec_fromstarttime(bio_t, 0.1);
+        BIOPAC_trigger(ljHandle, biopac_channel, 'off');
+    end
+    
     save(mot.datafile, '-append', 'mot');
     
     %closing message utill stoke specific keyboard

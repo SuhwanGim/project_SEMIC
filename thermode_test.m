@@ -32,7 +32,10 @@ end
 testmode = false;
 USE_BIOPAC = false;
 dofmri = false;
-joystick = false;
+joystick= false;
+USE_EYELINK = false;
+% need to be specified differently for different computers
+% psytool = 'C:\toolbox\Psychtoolbox';
 for i = 1:length(varargin)
     if ischar(varargin{i})
         switch varargin{i}
@@ -47,6 +50,8 @@ for i = 1:length(varargin)
                 ljHandle = BIOPAC_setup(channel_n); % BIOPAC SETUP
             case {'joystick'}
                 joystick=true;
+            case {'eyelink', 'eye', 'eyetrack'}
+                USE_EYELINK = true;
         end
     end
 end
@@ -211,6 +216,23 @@ NumberOfCue = 25;
 velocity_ovr = cal_vel_joy('overall');
 velocity_cot = cal_vel_joy('cont');
 
+
+%% SETUP: Eyelink
+% need to be revised when the eyelink is here.
+if USE_EYELINK
+    new_SID = erase(SID,'SEM'); % For limitation of file name 
+    edf_filename = ['M_' new_SID '_' num2str(runNbr)]; % name should be equal or less than 8
+    edfFile = sprintf('%s.EDF', edf_filename);
+    eyelink_main(edfFile, 'Init');
+    
+    status = Eyelink('Initialize');
+    if status
+        error('Eyelink is not communicating with PC. Its okay baby.');
+    end
+    Eyelink('Command', 'set_idle_mode');
+    waitsec_fromstarttime(GetSecs, .5);
+end
+
 %% EXPERIEMENT START
 try
     theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
@@ -296,6 +318,11 @@ try
                 BIOPAC_trigger(ljHandle, biopac_channel, 'off');
             end
             
+            if USE_EYELINK
+                Eyelink('StartRecording');
+                data.dat{runNbr}{trial_Number(j)}.eyetracker_starttime = GetSecs; % eyelink timestamp
+                Eyelink('Message','Run start');
+            end           
         end
         
         TrSt_t = GetSecs; %
@@ -305,21 +332,36 @@ try
         if cue_mean(j)<1
             % 1. ITI (jitter)
             fixPoint(TrSt_t, ITI(j), white, '+') % ITI
+            if USE_EYELINK
+                Eyelink('Message','ITI ends');
+            end
             data.dat{runNbr}{trial_Number(j)}.ITI_endtimestamp = GetSecs;
+            
+            
             % 2. Cue
             draw_scale('overall_predict_semicircular');
             [~ , data.dat{runNbr}{trial_Number(j)}.cue_theta] = draw_social_cue(cue_mean(j), cue_var(j), NumberOfCue, rating_type); % draw & save details: draw_socia_cue(m, std, n, rating_type)
             Screen('Flip', theWindow);
-            %-------------Ready------------------
+            %-------------Ready for Pathway------------------
             main(ip,port,1,program(j)); %select the program
             WaitSecs(0.5);
             main(ip,port,2); %ready to pre-start
-            
+            %-------------------------------------------------
             waitsec_fromstarttime(TrSt_t, ITI(j) + 2); % 2 seconds
+            if USE_EYELINK
+                Eyelink('Message','Social cue ends');
+            end
             data.dat{runNbr}{trial_Number(j)}.cue_end_timestamp = GetSecs;
+            
+            
             % 3. Delay
             fixPoint(TrSt_t , ITI(j) + 2 + Delay(j), white, '+') % Delay
+            if USE_EYELINK
+                Eyelink('Message','Delay1 ends');
+            end            
             data.dat{runNbr}{trial_Number(j)}.Delay1_end_timestamp = GetSecs;
+            
+            
             % 4. HEAT and Ratings
             rec_i = 0;
             ready3=0;
@@ -336,6 +378,9 @@ try
             % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
             start_while=GetSecs;
             data.dat{runNbr}{trial_Number(j)}.contRating_start_timestamp = start_while;
+            if USE_EYELINK
+                Eyelink('Message','Continuous rating start');
+            end
             while GetSecs - TrSt_t < 14.5 + ITI(j) + 2 + Delay(j)
                 if joystick
                     [pos, button] = mat_joy(0);
@@ -383,7 +428,10 @@ try
                         tic;
                         data.dat{runNbr}{trial_Number(j)}.heat_start_txt = main(ip,port,2); % start heat signal
                         data.dat{runNbr}{trial_Number(j)}.duration_heat_trigger = toc;
-                        data.dat{runNbr}{trial_Number(j)}.heat_start_timestamp = GetSecs; % heat-stimulus time stamp
+                        data.dat{runNbr}{trial_Number(j)}.heat_start_timestamp = GetSecs; % heat-stimulus time stamp                        
+                        if USE_EYELINK
+                            Eyelink('Message','heat_stimulation_start');
+                        end
                         ready3=1;
                     end
                 end
@@ -395,11 +443,17 @@ try
                 data.dat{runNbr}{trial_Number(j)}.con_r_theta(rec_i,:) = [curr_r/radius curr_theta/180]; %radius and degree?
             end
             data.dat{runNbr}{trial_Number(j)}.contRating_end_timestamp = GetSecs;
+            if USE_EYELINK
+                Eyelink('Message','Continuous rating ends');
+            end
             
             %5. Delay2
             fixPoint(TrSt_t, Delay2(j)+14.5 + ITI(j) + 2 + Delay(j), white, '+')
             data.dat{runNbr}{trial_Number(j)}.Delay2_end_timestamp_end = GetSecs;
-            
+            if USE_EYELINK
+            Eyelink('Message','Delay2 rating ends');
+            end
+        
             %6. Overall ratings
             cir_center = [(lb2+rb2)/2, H*3/4+100];
             SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
@@ -408,6 +462,10 @@ try
             rec_i = 0;
             sTime=GetSecs;
             data.dat{runNbr}{trial_Number(j)}.overallRating_start_timestamp=sTime; % overall rating time stamp
+            if USE_EYELINK
+                Eyelink('Message','Overall rating starts');
+            end
+            
             while GetSecs - TrSt_t < 5 + Delay2(j)+14.5 + ITI(j) + 2 + Delay(j)
                 if joystick
                     [pos, button] = mat_joy(0);
@@ -477,6 +535,11 @@ try
                 
             end %end of a overall rating
             data.dat{runNbr}{trial_Number(j)}.overallRating_end_timestamp = GetSecs;
+            if USE_EYELINK
+                Eyelink('Message','Overall rating ends');
+            end
+            
+            
             %
             SetMouse(0,0);
             Screen(theWindow,'FillRect',bgcolor, window_rect);
@@ -497,8 +560,11 @@ try
             main(ip,port,1,program(j)); %select the program
             WaitSecs(0.5);
             main(ip,port,2); %ready to pre-start
-            waitsec_fromstarttime(TrSt_t, ITI(j));           
+            waitsec_fromstarttime(TrSt_t, ITI(j));
             % fixPoint(TrSt_t, ITI(j), white, '+') % ITI
+            if USE_EYELINK
+                Eyelink('Message','ITI ends');
+            end
             data.dat{runNbr}{trial_Number(j)}.ITI_endtimestamp = GetSecs;
             
             % 2. HEAT and Ratings
@@ -514,7 +580,9 @@ try
             SetMouse(cir_center(1), cir_center(2)); % set mouse at the center
             % lb2 = W/3; rb2 = (W*2)/3; % new bound for or not
             start_while=GetSecs;
-            
+            if USE_EYELINK
+                Eyelink('Message','Continuous rating start');
+            end
             data.dat{runNbr}{trial_Number(j)}.contRating_start_timestamp = start_while;
             while GetSecs - TrSt_t < 14.5 + ITI(j)
                 if joystick
@@ -563,6 +631,9 @@ try
                         data.dat{runNbr}{trial_Number(j)}.heat_start_txt = main(ip,port,2); % start heat signal
                         data.dat{runNbr}{trial_Number(j)}.duration_heat_trigger = toc;
                         data.dat{runNbr}{trial_Number(j)}.heat_start_timestamp = GetSecs; % heat-stimulus time stamp
+                        if USE_EYELINK
+                            Eyelink('Message','heat_stimulation_start');
+                        end
                         ready3=1;
                     else
                         %do nothing
@@ -578,10 +649,17 @@ try
                 data.dat{runNbr}{trial_Number(j)}.con_r_theta(rec_i,:) = [curr_r/radius curr_theta/180]; %radius and degree?
             end
             data.dat{runNbr}{trial_Number(j)}.contRating_end_timestamp = GetSecs;
+            if USE_EYELINK
+                Eyelink('Message','Continuous rating ends');
+            end
             
             %5. Delay2
             fixPoint(TrSt_t, Delay2(j)+ 14.5 + ITI(j), white, '+')
             data.dat{runNbr}{trial_Number(j)}.Delay2_end_timestamp_end = GetSecs;
+            if USE_EYELINK
+                Eyelink('Message','Delay2 rating ends');
+            end
+            
             
             %6. Overall ratings
             cir_center = [(lb2+rb2)/2, H*3/4+100];
@@ -591,6 +669,9 @@ try
             rec_i = 0;
             ready2=0;
             sTime=GetSecs;
+            if USE_EYELINK
+                Eyelink('Message','Overall rating starts');
+            end
             data.dat{runNbr}{trial_Number(j)}.overallRating_start_timestamp=sTime; % overall rating time stamp
             while GetSecs - TrSt_t < 5 + Delay2(j)+14.5 + ITI(j) % overall rating 5 seconds
                 if joystick
@@ -661,6 +742,10 @@ try
                 
             end %end of a overall rating
             data.dat{runNbr}{trial_Number(j)}.overallRating_end_timestamp = GetSecs;
+            if USE_EYELINK
+                Eyelink('Message','Overall rating ends');
+            end
+            
             %
             SetMouse(0,0);
             Screen(theWindow,'FillRect',bgcolor, window_rect);
@@ -677,6 +762,20 @@ try
         % waitsec_fromstarttime(end_trial, 1); % For your rest,
     end
     data.run_endtime_timestamp{runNbr}=GetSecs;
+    
+    if USE_EYELINK
+        Eyelink('Message','Run ends');
+        eyelink_main(edfFile, 'Shutdown');
+    end
+    
+    if USE_BIOPAC %end BIOPAC
+        bio_t = GetSecs;
+        data.dat{runNbr}{trial_Number(j)}.biopac_endtime = bio_t;% biopac end timestamp
+        BIOPAC_trigger(ljHandle, biopac_channel, 'on');
+        waitsec_fromstarttime(bio_t, 0.1);
+        BIOPAC_trigger(ljHandle, biopac_channel, 'off');
+    end
+    
     save(data.datafile, '-append', 'data');
     
     %closing message utill stoke specific keyboard

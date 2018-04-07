@@ -20,7 +20,7 @@ global fontsize;
 
 Screen(theWindow,'FillRect',bgcolor, window_rect);
 
-msg=double('이동한 열패드를 확인하기 위해 테스트를 진행하겠습니다 (space)');
+msg=double('이동한 열패드를 확인을 위한 테스트를 진행하겠습니다 (space)');
 display_expmessage(msg);
 
 while (1)
