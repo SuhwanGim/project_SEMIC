@@ -27,6 +27,20 @@ global reg;
 std_rating=[30 50 70]; % low, mid, and high %from L. Atlas et al. (2010)
 final_rating=[30 40 50 60 70];
 
+%% SETUP: Correting input data 
+% For example, a boundary score of semi-sircular rating is between 0 to 100
+% . However, there are some cases exceeding this boundry such due to the
+% program error. Therefore, we should correct this rating score into the
+% between 0 to 100.
+
+if (150>= rating) && (rating > 100) % if 100<rating<=150
+    rating = 100;
+elseif (200>= rating) && (rating > 150) % if 150<rating<=200
+    rating = 0;
+else % if 0<=rating<100 
+    %do nothing
+end
+
 %% SETUP: Input data
 reg.stim_degree(th)=degree;
 reg.stim_rating(th)=rating; %0 to 100

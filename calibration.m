@@ -310,7 +310,7 @@ try
             end
             %[x,y,button] = GetMouse(theWindow);
             msg = double('얼마나 아팠나요?');
-            Screen('TextSize', theWindow, 26);
+            Screen('TextSize', theWindow, fontsize);
             DrawFormattedText(theWindow, msg, 'center', 1/2*H-100, white, [], [], [], 2);
             draw_scale('overall_predict_semicircular');
             Screen('DrawDots', theWindow, [x y]', 14, [255 164 0 130], [0 0], 1);  %dif color
