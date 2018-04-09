@@ -544,7 +544,7 @@ try
     msg='연습이 끝났습니다. 구조촬영이 계속 진행 중 입니다. \n몸을 움직이지 마시고 기다려 주시기 바랍니다.';
     DrawFormattedText(theWindow, double(msg), 'center', 'center', white, [], [], [], 1.2);
     Screen('Flip', theWindow);
-    WaitSec(10);
+    WaitSecs(10);
     
     DrawFormattedText(theWindow, double('+'), 'center', 'center', white, [], [], [], 1.2);
     Screen('Flip', theWindow);
