@@ -154,7 +154,8 @@ try
     
     waitsec_fromstarttime(t_time, seconds);
     
-    rest.dat{1}{1}.screen_end_timestamp = GetSecs;
+    rest.dat{1}{1}.screen_end_timestamp = GetSecs;    
+    save(rest.datafile, '-append', 'rest');
     
     WaitSecs(10);
     
