@@ -217,8 +217,15 @@ velocity_ovr = cal_vel_joy('overall');
 velocity_cot = cal_vel_joy('cont');
 
 
+%% SETUP: Screen
+    theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
+    Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
+    Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); % For alpha value of e.g.,[R G B alpha]
+%     Screen('TextFont', theWindow, font); % setting font
+    Screen('TextSize', theWindow, fontsize);
 %% SETUP: Eyelink
 % need to be revised when the eyelink is here.
+% It located after open screen
 if USE_EYELINK
     new_SID = erase(SID,'SEM'); % For limitation of file name 
     edf_filename = ['M_' new_SID '_' num2str(runNbr)]; % name should be equal or less than 8
@@ -235,10 +242,6 @@ end
 
 %% EXPERIEMENT START
 try
-    theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
-    Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
-%     Screen('TextFont', theWindow, font); % setting font
-    Screen('TextSize', theWindow, fontsize);
     % settings of ts
     if start_trial ~= 1,    k=start_trial; else, k=1; end
     
@@ -500,7 +503,7 @@ try
                     SetMouse(x,y);
                 end
                 msg = double(overall_unpl_Q_txt{j});
-                Screen('TextSize', theWindow, 26);
+                Screen('TextSize', theWindow, fontsize);
                 DrawFormattedText(theWindow, msg, 'center', 1/2*H-100, white, [], [], [], 2);
                 draw_scale('overall_predict_semicircular')
                 Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
@@ -707,7 +710,7 @@ try
                     SetMouse(x,y);
                 end
                 msg = double(overall_unpl_Q_txt{j});
-                Screen('TextSize', theWindow, 26);
+                Screen('TextSize', theWindow, fontsize);
                 DrawFormattedText(theWindow, msg, 'center', 1/2*H-100, white, [], [], [], 2);
                 draw_scale('overall_predict_semicircular')
                 Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);

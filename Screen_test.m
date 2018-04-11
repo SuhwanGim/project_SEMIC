@@ -75,9 +75,13 @@ Screen('TextSize', theWindow, fontsize);
 %%
 sTime = GetSecs;
 ready2=0;
+rec=0;
 while ~ready2
-    
+    rec=rec+1;
     [x,y,button] = GetMouse(theWindow);
+    xc(rec,:)=x; 
+    yc(rec,:)=y;
+    
     rating_type = 'semicircular';
     draw_scale('overall_motor_semicircular');
     Screen('DrawDots', theWindow, [x y]', 20, [255 164 0 130], [0 0], 1);  %dif color
@@ -101,7 +105,9 @@ while ~ready2
     theta= 180 - theta;
     theta = num2str(theta);
     DrawFormattedText(theWindow, theta, 'center', 'center', white, [], [], [], 1.2); %Display the degree of the cursur based on cir_center
-    disp(theta);
+    disp(theta); %angle
+    Screen('DrawDots', theWindow, [xc yc]', 5, yellow, [0 0], 1);  %dif color
+    %Screen(theWindow,'DrawLines', [xc yc]', 5, 255);
     Screen('Flip',theWindow);
     if button(1)
         draw_scale('overall_avoidance_semicircular');
@@ -119,7 +125,9 @@ while ~ready2
         end
         
         break;
-    elseif GetSecs - sTime > 10
+        
+        
+    elseif GetSecs - sTime > 20
         ready2=1;
         break;
     else
