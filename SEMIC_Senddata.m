@@ -18,6 +18,8 @@ setpref('Internet','SMTP_Username',mail);
 setpref('Internet','SMTP_Password',password);
 % 
 props = java.lang.System.getProperties;
+clc;
+disp('This function requires Java');
 props.setProperty('mail.smtp.auth','true');
 props.setProperty('mail.smtp.socketFactory.class', 'javax.net.ssl.SSLSocketFactory');
 props.setProperty('mail.smtp.socketFactory.port','465');
@@ -27,11 +29,16 @@ props.setProperty('mail.smtp.socketFactory.port','465');
 % In my(SEMIC) case, find the specific participant's data files.
 sbj=subj_name; %SEM000~
 
+new_SID = erase(sbj,'SEM'); % For limitation of file name
+
+edf_filename = new_SID; % 'M_003_2' <-['M_' new_SID '_' num2str(runNbr)]
+
+
 switch type
     case 'Calibration'
         data_dir ={[pwd '/Cali_Semic_data/' 'Calib_' sbj '.mat']};
-        %modify message
         
+        %modify message        
         msg_title = ['Calibration_' sbj '_' datestr(now)];
         msg_text = ['Calibration' 'Subject Name:' sbj '      ' 'Time:' datestr(now) '      ' 'data_files'];
         
@@ -40,7 +47,15 @@ switch type
         data_dir ={[pwd '/LEARN_SEMIC_data/' 'Learning_' sbj '.mat'],...
             [pwd '/REST_SEMIC_data/' 'Rest_' sbj '.mat'],...
             [pwd '/Main_SEMIC_data/' 'Main_' sbj '.mat'],...
-            [pwd '/Motor_Semic_data/' 'Motor_' sbj '.mat']};
+            [pwd '/Motor_Semic_data/' 'Motor_' sbj '.mat'],...
+            [pwd '/M_' edf_filename '_1.edf']...
+            [pwd '/M_' edf_filename '_2.edf']...
+            [pwd '/M_' edf_filename '_3.edf']...
+            [pwd '/M_' edf_filename '_4.edf']...
+            [pwd '/M_' edf_filename '_5.edf']...
+            [pwd '/M_' edf_filename '_6.edf']...
+            [pwd '/L_' edf_filename '_1.edf']...
+            };
         
         
         %modify message

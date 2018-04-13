@@ -1,17 +1,16 @@
-%% SESSEION2
+%% DAY2
 clc;
 clear;
 close all;
 %% SETUP: PARAMETER
 %ip = '115.145.189.133'; % or LocalHost?
-ip = '203.252.54.21';
-port = 20121;
+ip = '192.168.0.3'; port = 20121;
 addpath(genpath(pwd));
-%% SETUP: Load calibration data
-reg = load_cali_results();
-%% SETUP: SkinSite sequences
-disp(reg.skinSite_rs); %after 2018/03/01 calibration data
+%% SETUP: Load calibration data & SkinSite sequences
+reg = load_cali_results(); disp(reg.skinSite_rs);
 
+
+%% EXPERIMENT %% 
 %% 0. Rest run
     SID = 입력하세요 %Participants
     rest_run(SID,'fmri','biopac1','eyelink','test');

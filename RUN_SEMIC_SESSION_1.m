@@ -1,11 +1,13 @@
-%% SESSEION1
+%% DAY1
 clc;
 clear;
 close all;
 %% SETUP: PARAMETER
-ip = '115.145.189.133'; %ip = '203.252.54.21';
+ip = '192.168.0.3'; %ip = '115.145.189.133'; %ip = '203.252.54.21';
 port = 20121;
 addpath(genpath(pwd));
+
+
 
 %% 1. Calibration
 SID = 입력하세요;
