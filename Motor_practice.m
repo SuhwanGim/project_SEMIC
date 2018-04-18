@@ -56,7 +56,7 @@ addpath(genpath(pwd));
 savedir = 'MOTOR_SEMIC_data';
 [fname,~ , SID] = subjectinfo_check_SEMIC(SID, savedir,runNbr,'Mot'); % subfunction %start_trial
 % save data using the canlab_dataset object
-mot.version = 'SEMIC_Motor_task_v1_17-02-2018_Cocoanlab';
+mot.version = 'SEMIC_Motor_task_v1_18-04-2018_Cocoanlab';
 mot.subject = SID;
 mot.datafile = fname;
 mot.starttime = datestr(clock, 0); % date-time
@@ -132,6 +132,7 @@ th = deg2rad(deg);
 xx = radius*cos(th)+cir_center(1);
 yy = cir_center(2)-radius*sin(th);
 
+
 %% SETUP: DATA and Subject INFO
 %% SETUP: parameter and ISI
 rating_type = 'semicircular';
@@ -156,7 +157,7 @@ try
         elseif keyCode(KbName('q'))==1
             abort_man;
         end
-        display_expmessage('지금부터 조이스틱 연습을 하겠습니다.\n 선에 있는 점을 향해 조이스틱을 조작해주시면 됩니다.\n준비되었으면 SPACE BAR를 눌러주세요.'); % until space; see subfunctions
+        display_expmessage('지금부터 단순동작과제를 시작 하겠습니다.\n 선에 있는 점을 향해 조이스틱을 조작해주시면 됩니다.(SPACE BAR)'); % until space; see subfunctions
     end
     
     while (1)
@@ -286,6 +287,7 @@ try
                 mot.dat{runNbr}{i}.move_end_timestamp = GetSecs;
             end
         end
+        
         while GetSecs - TrSt_t < 6 + ISI(i)
             if button(1)
                 Screen('Flip',theWindow);
@@ -293,6 +295,7 @@ try
         end
         mot.dat{runNbr}{i}.trial_end_timestamp=GetSecs; % trial_star_timestamp
         mot.dat{runNbr}{i}.ISI = ISI(i);
+        mot.dat{runNbr}{i}.target_dot = [xx(i) yy(i)]';
         if mod(i,2) == 0, save(mot.datafile, '-append', 'mot'); end % save data every two trials
     end
     mot.task_end_timestamp{runNbr}=GetSecs;
@@ -311,7 +314,7 @@ try
     Screen('Flip',theWindow);
     WaitSecs(10);
     
-    display_expmessage('조이스틱 연습이 끝났습니다. 연구자의 안내를 기다려 주세요.');
+    display_expmessage('단순동작과제가 끝났습니다. 연구자의 안내를 기다려 주세요.');
     while (1)
         [~,~,keyCode] = KbCheck;
         if keyCode(KbName('q'))==1

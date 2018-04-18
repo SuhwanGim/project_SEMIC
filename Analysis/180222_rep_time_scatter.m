@@ -28,5 +28,21 @@ end
 
 
 
+%% check 
+
+
+runN = 2;
+trialN = 18;
+x=zeros(trialN,runN);
+for j=1:runN
+    for i=1:trialN
+        x(i,j)=data.dat{1, j}{1, i}.duration_heat_trigger;
+        if x(i,j)>2
+            idx = data.dat{1, j}{1, i}.ts(6);
+            disp(['Run:' num2str(j) ' Trial:' num2str(i) 'Cue type:' idx]);
+        end
+    end
+end
+disp(data.datafile);
 
 
