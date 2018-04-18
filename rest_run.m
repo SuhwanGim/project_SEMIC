@@ -42,7 +42,7 @@ rest.datafile = fname;
 rest.starttime = datestr(clock, 0); % date-time
 rest.starttime_getsecs = GetSecs; % in the same format of timestamps for each trial
 
-
+save(rest.datafile,'rest');
 %% SETUP: Screen
 Screen('Clear');
 Screen('CloseAll');
@@ -146,7 +146,9 @@ try
         BIOPAC_trigger(ljHandle, biopac_channel, 'off');
     end
     
-    % Start: Gray screen
+    
+    
+    %==========================Start: Gray screen=========================
     t_time=GetSecs;
     rest.dat{1}{1}.screen_start_timestamp = t_time;
     DrawFormattedText(theWindow, double(stimText), 'center', 'center', white, [], [], [], 1.2);

@@ -396,8 +396,21 @@ try
     Screen('CloseAll');
     
     % disp(best skin site)
-    disp(reg.studySkinSite);
-    
+    % disp(reg.studySkinSite);
+    %
+    % ---------------------------------------------------------------------
+    % IF Rsquared value of fitted line was below 0.4, display this message
+    % This value is our criteria for screen experiment .
+    % ---------------------------------------------------------------------
+    if reg.total_fit.Rsquared.Ordinary <= 0.4
+        disp("===================WARNING=======================");
+        disp("=================================================");
+        disp("PLEASE, check calibration data carefully.");
+        disp("This participant may inappripriate for pain experiment");
+        disp("=================================================");
+    end
+        
+        
 catch err
     % ERROR
     disp(err);
