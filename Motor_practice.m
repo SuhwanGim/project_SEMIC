@@ -8,9 +8,8 @@ function Motor_practice(SID, runNbr,varargin)
 % 1) a randomizaed inter-trial interval with white cross-hair point.
 % 2) a target bullet point with semi-circular rating.
 %
-% The goal of this task is simple.
-% After fixation point disappear, participants move to target bullet point
-% with a joystick.
+% The goal of this task is simple. After fixation point disappear,
+% participants should move to target bullet point with a joystick.
 %
 % written by Suhwan Gim (19, December 2017)
 
@@ -295,7 +294,7 @@ try
         end
         mot.dat{runNbr}{i}.trial_end_timestamp=GetSecs; % trial_star_timestamp
         mot.dat{runNbr}{i}.ISI = ISI(i);
-        mot.dat{runNbr}{i}.target_dot = [xx(i) yy(i)]';
+        mot.dat{runNbr}{i}.target_dot_location = [xx(i) yy(i)]';
         if mod(i,2) == 0, save(mot.datafile, '-append', 'mot'); end % save data every two trials
     end
     mot.task_end_timestamp{runNbr}=GetSecs;
