@@ -148,7 +148,7 @@ try
     
     
     
-    %==========================Start: Gray screen=========================
+    %==========================START: Gray screen with crosshair===========
     t_time=GetSecs;
     rest.dat{1}{1}.screen_start_timestamp = t_time;
     DrawFormattedText(theWindow, double(stimText), 'center', 'center', white, [], [], [], 1.2);
@@ -159,7 +159,9 @@ try
     rest.dat{1}{1}.screen_end_timestamp = GetSecs;    
     save(rest.datafile, '-append', 'rest');
     
-    WaitSecs(10);
+    
+    %==========================END: Gray screen with crosshair=============
+    WaitSecs(5);
     
     display_expmessage('잠시만 기다려주세요.');
     while (1)
