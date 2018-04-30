@@ -99,7 +99,7 @@ uc_number=uc_number.*5;
 c_number=round(uc_number)./5;
 
 % limit the degree
-c_number(c_number > 49) = 49;
+c_number(c_number > 49.2) = 49.2;
 c_number(c_number < 39) = 39;
 end
 
