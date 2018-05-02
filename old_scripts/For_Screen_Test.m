@@ -5,7 +5,7 @@ global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
 global lb1 rb1 lb2 rb2;
 global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
 
- sss
+sss
 %%
 
 Screen('Clear');
@@ -75,11 +75,10 @@ radius = (rb2-lb2)/2;
 
 
 %% EXPERIEMENT START
-sTime=GetSecs;
 rating_type = 'semicircular';
-joystick = false;
+joystick = true;
 %% Explain
-exp_scale('predict',joystick)
+% exp_scale('predict',joystick)
 
 % %% d
 % draw_scale('overall_predict_semicircular');
@@ -111,7 +110,7 @@ y= cir_center(2);
 SetMouse(cir_center(1), cir_center(2));
 while true
     if joystick
-        [pos, ~] = mat_joy(0);
+        [pos, button] = mat_joy(0);
         xAlpha=pos(1);
         x=x+xAlpha*10;
         yAlpha=pos(2);
@@ -141,8 +140,10 @@ while true
     
     
     Screen(theWindow,'FillRect',bgcolor, window_rect);
-    msg = '예상해보십시요';
-    msg = double(msg);
+    msg1 = GetSecs-sTime;
+    msg2 = '조이스틱_테스트_30초동안: ';
+    msg_sum = [msg2 ' ' num2str(msg1)];
+    msg = double(msg_sum);
     DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 1.5);
     
     
@@ -153,6 +154,26 @@ while true
     
     Screen('DrawDots', theWindow, [x y], 15, orange, [0 0], 1);
     Screen('Flip', theWindow);
+    
+    if button(1)
+        draw_scale('overall_predict_semicircular');
+        Screen('DrawDots', theWindow, [x y]', 18, red, [0 0], 1);  % Feedback
+        Screen('Flip',theWindow);
+        WaitSecs(min(0.5, 5-(GetSecs-sTime)));
+        ready3=0;
+        while ~ready3 %GetSecs - sTime> 5
+            msg = double(' ');
+            DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 1.2);
+            Screen('Flip',theWindow);
+            if  GetSecs - sTime > 5
+                break
+            end
+        end
+        break;
+    else
+        %do nothing
+    end
+    
     if GetSecs - sTime >30
         pause(1);
         Screen('Flip', theWindow);

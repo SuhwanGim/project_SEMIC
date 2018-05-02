@@ -21,7 +21,7 @@ testmode = false;
 dofmri = false;
 USE_BIOPAC = false;
 joystick = false;
-
+USE_EYELINK = false;
 for i = 1:length(varargin)
     if ischar(varargin{i})
         switch varargin{i}
@@ -35,7 +35,7 @@ for i = 1:length(varargin)
                 biopac_channel = 0;
                 ljHandle = BIOPAC_setup(channel_n); % BIOPAC SETUP
             case {'eyelink'}
-                %
+                USE_EYELINK = true;
             case {'joystick'}
                 joystick = true;
                 % do nothing
@@ -146,6 +146,23 @@ Screen('BlendFunction', theWindow, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
 % Screen('TextFont', theWindow, font); % setting font
 Screen('TextSize', theWindow, fontsize);
+
+%% SETUP: Eyelink
+% need to be revised when the eyelink is here.
+if USE_EYELINK
+    new_SID = erase(SID,'SEM'); % For limitation of file name 
+    edf_filename = ['O_' new_SID '_' num2str(runNbr)]; % name should be equal or less than 8
+    edfFile = sprintf('%s.EDF', edf_filename);
+    eyelink_main(edfFile, 'Init');
+    
+    status = Eyelink('Initialize');
+    if status
+        error('Eyelink is not communicating with PC. Its okay baby.');
+    end
+    Eyelink('Command', 'set_idle_mode');
+    waitsec_fromstarttime(GetSecs, .5);
+end
+
 %% TASK
 try
     % 0. Instruction
