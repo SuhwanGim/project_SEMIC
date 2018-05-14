@@ -112,7 +112,7 @@ switch type
         while GetSecs - sTime <14.5 + 10
             % pause
         end
-        msg=double('확인하였습니다.\n다음으로는 척도 확인 및 연습을 시작하겠습니다 (space)');
+        msg=double('확인하였습니다.\n다음으로는 척도 확인을 하겠습니다 (space)');
 end
 
 while (1)

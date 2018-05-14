@@ -20,6 +20,8 @@ for i = 1:length(varargin)
                 channel_n = 3;
                 biopac_channel = 0;
                 ljHandle = BIOPAC_setup(channel_n); % BIOPAC SETUP
+            case {'eyelink', 'eye', 'eyetrack'}
+                USE_EYELINK = true;
         end
     end
 end
@@ -71,9 +73,28 @@ red = [255 0 0];
 red_Alpha = [255 164 0 130]; % RGB + A(Level of tranceprency: for social Cue)
 orange = [255 164 0];
 yellow = [255 220 0];
+%% SETUP: Eyelink
+% need to be revised when the eyelink is here.
+% It must be located after open screen
+runNbr=1;
+
+if USE_EYELINK
+    new_SID = erase(SID,'SEM'); % For limitation of file name 
+    edf_filename = ['R_' new_SID '_' num2str(runNbr)]; % name should be equal or less than 8
+    edfFile = sprintf('%s.EDF', edf_filename);
+    eyelink_main(edfFile, 'Init');
+    
+    status = Eyelink('Initialize');
+    if status
+        error('Eyelink is not communicating with PC. Its okay baby.');
+    end
+    Eyelink('Command', 'set_idle_mode');
+    waitsec_fromstarttime(GetSecs, .5);
+end
+
 %% Parameter
 stimText = '+';
-seconds = 385; %duration: 6 min 20 seoncds
+seconds = 382; %duration: 6 min 20 seoncds
 
 %%
 try
@@ -146,9 +167,17 @@ try
         BIOPAC_trigger(ljHandle, biopac_channel, 'off');
     end
     
+    if USE_EYELINK
+        Eyelink('StartRecording');
+        rest.dat{1}{1}.eyetracker_starttime = GetSecs; % eyelink timestamp
+        Eyelink('Message','Run start');
+    end
     
     
     %==========================START: Gray screen with crosshair===========
+    if USE_EYELINK
+        Eyelink('Message','Gray screen starts');
+    end
     t_time=GetSecs;
     rest.dat{1}{1}.screen_start_timestamp = t_time;
     DrawFormattedText(theWindow, double(stimText), 'center', 'center', white, [], [], [], 1.2);
@@ -156,12 +185,29 @@ try
     
     waitsec_fromstarttime(t_time, seconds);
     
-    rest.dat{1}{1}.screen_end_timestamp = GetSecs;    
+    rest.dat{1}{1}.screen_end_timestamp = GetSecs;
     save(rest.datafile, '-append', 'rest');
     
-    
+    if USE_EYELINK
+        Eyelink('Message','Gray screen ends');
+    end
     %==========================END: Gray screen with crosshair=============
-    WaitSecs(5);
+    
+    %%
+    if USE_EYELINK % end Eyelink
+        Eyelink('Message','Run ends');
+        eyelink_main(edfFile, 'Shutdown');
+    end
+    
+    if USE_BIOPAC %end BIOPAC
+        bio_t = GetSecs;
+        rest.dat{1}{1}.biopac_endtime = bio_t;% biopac end timestamp
+        BIOPAC_trigger(ljHandle, biopac_channel, 'on');
+        waitsec_fromstarttime(bio_t, 0.1);
+        BIOPAC_trigger(ljHandle, biopac_channel, 'off');
+    end
+    save(rest.datafile, '-append', 'rest');
+    WaitSecs(3);
     
     display_expmessage('잠시만 기다려주세요.');
     while (1)

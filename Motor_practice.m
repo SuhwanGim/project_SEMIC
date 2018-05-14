@@ -226,6 +226,13 @@ try
         BIOPAC_trigger(ljHandle, biopac_channel, 'off');
     end
     
+    % EYELINK
+    if USE_EYELINK
+        Eyelink('StartRecording');
+        mot.dat{runNbr}{1}.eyetracker_starttime = GetSecs; % eyelink timestamp
+        Eyelink('Message','Run start');
+    end
+    
     mot.task_start_timestamp{runNbr}=GetSecs; % trial_star_timestamp
     % -------------------------TRIAL START---------------------------------
     for i=1:numel(xx)
@@ -315,6 +322,12 @@ try
         if mod(i,2) == 0, save(mot.datafile, '-append', 'mot'); end % save data every two trials
     end
     mot.task_end_timestamp{runNbr}=GetSecs;
+    
+    if USE_EYELINK
+        Eyelink('Message','Run ends');
+        eyelink_main(edfFile, 'Shutdown');
+    end
+    
     
     if USE_BIOPAC %end BIOPAC
         bio_t = GetSecs;

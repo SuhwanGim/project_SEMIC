@@ -525,7 +525,7 @@ try
     
     if USE_EYELINK
         Eyelink('Message','Run ends');
-         eyelink_main(edfFile, 'Shutdown');
+        eyelink_main(edfFile, 'Shutdown');
     end
     
     if USE_BIOPAC %end BIOPAC
