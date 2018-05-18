@@ -549,7 +549,7 @@ try
             Screen('Flip', theWindow);
             end_trial = GetSecs;
             % Saving trial sequence(i)
-            data.dat{runNbr}{trial_Number(j)}.ts = ts{1,1}(j,:);
+            data.dat{runNbr}{trial_Number(j)}.ts = ts{1,runNbr}(j,:);
             data.dat{runNbr}{trial_Number(j)}.end_trial_t = end_trial;
             
         else
@@ -755,7 +755,7 @@ try
             Screen('Flip', theWindow);
             end_trial = GetSecs;
             % Saving trial sequence(i)
-            data.dat{runNbr}{trial_Number(j)}.ts = ts{1,1}(j,:);
+            data.dat{runNbr}{trial_Number(j)}.ts = ts{1,runNbr}(j,:);
             data.dat{runNbr}{trial_Number(j)}.end_trial_t = end_trial;
         end
         % send a stop program signal
