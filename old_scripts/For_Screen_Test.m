@@ -5,7 +5,7 @@ global window_rect prompt_ex lb rb tb bb scale_H promptW promptH; % rating scale
 global lb1 rb1 lb2 rb2;
 global fontsize anchor_y anchor_y2 anchor anchor_xl anchor_xr anchor_yu anchor_yd; % anchors
 
-sss
+
 %%
 
 Screen('Clear');
@@ -97,7 +97,7 @@ joystick = true;
 %     end
 % end
 %
-% msg = 'ÀÌ¹ø ÀÚ±ØÀÌ ÃÖ´ë ¾ó¸¶³ª ¾ÆÇÃ±î¿ä?';
+% msg = 'ï¿½Ì¹ï¿½ ï¿½Ú±ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ó¸¶³ï¿½ ï¿½ï¿½ï¿½Ã±ï¿½ï¿½?';
 % msg = double(msg);
 % DrawFormattedText(theWindow, msg, 'center', 150, orange, [], [], [], 2);
 % Screen('Flip', theWindow);
@@ -141,7 +141,7 @@ while true
     
     Screen(theWindow,'FillRect',bgcolor, window_rect);
     msg1 = GetSecs-sTime;
-    msg2 = 'Á¶ÀÌ½ºÆ½_Å×½ºÆ®_30ÃÊµ¿¾È: ';
+    msg2 = 'ï¿½ï¿½ï¿½Ì½ï¿½Æ½_ï¿½×½ï¿½Æ®_30ï¿½Êµï¿½ï¿½ï¿½: ';
     msg_sum = [msg2 ' ' num2str(msg1)];
     msg = double(msg_sum);
     DrawFormattedText(theWindow, msg, 'center', 150, white, [], [], [], 1.5);

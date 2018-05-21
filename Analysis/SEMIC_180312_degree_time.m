@@ -1,10 +1,10 @@
 
 col2 = [0.9922 0.6824 0.3804];
-load('/Main_SEM006.mat')
+load('/Main_SEM013.mat')
 
 %% Just one run
 trial_number = 18;
-i=2; %Run Number
+i=1; %Run Number
 for j=1:trial_number
     subplot(4,5,j);
     theta = data.dat{i}{j}.con_r_theta(:,2);
@@ -19,7 +19,8 @@ for j=1:trial_number
     
     %subplot(4,5,j);
     plot(t1, theta);
-    title([data.dat{1,i}{1,j}.ts(6) data.dat{1,i}{1,j}.ts(9)]);
+    title([ts{1,i}(j,6) ts{1,i}(j,9)]);
+    %title([data.dat{1,i}{1,j}.ts(6) data.dat{1,i}{1,j}.ts(9)]);
     axis([-1 t1(numel(t1)) 0 185]);
     xlabel('TIME(0-14.5)') % x-axis label
     ylabel('DEGREE(0-180)') % y-axis label
