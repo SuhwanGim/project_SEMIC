@@ -8,6 +8,7 @@ function rest_run(SID,varargin)
 testmode = false;
 USE_BIOPAC = false;
 dofmri = false;
+USE_EYELINK = false;
 for i = 1:length(varargin)
     if ischar(varargin{i})
         switch varargin{i}
@@ -73,7 +74,18 @@ red = [255 0 0];
 red_Alpha = [255 164 0 130]; % RGB + A(Level of tranceprency: for social Cue)
 orange = [255 164 0];
 yellow = [255 220 0];
-%% SETUP: Eyelink
+
+
+%% Parameter
+stimText = '+';
+seconds = 382; %duration: 6 min 20 seoncds
+
+%% START: Screen
+
+    theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
+    Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
+    
+%% START: Eyelink
 % need to be revised when the eyelink is here.
 % It must be located after open screen
 runNbr=1;
@@ -91,18 +103,8 @@ if USE_EYELINK
     Eyelink('Command', 'set_idle_mode');
     waitsec_fromstarttime(GetSecs, .5);
 end
-
-%% Parameter
-stimText = '+';
-seconds = 382; %duration: 6 min 20 seoncds
-
-%%
-try
-    theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
-    Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
-    
-    %Start
-    
+%% Exp Start
+try    
     rest.dat{1}{1}.run_start_timestamp=GetSecs;
     while (1)
         [~,~,keyCode] = KbCheck;
