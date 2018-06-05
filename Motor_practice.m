@@ -54,6 +54,7 @@ addpath(genpath(pwd));
 %% SETUP: DATA and Subject INFO
 savedir = 'MOTOR_SEMIC_data';
 [fname,~ , SID] = subjectinfo_check_SEMIC(SID, savedir,runNbr,'Mot'); % subfunction %start_trial
+if exist(fname, 'file'), load(fname, 'mot'); end
 % save data using the canlab_dataset object
 mot.version = 'SEMIC_Motor_task_v1_18-04-2018_Cocoanlab';
 mot.subject = SID;
