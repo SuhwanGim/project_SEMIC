@@ -67,8 +67,8 @@ if exist(fname, 'file'), load(fname, 'data'); load(fname,'ts'); end
 data.version = 'SEMIC_v1_03-01-2018_Cocoanlab';
 data.subject = SID;
 data.datafile = fname;
-data.starttime = datestr(clock, 0); % date-time
-data.starttime_getsecs = GetSecs; % in the same format of timestamps for each trial
+data.starttime{runNbr} = datestr(clock, 0); % date-time
+data.starttime_getsecs(runNbr) = GetSecs; % in the same format of timestamps for each trial
 %% SETUP: load the pathway program
 PathPrg = load_PathProgram('SEMIC');
 %% SETUP: Generate a trial sequence

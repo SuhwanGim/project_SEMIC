@@ -56,11 +56,11 @@ savedir = 'MOTOR_SEMIC_data';
 [fname,~ , SID] = subjectinfo_check_SEMIC(SID, savedir,runNbr,'Mot'); % subfunction %start_trial
 if exist(fname, 'file'), load(fname, 'mot'); end
 % save data using the canlab_dataset object
-mot.version = 'SEMIC_Motor_task_v1_18-04-2018_Cocoanlab';
+mot.version = 'SEMIC_Motor_task_v1_05-06-2018_Cocoanlab';
 mot.subject = SID;
 mot.datafile = fname;
-mot.starttime = datestr(clock, 0); % date-time
-mot.starttime_getsecs = GetSecs; % in the same format of timestamps for each trial
+mot.starttime{runNbr} = datestr(clock, 0); % date-time
+mot.starttime_getsecs(runNbr) = GetSecs; % in the same format of timestamps for each trial
 
 %%save?
 save(mot.datafile,'mot');
