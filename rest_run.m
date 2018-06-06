@@ -78,7 +78,7 @@ yellow = [255 220 0];
 
 %% Parameter
 stimText = '+';
-seconds = 382; %duration: 6 min 20 seoncds
+seconds = 380; %duration: 6 min 20 seoncds
 
 %% START: Screen
 
@@ -209,7 +209,7 @@ try
         BIOPAC_trigger(ljHandle, biopac_channel, 'off');
     end
     save(rest.datafile, '-append', 'rest');
-    WaitSecs(3);
+    WaitSecs(2);
     
     display_expmessage('잠시만 기다려주세요.');
     while (1)
