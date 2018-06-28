@@ -78,7 +78,7 @@ yellow = [255 220 0];
 
 %% Parameter
 stimText = '+';
-seconds = 380; %duration: 6 min 20 seoncds
+seconds = 375; %duration: 6 min 20 seoncds
 
 %% START: Screen
 
