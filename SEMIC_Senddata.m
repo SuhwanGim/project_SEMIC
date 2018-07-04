@@ -9,7 +9,7 @@ function SEMIC_Senddata(subj_name, type)
 mail = 'cocoan.matlab@gmail.com';
 password = 'public20170302';
 % mail address of receiver
-rec_mail = 'roseno.9@daum.net'; %Suhwan Gim @Cocoanlab
+rec_mail = 'suhwan.gim.psych@gmail.com'; %Suhwan Gim @Cocoanlab
 
 %% SETTING: SMTP protocol (gmail)
 setpref('Internet','E_mail',mail);
@@ -36,18 +36,21 @@ edf_filename = new_SID; % 'M_003_2' <-['M_' new_SID '_' num2str(runNbr)]
 
 switch type
     case 'Calibration'
-        data_dir ={[pwd '/Cali_Semic_data/' 'Calib_' sbj '.mat']};
+        data_dir ={fullfile(pwd, 'Cali_Semic_data', ['Calib_' sbj '.mat'])};
         
         %modify message        
         msg_title = ['Calibration_' sbj '_' datestr(now)];
-        msg_text = ['Calibration' 'Subject Name:' sbj '      ' 'Time:' datestr(now) '      ' 'data_files'];
+        msg_text = ['Calibration' 10 'Subject Name:' sbj 10 ... 
+            'Time:' datestr(now) 10 ... 
+            'data_files'];
         
         
     case 'mri'
-        data_dir ={[pwd '/LEARN_SEMIC_data/' 'Learning_' sbj '.mat'],...
-            [pwd '/REST_SEMIC_data/' 'Rest_' sbj '.mat'],...
-            [pwd '/Main_SEMIC_data/' 'Main_' sbj '.mat'],...
-            [pwd '/Motor_Semic_data/' 'Motor_' sbj '.mat']
+        data_dir ={fullfile(pwd,'LEARN_SEMIC_data',['Learning_' sbj '.mat']), ...
+            fullfile(pwd,'REST_SEMIC_data', ['Rest_' sbj '.mat']), ...
+            fullfile(pwd,'Main_SEMIC_data', ['Main_' sbj '.mat']), ...
+            fullfile(pwd,'Motor_Semic_data', ['Motor_' sbj '.mat'])
+            };
 %             [pwd '/M_' edf_filename '_1.edf']...
 %             [pwd '/M_' edf_filename '_2.edf']...
 %             [pwd '/M_' edf_filename '_3.edf']...
@@ -57,12 +60,15 @@ switch type
 %             [pwd '/L_' edf_filename '_1.edf']...
 %             [pwd '/O_' edf_filename '_1.edf']...
 %             [pwd '/O_' edf_filename '_2.edf']
-            };
+%             };
+%         
         
-        
-        %modify message
+        %  message
         msg_title = ['MRI_experiment_' sbj '_' datestr(now)];
-        msg_text = ['MRI_experiment' 'Subject Name:' sbj '      ' 'Time:' datestr(now) '      ' 'data_files'];
+        msg_text = ['MRI_experiment' 10 ...
+            'Subject Name:' sbj 10 ...
+            'Time:' datestr(now) 10 ...
+            'data_files'];
 end
 
 % Attachment files
