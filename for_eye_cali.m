@@ -5,6 +5,7 @@
 %
 %   2018.07.08
 %% SETUP
+global theWindow
 window_num = 0;
 if testmode
     window_rect = [1 1 1200 720]; % in the test mode, use a little smaller screen
@@ -56,4 +57,8 @@ waitsec_fromstarttime(GetSecs, .5);
 %%
 if GetSecs - eye_start > 100
     eyelink_main(edfFile, 'Shutdown');
+    sca;
+    
+    Screen('Clear');
+    Screen('CloseAll');
 end
