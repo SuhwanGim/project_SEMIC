@@ -35,10 +35,10 @@ for i = 1:length(varargin)
 
                     Eyelink('Openfile', edfFile);
       
-                    % Eyelink('command','screen_pixel_coords = %ld %ld %ld %ld', 0, 0, width-1, height-1); % wani: don't need calibration
-                    % Eyelink('message', 'DISPLAY_COORDS %ld %ld %ld %ld', 0, 0, width-1, height-1); % wani: don't need calibration
-                    % set calibration type.
-                    % Eyelink('command', 'calibration_type = HV9'); % wani: don't need calibration
+                    Eyelink('command','screen_pixel_coords = %ld %ld %ld %ld', 0, 0, width-1, height-1); 
+                    Eyelink('message', 'DISPLAY_COORDS %ld %ld %ld %ld', 0, 0, width-1, height-1); 
+                    set calibration type.
+                    Eyelink('command', 'calibration_type = HV9'); 
 
                     Eyelink('command', 'link_sample_data  = LEFT,RIGHT,GAZE,GAZERES,AREA,STATUS,INPUT');
                     
@@ -53,7 +53,7 @@ for i = 1:length(varargin)
                         return;
                     end
                     
-                    EyelinkDoTrackerSetup(el); % wani: don't need calibration
+                    EyelinkDoTrackerSetup(el); 
                     EyelinkDoDriftCorrection(el); % add from Song, driftcorrection
                     
                 catch exc

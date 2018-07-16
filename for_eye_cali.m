@@ -7,6 +7,7 @@
 %% SETUP
 global theWindow
 window_num = 0;
+testmode = true;
 if testmode
     window_rect = [1 1 1200 720]; % in the test mode, use a little smaller screen
     %window_rect = [0 0 1900 1200];
