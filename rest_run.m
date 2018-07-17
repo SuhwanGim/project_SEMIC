@@ -81,10 +81,10 @@ stimText = '+';
 seconds = 375; %duration: 6 min 20 seoncds
 
 %% START: Screen
+theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
+Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
+Screen('TextSize', theWindow, fontsize);
 
-    theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
-    Screen('Preference','TextEncodingLocale','ko_KR.UTF-8');
-    
 %% START: Eyelink
 % need to be revised when the eyelink is here.
 % It must be located after open screen
