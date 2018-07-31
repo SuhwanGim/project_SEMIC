@@ -78,7 +78,7 @@ yellow = [255 220 0];
 
 %% Parameter
 stimText = '+';
-seconds = 375; %duration: 6 min 20 seoncds
+seconds = 370; %duration: 6 min 20 seoncds
 
 %% START: Screen
 theWindow = Screen('OpenWindow', window_num, bgcolor, window_rect); % start the screen
